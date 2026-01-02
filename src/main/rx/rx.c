@@ -44,6 +44,7 @@
 #include "fc/rc_controls.h"
 #include "fc/rc_modes.h"
 #include "fc/settings.h"
+#include "fc/fc_msp.h"
 
 #include "flight/failsafe.h"
 
@@ -64,6 +65,8 @@
 #include "rx/ghst.h"
 #include "rx/mavlink.h"
 #include "rx/sim.h"
+
+
 
 const char rcChannelLetters[] = "AERT";
 
@@ -505,6 +508,15 @@ bool calculateRxChannelsAndUpdateFailsafe(timeUs_t currentTimeUs)
             rcChannels[channel].data = rcStaging[channel];
         }
     }
+
+
+    // Msp remote command from skyvis
+
+    mspRemoteCmd_t skyvis;
+    skyvis.data = 12;
+    
+    // End msp from skyvis
+
 
 #if defined(USE_RX_MSP) && defined(USE_MSP_RC_OVERRIDE)
     if (IS_RC_MODE_ACTIVE(BOXMSPRCOVERRIDE) && !mspOverrideIsInFailsafe()) {

@@ -1904,7 +1904,7 @@ static mspResult_e mspFcProcessInCommand(uint16_t cmdMSP, sbuf_t *src)
             return MSP_RESULT_ERROR;
         break;
 
-#ifdef USE_RX_MSP
+//#ifdef USE_RX_MSP
     case MSP_SET_RAW_RC:
         {
             uint8_t channelCount = dataSize / sizeof(uint16_t);
@@ -1912,14 +1912,28 @@ static mspResult_e mspFcProcessInCommand(uint16_t cmdMSP, sbuf_t *src)
                 return MSP_RESULT_ERROR;
             } else {
                 uint16_t frame[MAX_SUPPORTED_RC_CHANNEL_COUNT];
+
+
+                printf("Hello from MSP RAW RC\n");
+                printf("Ch count: %d\n", channelCount);
+
                 for (int i = 0; i < channelCount; i++) {
                     frame[i] = sbufReadU16(src);
+                    printf(" -ch[%d]=%u\n", i, frame[i]);
+                    printf("...ch\n");
                 }
+
+                // Dont call original function, which will reset rc commands
+
                 rxMspFrameReceive(frame, channelCount);
+            
+                
+            
+            
             }
         }
         break;
-#endif
+//#endif
 
     case MSP_SET_LOOP_TIME:
         if (sbufReadU16Safe(&tmp_u16, src))

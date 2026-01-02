@@ -19,5 +19,14 @@
 
 #include "msp/msp.h"
 
+typedef struct mspRemoteCmd_s {
+    int16_t raw;        // Value received via RX - [1000;2000]
+    int16_t data;       // Value after processing - [1000;2000]
+    timeMs_t expiresAt; // Time when this value becomes too old and it's discarded
+} mspRemoteCmd_t;
+
 void mspFcInit(void);
 mspResult_e mspFcProcessCommand(mspPacket_t *cmd, mspPacket_t *reply, mspPostProcessFnPtr *mspPostProcessFn);
+
+
+
