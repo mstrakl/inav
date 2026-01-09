@@ -1,3 +1,5 @@
+# diff all
+
 # version
 # INAV/MATEKF405SE 8.0.1 Mar 28 2025 / 09:55:06 (ae47bcba) 
 # GCC-13.2.1 20231009
@@ -5,13 +7,24 @@
 # start the command batch
 batch start
 
+# reset configuration to default settings
+defaults noreboot
+
 # resources
 
 # Timer overrides
+timer_output_mode 0 SERVOS
+timer_output_mode 1 MOTORS
+timer_output_mode 2 SERVOS
+timer_output_mode 3 MOTORS
+timer_output_mode 7 SERVOS
+timer_output_mode 11 SERVOS
 
 # Outputs [servo]
-servo 4 1100 1950 1525 -100
-servo 5 1120 2010 1565 -100
+servo 3 1325 1825 1625 100
+servo 4 1220 1720 1420 100
+servo 5 1230 2050 1660 -100
+servo 6 1000 1850 1420 -100
 
 # safehome
 
@@ -22,14 +35,12 @@ servo 5 1120 2010 1565 -100
 # geozone vertices
 
 # features
-feature GPS
-feature BLACKBOX
 feature PWM_OUTPUT_ENABLE
 
 # beeper
 
 # blackbox
-blackbox NAV_ACC
+blackbox -NAV_ACC
 blackbox NAV_POS
 blackbox NAV_PID
 blackbox MAG
@@ -47,9 +58,6 @@ blackbox SERVOS
 # Receiver: Channel map
 
 # Ports
-serial 3 2 115200 38400 0 115200
-serial 5 1 230400 115200 0 115200
-serial 30 0 115200 115200 0 115200
 
 # LEDs
 
@@ -59,11 +67,11 @@ serial 30 0 115200 115200 0 115200
 
 # Modes [aux]
 aux 0 0 0 1875 2100
-aux 1 1 1 1550 1700
+aux 1 1 1 1300 1700
 aux 2 2 1 1775 2100
-aux 3 11 3 1700 2100
+aux 3 12 1 900 1250
 aux 4 3 3 1700 2100
-aux 5 5 2 1600 1800
+aux 5 5 2 1500 1800
 aux 6 35 2 1800 2100
 
 # Adjustments [adjrange]
@@ -78,9 +86,6 @@ aux 6 35 2 1800 2100
 # OSD [osd_layout]
 
 # Programming: logic
-logic 0 1 -1 2 1 7 0 2000 0
-logic 1 1 0 38 0 1 5 0 0
-logic 2 1 -1 51 5 0 0 500 0
 
 # Programming: global variables
 
@@ -89,14 +94,14 @@ logic 2 1 -1 51 5 0 0 500 0
 # OSD: custom elements
 
 # master
-set gyro_main_lpf_hz = 80
+set gyro_main_lpf_hz = 110
 set dynamic_gyro_notch_q = 250
-set dynamic_gyro_notch_min_hz = 60
+set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
 set gyro_zero_x = 10
-set gyro_zero_y = -7
-set ins_gravity_cmss =  981.530
+set gyro_zero_y = -6
+set ins_gravity_cmss =  983.009
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -3
@@ -105,7 +110,7 @@ set accgain_x = 4086
 set accgain_y = 4085
 set accgain_z = 4087
 set align_mag = CW270FLIP
-set mag_hardware = IST8310
+set mag_hardware = NONE
 set magzero_x = 61
 set magzero_y = 6
 set magzero_z = -1
@@ -122,34 +127,17 @@ set small_angle = 180
 set applied_defaults = 3
 set airmode_type = STICK_CENTER_ONCE
 set nav_wp_radius = 800
-set nav_wp_enforce_altitude = 500
 set nav_wp_max_safe_distance = 500
 set nav_rth_allow_landing = FS_ONLY
-set nav_rth_altitude = 500
-set nav_rth_home_altitude = 500
+set nav_rth_altitude = 5000
 set nav_fw_control_smoothness = 2
 set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
 set nav_fw_launch_climb_angle = 25
-set debug_mode = FLOW
 
 # control_profile
 control_profile 1
 
-set mc_p_pitch = 33
-set mc_i_pitch = 57
-set mc_d_pitch = 24
-set mc_cd_pitch = 80
-set mc_p_roll = 26
-set mc_i_roll = 43
-set mc_d_roll = 20
-set mc_cd_roll = 73
-set mc_p_yaw = 37
-set mc_i_yaw = 30
-set mc_d_yaw = 10
-set mc_cd_yaw = 40
-set mc_p_level = 8
-set mc_d_level = 55
 set fw_p_pitch = 15
 set fw_i_pitch = 5
 set fw_d_pitch = 5
@@ -161,59 +149,149 @@ set fw_p_yaw = 50
 set fw_i_yaw = 0
 set fw_d_yaw = 20
 set fw_ff_yaw = 255
-set max_angle_inclination_rll = 300
-set max_angle_inclination_pit = 300
-set dterm_lpf_hz = 60
+set dterm_lpf_hz = 10
 set fw_turn_assist_pitch_gain =  0.400
-set heading_hold_rate_limit = 45
 set nav_fw_pos_z_p = 25
 set nav_fw_pos_z_d = 8
 set nav_fw_pos_xy_p = 55
 set d_boost_min =  1.000
 set d_boost_max =  1.000
-set smith_predictor_delay =  1.768
-set rc_expo = 55
-set rc_yaw_expo = 55
-set roll_rate = 17
-set pitch_rate = 17
-set yaw_rate = 10
-set ez_filter_hz = 90
-set ez_axis_ratio = 130
-set ez_response = 75
-set ez_aggressiveness = 75
-set ez_rate = 50
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+
+# control_profile
+control_profile 2
+
+set mc_p_pitch = 44
+set mc_i_pitch = 82
+set mc_d_pitch = 25
+set mc_cd_pitch = 110
+set mc_i_roll = 75
+set mc_cd_roll = 100
+set mc_p_yaw = 45
+set mc_i_yaw = 80
+set mc_cd_yaw = 100
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set dterm_lpf_hz = 105
+set fw_turn_assist_pitch_gain =  0.400
+set nav_fw_pos_z_p = 25
+set nav_fw_pos_z_d = 8
+set nav_fw_pos_xy_p = 55
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set smith_predictor_delay =  1.447
+set rc_yaw_expo = 70
+set roll_rate = 60
+set pitch_rate = 60
+set yaw_rate = 50
+set ez_enabled = ON
+
+# control_profile
+control_profile 3
+
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set dterm_lpf_hz = 10
+set fw_turn_assist_pitch_gain =  0.400
+set nav_fw_pos_z_p = 25
+set nav_fw_pos_z_d = 8
+set nav_fw_pos_xy_p = 55
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
 
 # mixer_profile
 mixer_profile 1
 
-set platform_type = TRICOPTER
-set model_preview_type = 1
-set motorstop_on_low = OFF
+set has_flaps = ON
+set model_preview_type = 28
+set mixer_pid_profile_linking = ON
 
 # Mixer: motor mixer
 
 mmix reset
 
-mmix 0  1.000  0.000  1.000  0.000
-mmix 1  1.000 -1.000 -0.667  0.000
-mmix 2  1.000  1.000 -0.667  0.000
+mmix 0  1.000  0.000  0.000  0.000
+mmix 1  1.000  0.000  0.000  0.000
+mmix 2 -1.000  0.000  0.000  0.000
 
 # Mixer: servo mixer
 smix reset
 
-smix 0 4 2 60 0 -1
-smix 1 5 2 60 0 -1
-smix 2 4 29 75 0 -1
-smix 3 5 29 -75 0 -1
+smix 0 3 0 100 0 -1
+smix 1 4 0 100 0 -1
+smix 2 5 1 85 0 -1
+smix 3 5 2 50 0 -1
+smix 4 6 1 -85 0 -1
+smix 5 6 2 50 0 -1
+smix 6 7 2 30 0 -1
+
+# mixer_profile
+mixer_profile 2
+
+set platform_type = TRICOPTER
+set model_preview_type = 1
+set mixer_pid_profile_linking = ON
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000  1.000 -0.667  0.000
+mmix 1  1.000 -1.000 -0.667  0.000
+mmix 2  1.000  0.000  1.333  0.000
+
+# Mixer: servo mixer
+smix reset
+
+smix 0 1 2 -50 0 -1
+smix 1 2 2 -50 0 -1
 
 # battery_profile
 battery_profile 1
 
+set throttle_idle =  10.000
+
+# battery_profile
+battery_profile 2
+
 set throttle_idle =  5.000
-set nav_mc_hover_thr = 1600
+
+# battery_profile
+battery_profile 3
+
+set throttle_idle =  5.000
+
+# restore original profile selection
+control_profile 2
+mixer_profile 2
+battery_profile 1
 
 # save configuration
 save
-
-# end the command batch
-batch end
