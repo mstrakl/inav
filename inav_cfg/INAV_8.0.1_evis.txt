@@ -1,0 +1,219 @@
+# version
+# INAV/MATEKF405SE 8.0.1 Mar 28 2025 / 09:55:06 (ae47bcba) 
+# GCC-13.2.1 20231009
+
+# start the command batch
+batch start
+
+# resources
+
+# Timer overrides
+
+# Outputs [servo]
+servo 4 1100 1950 1525 -100
+servo 5 1120 2010 1565 -100
+
+# safehome
+
+# Fixed Wing Approach
+
+# geozone
+
+# geozone vertices
+
+# features
+feature GPS
+feature BLACKBOX
+feature PWM_OUTPUT_ENABLE
+
+# beeper
+
+# blackbox
+blackbox NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 3 2 115200 38400 0 115200
+serial 5 1 230400 115200 0 115200
+serial 30 0 115200 115200 0 115200
+
+# LEDs
+
+# LED color
+
+# LED mode_color
+
+# Modes [aux]
+aux 0 0 0 1875 2100
+aux 1 1 1 1550 1700
+aux 2 2 1 1775 2100
+aux 3 11 3 1700 2100
+aux 4 3 3 1700 2100
+aux 5 5 2 1600 1800
+aux 6 35 2 1800 2100
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 0 invalid
+
+# OSD [osd_layout]
+
+# Programming: logic
+logic 0 1 -1 2 1 7 0 2000 0
+logic 1 1 0 38 0 1 5 0 0
+logic 2 1 -1 51 5 0 0 500 0
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set gyro_main_lpf_hz = 80
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 60
+set dynamic_gyro_notch_mode = 3D
+set setpoint_kalman_q = 200
+set gyro_zero_x = 10
+set gyro_zero_y = -7
+set ins_gravity_cmss =  981.530
+set gyro_adaptive_filter_min_hz = 20
+set acc_hardware = ICM42605
+set acczero_x = -3
+set acczero_z = -4
+set accgain_x = 4086
+set accgain_y = 4085
+set accgain_z = 4087
+set align_mag = CW270FLIP
+set mag_hardware = IST8310
+set magzero_x = 61
+set magzero_y = 6
+set magzero_z = -1
+set maggain_x = 422
+set maggain_y = 405
+set maggain_z = 559
+set baro_hardware = SPL06
+set serialrx_provider = CRSF
+set blackbox_rate_denom = 2
+set motor_pwm_protocol = STANDARD
+set align_board_yaw = 1800
+set current_meter_scale = 150
+set small_angle = 180
+set applied_defaults = 3
+set airmode_type = STICK_CENTER_ONCE
+set nav_wp_radius = 800
+set nav_wp_enforce_altitude = 500
+set nav_wp_max_safe_distance = 500
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 500
+set nav_rth_home_altitude = 500
+set nav_fw_control_smoothness = 2
+set nav_fw_launch_motor_delay = 100
+set nav_fw_launch_max_altitude = 5000
+set nav_fw_launch_climb_angle = 25
+set debug_mode = FLOW
+
+# control_profile
+control_profile 1
+
+set mc_p_pitch = 33
+set mc_i_pitch = 57
+set mc_d_pitch = 24
+set mc_cd_pitch = 80
+set mc_p_roll = 26
+set mc_i_roll = 43
+set mc_d_roll = 20
+set mc_cd_roll = 73
+set mc_p_yaw = 37
+set mc_i_yaw = 30
+set mc_d_yaw = 10
+set mc_cd_yaw = 40
+set mc_p_level = 8
+set mc_d_level = 55
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set max_angle_inclination_rll = 300
+set max_angle_inclination_pit = 300
+set dterm_lpf_hz = 60
+set fw_turn_assist_pitch_gain =  0.400
+set heading_hold_rate_limit = 45
+set nav_fw_pos_z_p = 25
+set nav_fw_pos_z_d = 8
+set nav_fw_pos_xy_p = 55
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set smith_predictor_delay =  1.768
+set rc_expo = 55
+set rc_yaw_expo = 55
+set roll_rate = 17
+set pitch_rate = 17
+set yaw_rate = 10
+set ez_filter_hz = 90
+set ez_axis_ratio = 130
+set ez_response = 75
+set ez_aggressiveness = 75
+set ez_rate = 50
+
+# mixer_profile
+mixer_profile 1
+
+set platform_type = TRICOPTER
+set model_preview_type = 1
+set motorstop_on_low = OFF
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000  0.000  1.000  0.000
+mmix 1  1.000 -1.000 -0.667  0.000
+mmix 2  1.000  1.000 -0.667  0.000
+
+# Mixer: servo mixer
+smix reset
+
+smix 0 4 2 60 0 -1
+smix 1 5 2 60 0 -1
+smix 2 4 29 75 0 -1
+smix 3 5 29 -75 0 -1
+
+# battery_profile
+battery_profile 1
+
+set throttle_idle =  5.000
+set nav_mc_hover_thr = 1600
+
+# save configuration
+save
+
+# end the command batch
+batch end
