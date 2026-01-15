@@ -29,3 +29,23 @@ jobs:
             g++ \
             ninja-build \
             gcc-arm-none-eabi
+            
+      - name: Build (SITL)
+        run: |
+          rm -rf build_SITL
+          mkdir -p build_SITL
+          cmake \
+            -DSITL=ON \
+            -DDEBUG=ON \
+            -DWARNINGS_AS_ERRORS=OFF \
+            -GNinja \
+            -B build_SITL \
+            .
+          cd build_SITL
+          ninja
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: inav-sitl-build
+          path: build_SITL
