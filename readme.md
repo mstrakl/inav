@@ -5,4 +5,4 @@ Some day, far far away from now, there will be someone, who will have time and m
 Today is not that day.
 
 ## Build status
-https://github.com/<org>/<repo>/actions/workflows/<workflow>.yml/badge.svg
+[![Adum Inav CI](https://github.com/mstrakl/inav/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mstrakl/inav/actions/workflows/docker-image.yml)
