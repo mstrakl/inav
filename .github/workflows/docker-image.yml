@@ -30,7 +30,7 @@ jobs:
             ninja-build \
             gcc-arm-none-eabi
             
-      - name: Build (SITL)
+      - name: Build SITL
         run: |
           rm -rf build_SITL
           mkdir -p build_SITL
@@ -47,5 +47,29 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: inav-sitl-build
+          name: inav-sitl
           path: build_SITL
+
+      - name: Build MATEK F405 SE
+        run: |
+          rm -rf build
+          mkdir -p build
+          cmake \
+            -DTARGET=MATEKF405SE \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DWARNINGS_AS_ERRORS=OFF \
+            -GNinja \
+            -B build \
+            .
+          cd build
+          ninja
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: inav-MATEKF405SE
+          path: build
+
+
+
+          
