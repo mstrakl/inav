@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '**'
+    tags:
+      - "v*"
   pull_request:
     branches:
       - '**'
@@ -12,9 +14,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    
       - name: Check out repository
         uses: actions/checkout@v4 
+        with:
+          fetch-depth: 0   # IMPORTANT: needed for git tags
 
+      - name: Get version from latest tag
+        id: version
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          BUILD=${{ github.run_number }}
+          VERSION="${TAG}-${BUILD}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Log version
+        run: echo "Building version ${{ steps.version.outputs.version }}"
+          
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -47,7 +63,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: inav-sitl
+          name: inav-sitl-${{ steps.version.outputs.version }}
           path: build_SITL
 
       - name: Build MATEK F405 SE
@@ -67,7 +83,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: inav-MATEKF405SE
+          name: inav-MATEKF405SE-${{ steps.version.outputs.version }}
           path: build
 
 
