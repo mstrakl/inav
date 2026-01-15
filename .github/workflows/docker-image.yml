@@ -62,7 +62,7 @@ jobs:
             -B build \
             .
           cd build
-          ninja
+          ninja MATEKF405SE
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
