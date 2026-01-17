@@ -69,5 +69,18 @@ jobs:
           if-no-files-found: warn
 
 
+      # Prepare auto release upload, but don't enable yet
+      #
+      #- name: Create GitHub Release and upload artifacts
+      #  if: startsWith(github.ref, 'refs/tags/')
+      #  uses: softprops/action-gh-release@v1
+      #  with:
+      #    tag_name: ${{ github.ref_name }}
+      #    name: inav-matekf405-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}
+      #    files: build/**/*.hex
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
 
           
