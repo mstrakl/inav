@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
+
+OS="$(uname -s)"
+
+if [[ "$OS" == "Linux" ]]; then
+    echo "Running on Linux"
+
+elif [[ "$OS" == "Darwin" ]]; then
+    echo "Running on macOS"
+    export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+
+else
+    echo "Unsupported OS: $OS"
+    exit 1
+fi
+
+
 set -euo pipefail
+
 
 if [[ $# == 0 ]]; then
   echo -e "\
@@ -61,13 +78,28 @@ case "$1" in
     valid_targets)
         run_docker targets | sed -n 's/^Valid targets: \(.*\)/\1/p'|tr ' ' '\n'
     ;;
+    SITL)
+        echo -e "*** Running SITL build\n"
+        # Run the SITL build inside Docker
+        # Pass CMAKE_BUILD_TYPE and SITL_CFLAGS as environment variables
+        docker run --rm -it --entrypoint /src/cmake/docker_build_sitl.sh \
+            -e CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-}" \
+            -e SITL_CFLAGS="${SITL_CFLAGS:-}" \
+            -v "$(pwd)":/src inav-build
+    ;;
     *)
         echo -e "*** Building targets [$@]\n"
         run_docker "$@"
         if ls ./build/*.hex &> /dev/null; then
             echo -e "\n*** Built targets in ./build:"
-            stat -c "%n (%.19y)" ./build/*.hex
+
+            if [[ "$OS" == "Linux" ]]; then
+                stat -c "%n (%.19y)" ./build/*.hex
+
+            elif [[ "$OS" == "Darwin" ]]; then
+                stat -f "%N (%Sm)" -t "%Y-%m-%d %H:%M:%S" ./build/*.hex
+            fi
+
         fi
     ;;
 esac
-

@@ -15,6 +15,34 @@
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
     "editor.expandTabs": true,
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4,  BreakBeforeBraces: Mozilla }"
-
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4,  BreakBeforeBraces: Mozilla }",
+    "files.watcherExclude": {
+        "**/build/**": true,
+        "**/downloads/**": true,
+        "**/tools/**": true,
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/lib/**": true
+    },
+    "C_Cpp.files.exclude": {
+        "**/build/**": true,
+        "**/lib/**": true,
+        "**/downloads/**": true,
+        "**/tools/**": true
+    },
+    "search.exclude": {
+        "**/build/**": true,
+        "**/lib/**": true,
+        "**/downloads/**": true,
+        "**/tools/**": true
+    },
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "C_Cpp.autocomplete": "disabled",
+    "C_Cpp.errorSquiggles": "disabled",
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
+    }
 }

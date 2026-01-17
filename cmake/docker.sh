@@ -6,7 +6,7 @@ CURR_REV="$(git rev-parse HEAD)"
 
 initialize_cmake() {
     echo -e "*** CMake was not initialized yet, doing it now.\n"
-    cmake -GNinja ..
+    cmake -GNinja -DCMAKE_BUILD_TYPE=DEBUG ..
     echo "$CURR_REV" > "$LAST_CMAKE_AT_REV_FILE"
 }
 
