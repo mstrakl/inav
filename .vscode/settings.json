@@ -45,4 +45,11 @@
         "markdown": false,
         "scminput": false
     }
+    ,
+    "python.analysis.indexing": false,
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.memory.keepLibraryAst": false,
+    "python.analysis.autoSearchPaths": false,
+    "python.analysis.useLibraryCodeForTypes": false,
+    "git.ignoreLimitWarning": true
 }
