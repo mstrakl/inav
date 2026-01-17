@@ -1,0 +1,73 @@
+name: Adum Inav CI
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Check out repository
+        uses: actions/checkout@v4 
+        with:
+          fetch-depth: 0   # IMPORTANT: needed for git tags
+
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+        
+      - name: Install build dependencies
+        run: |
+          #sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            gcc \
+            g++ \
+            ninja-build \
+            gcc-arm-none-eabi
+            
+      - name: Build MATEK F405 SE
+        run: |
+          rm -rf build
+          mkdir -p build
+          cmake \
+            -DTARGET=MATEKF405SE \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DWARNINGS_AS_ERRORS=OFF \
+            -GNinja \
+            -B build \
+            .
+          cd build
+          ninja MATEKF405SE
+
+      - name: Get project version
+        id: version
+        run: |
+          # Extract version from CMakeLists.txt `project(INAV VERSION x.y.z)`
+          ver=$(awk '/project\(INAV VERSION/ {for(i=1;i<=NF;i++) if ($i=="VERSION") {print $(i+1); exit}}' CMakeLists.txt)
+          if [ -z "$ver" ]; then
+            ver=unknown
+          fi
+          echo "version=$ver" >> $GITHUB_OUTPUT
+          echo "build=$GITHUB_RUN_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: inav-matekf405-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build }}
+          path: build/**/*.hex
+          if-no-files-found: warn
+
+
+
+          
