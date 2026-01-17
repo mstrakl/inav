@@ -54,7 +54,7 @@ jobs:
         id: version
         run: |
           # Extract version from CMakeLists.txt `project(INAV VERSION x.y.z)`
-          ver=$(awk '/project\(INAV VERSION/ {for(i=1;i<=NF;i++) if ($i=="VERSION") {print $(i+1); exit}}' CMakeLists.txt)
+          ver=$(awk '/project\(INAV VERSION/ {for(i=1;i<=NF;i++) if ($i=="VERSION") {v=$(i+1); gsub(/[^0-9.].*$/,"",v); print v; exit}}' CMakeLists.txt)
           if [ -z "$ver" ]; then
             ver=unknown
           fi
