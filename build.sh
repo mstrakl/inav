@@ -41,7 +41,12 @@ Notes:
 fi
 
 run_docker() {
-    docker run --rm -it -v "$(pwd)":/src inav-build "$@"
+  # Forward common CMake-related env vars so host can influence cmake configuration
+  docker run --rm -it \
+    -e CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-}" \
+    -e CMAKE_C_FLAGS="${CMAKE_C_FLAGS:-}" \
+    -e CMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS:-}" \
+    -v "$(pwd)":/src inav-build "$@"
 }
 
 if [ -z "$(docker images -q inav-build)" ]; then

@@ -6,7 +6,27 @@ CURR_REV="$(git rev-parse HEAD)"
 
 initialize_cmake() {
     echo -e "*** CMake was not initialized yet, doing it now.\n"
-    cmake -GNinja -DCMAKE_BUILD_TYPE=DEBUG ..
+    # Allow caller to specify build type and extra flags via environment
+    BUILD_TYPE="${CMAKE_BUILD_TYPE:-}"
+    EXTRA_C_FLAGS="${CMAKE_C_FLAGS:-}"
+    EXTRA_CXX_FLAGS="${CMAKE_CXX_FLAGS:-}"
+
+    CMAKE_ARGS="-GNinja .."
+
+    if [ -n "$BUILD_TYPE" ]; then
+        CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=$BUILD_TYPE"
+    fi
+
+    if [ -n "$EXTRA_C_FLAGS" ]; then
+        CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS='$EXTRA_C_FLAGS'"
+    fi
+
+    if [ -n "$EXTRA_CXX_FLAGS" ]; then
+        CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS='$EXTRA_CXX_FLAGS'"
+    fi
+
+    echo "Running: cmake $CMAKE_ARGS"
+    cmake $CMAKE_ARGS
     echo "$CURR_REV" > "$LAST_CMAKE_AT_REV_FILE"
 }
 
