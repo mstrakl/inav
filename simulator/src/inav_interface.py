@@ -11,10 +11,10 @@ from scipy.spatial.transform import Rotation as R
 import src.sim_utils as sutil
 
 
-quad_params['mass'] = 0.500           # kg
-quad_params['Ixx']  = 10.0*3.65e-3 *1e+1    # kg*m^2
-quad_params['Iyy']  = 10.0*3.68e-3 *1e+1    # kg*m^2
-quad_params['Izz']  = 10.0*7.03e-3 *1e+1    # kg*m^2
+quad_params['mass'] = 0.500      # kg
+quad_params['Ixx']  = 3.65e-2    # kg*m^2
+quad_params['Iyy']  = 3.68e-2    # kg*m^2
+quad_params['Izz']  = 3.00e-2    # kg*m^2
 
 
 class InavSimulate:
@@ -44,7 +44,7 @@ class InavSimulate:
         self.cmd_motor_targets = [0, 0, 0, 0]
         # motor lag time constant (seconds) for a first-order low-pass
         # smaller = faster response; realistic motors ~0.05-0.2s
-        self.motor_time_constant = 0.25
+        self.motor_time_constant = 0.05
         
         # Update once
         self.sim_state = self.vehicle.step(
@@ -190,33 +190,29 @@ class InavSimulate:
                 self.__updateState("ch5",  1.0) # Arm
             
             if trel > T_ARM + 1:
-                self.__updateState("ch3",  0.50) # Add power
+                self.__updateState("ch3",  0.85) # Add power
                 #self.__updateState("ch6",  0.00) # Angle mode
                 #self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
                 #self.__moveDrone = True
                 
-            if trel > T_ARM + 10:
-                sys.exit(1)
+            if trel > T_ARM + 4:
+                self.__updateState("ch6",  0.75) # Angle mode + Alt Hold + WP
+                self.__updateState("ch2",  0.5) 
+                
+            if trel > T_ARM + 11:
+                self.__updateState("ch2",  0.0) 
+                
+            if trel > T_ARM + 12:
+                self.__updateState("ch6", -0.75)
+                self.__updateState("ch7",  0.75) # WP Mode
+                
+                val = 0.2*np.sin(trel*0.05)
+                #self.__updateState("ch1",  val)
 
-#                
-#            if trel > T_ARM + 4:
-#                self.__updateState("ch6",  0.75) # Angle mode + Alt Hold + WP
-#                self.__updateState("ch2",  0.5) 
-#                
-#            if trel > T_ARM + 11:
-#                self.__updateState("ch2",  0.0) 
-#                
-#            if trel > T_ARM + 12:
-#                self.__updateState("ch6", -0.75)
-#                self.__updateState("ch7",  0.75) # WP Mode
-#                
-#                val = 0.2*np.sin(trel*0.05)
-#                #self.__updateState("ch1",  val)
-#
-#        
-#        # Stop drone on landing
-#        if trel > T_ARM + 5 and state["x"][2] < 0.0:
-#            self.__moveDrone = False
+        
+        # Stop drone on landing
+        if trel > T_ARM + 5 and state["x"][2] < 0.0:
+            self.__moveDrone = False
 
         # Output States
         
@@ -308,9 +304,9 @@ class InavSimulate:
             if len(vals) >= 4:
                 try:
                     # set targets; actual speeds will lag via filter
-                    self.cmd_motor_targets[0] = GAIN * float(vals[0])   # Motor FL
-                    self.cmd_motor_targets[1] = GAIN * float(vals[3])   # Motor FR
-                    self.cmd_motor_targets[2] = GAIN * float(vals[1])   # Motor RR
+                    self.cmd_motor_targets[0] = GAIN * float(vals[3])   # Motor FL
+                    self.cmd_motor_targets[1] = GAIN * float(vals[1])   # Motor FR
+                    self.cmd_motor_targets[2] = GAIN * float(vals[0])   # Motor RR
                     self.cmd_motor_targets[3] = GAIN * float(vals[2])   # Motor RL
                     
                     #self.cmd_motor_speeds[0] *= 1.000   

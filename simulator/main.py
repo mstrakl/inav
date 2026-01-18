@@ -7,7 +7,7 @@ from src.inav_interface import InavSimulate
 
 HOST = "127.0.0.1"
 PORT = 2323
-RATE_HZ = 20.0
+RATE_HZ = 60.0
 
 
 def main(args):
