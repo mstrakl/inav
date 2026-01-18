@@ -12,9 +12,9 @@ import src.sim_utils as sutil
 
 
 quad_params['mass'] = 0.500           # kg
-quad_params['Ixx']  = 10.0*3.65e-3    # kg*m^2
-quad_params['Iyy']  = 10.0*3.68e-3    # kg*m^2
-quad_params['Izz']  = 10.0*7.03e-3    # kg*m^2
+quad_params['Ixx']  = 10.0*3.65e-3 *1e+1    # kg*m^2
+quad_params['Iyy']  = 10.0*3.68e-3 *1e+1    # kg*m^2
+quad_params['Izz']  = 10.0*7.03e-3 *1e+1    # kg*m^2
 
 
 class InavSimulate:
@@ -40,6 +40,11 @@ class InavSimulate:
         self.cmd_motor_speeds = [
             0,0,0,0
         ]
+        # targets are set from incoming commands; actual speeds follow with lag
+        self.cmd_motor_targets = [0, 0, 0, 0]
+        # motor lag time constant (seconds) for a first-order low-pass
+        # smaller = faster response; realistic motors ~0.05-0.2s
+        self.motor_time_constant = 0.25
         
         # Update once
         self.sim_state = self.vehicle.step(
@@ -92,10 +97,10 @@ class InavSimulate:
             self.__moveDrone = True
             self.__isolatedRun = True
                       
-            self.cmd_motor_speeds[0] = 475 + 0 
-            self.cmd_motor_speeds[1] = 475 + 0.1    
-            self.cmd_motor_speeds[2] = 475 + 0.1   
-            self.cmd_motor_speeds[3] = 475  
+            init_vals = [475.0, 475.1, 475.1, 475.0]
+            for i in range(4):
+                self.cmd_motor_speeds[i] = init_vals[i]
+                self.cmd_motor_targets[i] = init_vals[i]
             
         self.__lastTime = None
         
@@ -133,11 +138,20 @@ class InavSimulate:
         
         dt  = trel - self.__lastTime
         
+        writeOutputState = False
+        
         a_ned, omega_ned = np.zeros(3,), np.zeros(3,)
+        #self.__moveDrone = True
         if self.__moveDrone or self.__isolatedRun:
+            # apply motor lag filter before stepping the vehicle
+            if dt > 0:
+                self._apply_motor_lag(dt)
+
             self.sim_state = self.vehicle.step(self.sim_state, {'cmd_motor_speeds': self.cmd_motor_speeds}, dt)
             a_ned, omega_ned = self._imu(self.sim_state, self.vehicle.s_dot)
             
+        
+        self.sim_state["x"][2] = max(self.sim_state["x"][2], 0.0)  # Don't go below ground
         state = self.sim_state
 
         lat, lon, alt, trk = self.Nav.to_geodetic(
@@ -165,63 +179,76 @@ class InavSimulate:
             self.__updateState("ch5",  0)
             self.__updateState("ch6", -1)
             
+            
+            if trel > T_ARM - 1.0:
+                self.__moveDrone = True
+                
+            if trel > T_ARM - 0.8:
+                writeOutputState = True
+            
             if trel > T_ARM:
                 self.__updateState("ch5",  1.0) # Arm
             
             if trel > T_ARM + 1:
-                self.__updateState("ch3",  0.85) # Add power
+                self.__updateState("ch3",  0.50) # Add power
                 #self.__updateState("ch6",  0.00) # Angle mode
                 #self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
-                self.__moveDrone = True
+                #self.__moveDrone = True
                 
-            if trel > T_ARM + 4:
-                self.__updateState("ch6",  0.75) # Angle mode + Alt Hold + WP
-                self.__updateState("ch2",  0.5) 
-                
-            if trel > T_ARM + 11:
-                self.__updateState("ch2",  0.0) 
-                
-            if trel > T_ARM + 12:
-                self.__updateState("ch6", -0.75)
-                self.__updateState("ch7",  0.75) # WP Mode
-                
-                val = 0.2*np.sin(trel*0.05)
-                #self.__updateState("ch1",  val)
+            if trel > T_ARM + 10:
+                sys.exit(1)
 
+#                
+#            if trel > T_ARM + 4:
+#                self.__updateState("ch6",  0.75) # Angle mode + Alt Hold + WP
+#                self.__updateState("ch2",  0.5) 
+#                
+#            if trel > T_ARM + 11:
+#                self.__updateState("ch2",  0.0) 
+#                
+#            if trel > T_ARM + 12:
+#                self.__updateState("ch6", -0.75)
+#                self.__updateState("ch7",  0.75) # WP Mode
+#                
+#                val = 0.2*np.sin(trel*0.05)
+#                #self.__updateState("ch1",  val)
+#
+#        
+#        # Stop drone on landing
+#        if trel > T_ARM + 5 and state["x"][2] < 0.0:
+#            self.__moveDrone = False
+
+        # Output States
         
-        # Stop drone on landing
-        if trel > T_ARM + 5 and state["x"][2] < 0.0:
-            self.__moveDrone = False
+        if writeOutputState:
 
-        # States
-
-        self.__updateState("lat", lat)
-        self.__updateState("lon", lon)
-        self.__updateState("alt", alt)
+            self.__updateState("lat", lat)
+            self.__updateState("lon", lon)
+            self.__updateState("alt", alt)
+                
+            # Don't update trk if too slow
+            #
+            if gvel > 1.0:
+                self.__updateState("trk", trk)
+                #self.__updateState("hdg", trk)
             
-        # Don't update trk if too slow
-        #
-        if gvel > 1.0:
-            self.__updateState("trk", trk)
-            #self.__updateState("hdg", trk)
-        
-        self.__updateState("posx", state["x"][0])
-        self.__updateState("posy", state["x"][1])
-        self.__updateState("posz", state["x"][2])
-        self.__updateState("gvel", gvel) 
+            self.__updateState("posx", state["x"][0])
+            self.__updateState("posy", state["x"][1])
+            self.__updateState("posz", state["x"][2])
+            self.__updateState("gvel", gvel) 
 
-        self.__updateState("roll", roll)
-        self.__updateState("pitch", -pitch)
-        self.__updateState("yaw", -yaw + 90.0)
-        self.__updateState("hdg", -yaw + 90.0)
-        self.__updateState("ax", a_ned[0] / 9.80665)
-        self.__updateState("ay", -a_ned[1] / 9.80665)
-        self.__updateState("az", -a_ned[2] / 9.80665)
-        self.__updateState("p", omega_ned[0] * np.rad2deg(1.0))
-        self.__updateState("q", omega_ned[1] * np.rad2deg(1.0))
-        self.__updateState("r", omega_ned[2] * np.rad2deg(1.0))
+            self.__updateState("roll", roll)
+            self.__updateState("pitch", -pitch)
+            self.__updateState("yaw", -yaw + 90.0)
+            self.__updateState("hdg", -yaw + 90.0)
+            self.__updateState("ax", a_ned[0] / 9.80665)
+            self.__updateState("ay", -a_ned[1] / 9.80665)
+            self.__updateState("az", -a_ned[2] / 9.80665)
+            self.__updateState("p", omega_ned[0] * np.rad2deg(1.0))
+            self.__updateState("q", omega_ned[1] * np.rad2deg(1.0))
+            self.__updateState("r", omega_ned[2] * np.rad2deg(1.0))
 
-        
+            
         # Debug ------------------------- #
 
         #print("Time:", trel)
@@ -259,7 +286,7 @@ class InavSimulate:
             data = conn.recv(1024)
             if data:
                 self._rx_buffer += data.decode("utf-8", errors="ignore")
-                print(f"Received data: {data}")
+                #print(f"Received data: {data}")
         except BlockingIOError:
             # No data available, that's ok
             pass
@@ -280,23 +307,43 @@ class InavSimulate:
             
             if len(vals) >= 4:
                 try:
-                    self.cmd_motor_speeds[0] = GAIN * float(vals[3])   # Motor FL
-                    self.cmd_motor_speeds[1] = GAIN * float(vals[1])   # Motor FR
-                    self.cmd_motor_speeds[2] = GAIN * float(vals[0])   # Motor RR
-                    self.cmd_motor_speeds[3] = GAIN * float(vals[2])   # Motor RL
+                    # set targets; actual speeds will lag via filter
+                    self.cmd_motor_targets[0] = GAIN * float(vals[0])   # Motor FL
+                    self.cmd_motor_targets[1] = GAIN * float(vals[3])   # Motor FR
+                    self.cmd_motor_targets[2] = GAIN * float(vals[1])   # Motor RR
+                    self.cmd_motor_targets[3] = GAIN * float(vals[2])   # Motor RL
                     
-                    self.cmd_motor_speeds[0] *= 1.000   
-                    self.cmd_motor_speeds[1] *= 1.000     
-                    self.cmd_motor_speeds[2] *= 1.001    
-                    self.cmd_motor_speeds[3] *= 1.001
+                    #self.cmd_motor_speeds[0] *= 1.000   
+                    #self.cmd_motor_speeds[1] *= 1.000     
+                    #self.cmd_motor_speeds[2] *= 1.000    
+                    #self.cmd_motor_speeds[3] *= 1.000
                 except (ValueError, IndexError) as e:
                     print(f"Error parsing motor speeds: {e}, line: {line}")   
+
+    def _apply_motor_lag(self, dt: float):
+        """First-order low-pass on motor speeds towards targets.
+
+        Implements: d/dt x = (target - x) / tau  => discrete: x += (target-x) * (1 - exp(-dt/tau))
+        """
+        if dt <= 0:
+            return
+
+        tau = max(1e-6, float(self.motor_time_constant))
+        alpha = 1.0 - np.exp(-dt / tau)
+        for i in range(4):
+            cur = float(self.cmd_motor_speeds[i])
+            tgt = float(self.cmd_motor_targets[i])
+            cur += (tgt - cur) * alpha
+            self.cmd_motor_speeds[i] = cur
     
     
     def tx(self, conn:socket.socket):
         
-        def appendToMsg(key):
+        def appendToMsg(key, override=None):
             val = self.state[key]
+            
+            if override is not None:
+                val = float(override)
             self.msg += f"{val:.6f};"
             
             
@@ -339,7 +386,6 @@ class InavSimulate:
 
         # Finish line
         msg = self.msg.rsplit(";", 1)[0] + "\n"
-        
         #print("msg:", msg)
 
         conn.sendall(msg.encode("utf-8"))

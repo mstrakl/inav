@@ -175,6 +175,9 @@ int init_fgear_socket(char* ip, int port) {
 
 int init_fgear_client(const char* server_ip, int server_port) {
 
+
+    printf("Starting with socket init...\n");
+
     struct sockaddr_in serverAddr;
 
     // Create TCP socket
@@ -199,7 +202,7 @@ int init_fgear_client(const char* server_ip, int server_port) {
     int conn_status = -1;
     for (int i=0; i<100; i++) {
 
-        //printf("Connecting attempt nr: %d\n", i);
+        printf("Connecting attempt nr: %d\n", i);
         conn_status = connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
 
         if (conn_status == 0) break;

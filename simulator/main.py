@@ -7,7 +7,7 @@ from src.inav_interface import InavSimulate
 
 HOST = "127.0.0.1"
 PORT = 2323
-RATE_HZ = 60
+RATE_HZ = 20.0
 
 
 def main(args):
@@ -27,7 +27,7 @@ def main(args):
 
         conn, addr = server.accept()
         print(f"Client connected from {addr}")
-            
+    
         
     Inav = InavSimulate(run_isolated=(not inav_connect))
      
