@@ -50,14 +50,18 @@ fpVector2_t navigationDLZUpdateState(
         navigationDLZReset();
         offset.x = posErrorX;
         offset.y = posErrorY;
+        LOG_DEBUG(SYSTEM, "DLZ (!inact) Offset X: %f cm, Y: %f cm", (double)offset.x, (double)offset.y);
+
         return offset;
     }
 
 
     float fadeValue = (float)NavDlzData.gpsFade / 1000.0f;
 
-    if (millis() - NavDlzData.lastUpdateTime > UPDATE_TIMEOUT_MS)
+    if (millis() - NavDlzData.lastUpdateTime > UPDATE_TIMEOUT_MS) {
         fadeValue = 0.0f;
+        LOG_DEBUG(SYSTEM, "Timeout!, fadeValue=%f", (double)fadeValue);
+    }
 
     float cosYaw = posControl.actualState.cosYaw;
     float sinYaw = posControl.actualState.sinYaw;
@@ -70,6 +74,11 @@ fpVector2_t navigationDLZUpdateState(
 
     offset.x = (1.0f - fadeValue) * posErrorX + fadeValue * dlzx; // centimeters
     offset.y = (1.0f - fadeValue) * posErrorY + fadeValue * dlzy; // centimeters
+
+
+    // Log offset x and y
+    LOG_DEBUG(SYSTEM, "DLZ Offset X: %f cm, Y: %f cm, Fade: %f", (double)offset.x, (double)offset.y, (double)fadeValue);
+
 
     return offset;
 }

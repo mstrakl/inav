@@ -581,8 +581,8 @@ static float computeVelocityScale(
 
 static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxAccelLimit, const float maxSpeed)
 {
-    const float measurementX = navGetCurrentActualPositionAndVelocity()->vel.x;
-    const float measurementY = navGetCurrentActualPositionAndVelocity()->vel.y;
+    const float measurementX = 0.0f; //navGetCurrentActualPositionAndVelocity()->vel.x;
+    const float measurementY = 0.0f; //navGetCurrentActualPositionAndVelocity()->vel.y;
 
     const float setpointX = posControl.desiredState.vel.x;
     const float setpointY = posControl.desiredState.vel.y;
