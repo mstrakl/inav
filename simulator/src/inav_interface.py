@@ -171,7 +171,7 @@ class InavSimulate:
         
         self.__updateState("trel",  trel)
         
-        T_ARM = 9.0
+        T_ARM = 15.0
         
         if not self.__isolatedRun:
             
@@ -191,25 +191,30 @@ class InavSimulate:
             
             if trel > T_ARM + 1:
                 self.__updateState("ch3",  0.85) # Add power
-                #self.__updateState("ch6",  0.00) # Angle mode
-                #self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
-                #self.__moveDrone = True
-                
+
             if trel > T_ARM + 4:
-                self.__updateState("ch6",  0.75) # Angle mode + Alt Hold + WP
-                self.__updateState("ch2",  0.5) 
+                self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
+                #self.__updateState("ch2",  0.5)  # Tilt forward to get some momentum
                 
             if trel > T_ARM + 11:
                 self.__updateState("ch2",  0.0) 
                 
+            
+            # Switch to WP mode
+            #if trel > T_ARM + 12:
+            #    self.__updateState("ch6", -0.75)
+            #    self.__updateState("ch7",  0.75) # WP Mode
+            
+            # Switch to POS HOLD 
             if trel > T_ARM + 12:
-                self.__updateState("ch6", -0.75)
-                self.__updateState("ch7",  0.75) # WP Mode
-                
-                val = 0.2*np.sin(trel*0.05)
-                #self.__updateState("ch1",  val)
+                self.__updateState("ch8",  0.75)
 
-        
+            if trel > T_ARM + 14:
+                self.__updateState("ch2",  -0.25) 
+
+            if trel > T_ARM + 20:
+                self.__updateState("ch2",  0.0) 
+                
         # Stop drone on landing
         if trel > T_ARM + 5 and state["x"][2] < 0.0:
             self.__moveDrone = False
