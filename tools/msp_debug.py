@@ -2,7 +2,8 @@
 # Simple MSPv2-native debug reader - prints MSP_DEBUGMSG payloads
 # Usage: python3 msp_debug_reader.py /dev/ttyACM0 115200
 
-import sys, serial, struct, time
+import sys, struct, time
+from serial import Serial
 
 MSP_DEBUGMSG = 253
 POLY = 0xD5
@@ -30,7 +31,7 @@ def main():
         print("Usage: {} <device> [baud]".format(sys.argv[0])); sys.exit(1)
     dev = sys.argv[1]
     baud = int(sys.argv[2]) if len(sys.argv) > 2 else 115200
-    ser = serial.Serial(dev, baud, timeout=1)
+    ser = Serial(dev, baud, timeout=1)
     
     print("Opened", dev, "at", baud)
     
