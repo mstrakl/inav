@@ -1,5 +1,5 @@
 # version
-# INAV/MATEKF405SE 9.0.0 Jan 18 2026 / 20:32:32 (6614ef6f) 
+# INAV/MATEKF405SE 9.0.0 Jan 22 2026 / 13:31:18 (0a3be01f) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -61,9 +61,7 @@ blackbox SERVOS
 # Receiver: Channel map
 
 # Ports
-serial 20 32769 115200 115200 0 115200
-serial 1 0 115200 115200 0 115200
-serial 2 64 115200 230400 0 115200
+serial 3 2 115200 115200 0 115200
 serial 5 1 230400 115200 0 115200
 serial 30 0 115200 115200 0 115200
 
@@ -110,9 +108,9 @@ set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
 set gyro_zero_x = 12
-set gyro_zero_y = -11
-set gyro_zero_z = -6
-set ins_gravity_cmss =  984.142
+set gyro_zero_y = -10
+set gyro_zero_z = -8
+set ins_gravity_cmss =  985.402
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -3
@@ -120,6 +118,9 @@ set acczero_z = -4
 set accgain_x = 4086
 set accgain_y = 4085
 set accgain_z = 4087
+set rangefinder_hardware = MSP
+set opflow_hardware = MSP
+set opflow_scale =  4.691
 set align_mag = CW270FLIP
 set mag_hardware = NONE
 set magzero_x = 61
@@ -139,8 +140,9 @@ set servo_pwm_rate = 100
 set servo_lpf_hz = 25
 set small_angle = 180
 set applied_defaults = 3
-set gps_provider = MSP
 set airmode_type = STICK_CENTER_ONCE
+set inav_allow_dead_reckoning = ON
+set inav_max_surface_altitude = 500
 set nav_wp_radius = 500
 set nav_wp_max_safe_distance = 500
 set nav_fw_wp_tracking_accuracy = 3
@@ -150,6 +152,7 @@ set nav_fw_control_smoothness = 2
 set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
 set nav_fw_launch_climb_angle = 25
+set debug_mode = FLOW_RAW
 set log_level = DEBUG
 set log_topics = 4294967295
 
@@ -189,7 +192,7 @@ set mc_p_yaw = 56
 set mc_i_yaw = 15
 set mc_d_yaw = 16
 set mc_cd_yaw = 23
-set mc_p_level = 12
+set mc_p_level = 15
 set mc_d_level = 65
 set fw_p_pitch = 15
 set fw_i_pitch = 5
@@ -203,6 +206,9 @@ set fw_i_yaw = 0
 set fw_d_yaw = 20
 set fw_ff_yaw = 255
 set max_angle_inclination_pit = 300
+set nav_mc_vel_xy_i = 5
+set nav_mc_vel_xy_d = 75
+set nav_mc_vel_xy_ff = 70
 set fw_level_pitch_trim =  2.000
 set yaw_rate = 10
 
@@ -306,7 +312,7 @@ set throttle_idle =  5.000
 
 # restore original profile selection
 control_profile 2
-mixer_profile 1
+mixer_profile 2
 battery_profile 1
 
 # save configuration
