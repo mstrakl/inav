@@ -77,8 +77,7 @@ fpVector2_t navigationDLZUpdateState(
 
 
     // Log offset x and y
-    LOG_DEBUG(SYSTEM, "DLZ Offset X: %f cm, Y: %f cm, Fade: %f", (double)offset.x, (double)offset.y, (double)fadeValue);
-
+    LOG_DEBUG(SYSTEM, "DLZ Offset X: %f cm, Y: %f cm, Fade: %f", (double)NavDlzData.posX, (double)NavDlzData.posY, (double)fadeValue);
 
     return offset;
 }
@@ -102,7 +101,7 @@ const float navigationDLZLandingController(const float vspd_in, const int32_t la
         return vspd_in;
     }
 
-    float vspd = -(float)NavDlzData.velZ; // cm/s 
+    float vspd = 0.0; //-(float)NavDlzData.velZ; // cm/s 
 
     // Sanity check
     vspd = fmin(fmax(vspd, -100.0f), 300.0f);
