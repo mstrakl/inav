@@ -557,12 +557,19 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
             );
             sbufWriteU16(dst, agl);                      // pos 11 centimeters
 
-            sbufWriteU16(dst, gpsSol.groundSpeed);       // pos 12 cm/s
-            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 13 decidegrees (deg/10)
-            sbufWriteU16(dst, GPS_distanceToHome);       // pos 14 meters
-            sbufWriteU16(dst, GPS_directionToHome);      // pos 15 degrees !
+            // 28 bytes up to here
 
-            // 36 bytes payload up to here
+            const float test = posControl.desiredState.vel.x;
+
+            sbufWriteU8(dst, (uint8_t)gpsSol.numSat);    // pos 12 num sat 
+            sbufWriteU16(dst, gpsSol.groundSpeed);       // pos 13 cm/s
+            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 14 decidegrees (deg/10)
+            sbufWriteU16(dst, GPS_distanceToHome);       // pos 15 meters
+            sbufWriteU16(dst, GPS_directionToHome);      // pos 16 degrees !
+
+            // 37 bytes payload up to here
+
+
 
         }
         break;

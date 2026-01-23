@@ -75,7 +75,6 @@ fpVector2_t navigationDLZUpdateState(
     offset.x = (1.0f - fadeValue) * posErrorX + fadeValue * dlzx; // centimeters
     offset.y = (1.0f - fadeValue) * posErrorY + fadeValue * dlzy; // centimeters
 
-
     // Log offset x and y
     LOG_DEBUG(SYSTEM, "DLZ Offset X: %f cm, Y: %f cm, Fade: %f", (double)NavDlzData.posX, (double)NavDlzData.posY, (double)fadeValue);
 
