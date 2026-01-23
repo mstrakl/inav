@@ -543,32 +543,40 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
             for (int i = 0; i < 3; i++) {
                 sbufWriteU16(dst, gyroRateDps(i));
             }
-            sbufWriteU16(dst, attitude.values.roll); // decidegrees (deg/10)
-            sbufWriteU16(dst, attitude.values.pitch); // decidegrees (deg/10)
-            sbufWriteU16(dst, attitude.values.yaw); // decidegrees (deg/10)
+            //sbufWriteU16(dst, attitude.values.roll); // decidegrees (deg/10)
+            //sbufWriteU16(dst, attitude.values.pitch); // decidegrees (deg/10)
+            //sbufWriteU16(dst, attitude.values.yaw); // decidegrees (deg/10)
+            
+            // Write orientation quaternion
+            uint32_t u;
+            memcpy(&u, &orientation.q0, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &orientation.q1, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &orientation.q2, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &orientation.q3, sizeof(u));
+            sbufWriteU32(dst, u);
 
-            // 18 bytes up to here
+            // 29 bytes up to here, positions 0 - 10
 
-            sbufWriteU32(dst, gpsSol.llh.lat);           // pos 9 * 1e+7
-            sbufWriteU32(dst, gpsSol.llh.lon);           // pos 10 * 1e+7
+            sbufWriteU32(dst, gpsSol.llh.lat);           // pos 11 * 1e+7
+            sbufWriteU32(dst, gpsSol.llh.lon);           // pos 12 * 1e+7
 
             uint16_t agl = (unsigned int)lroundf(
                 fminf(fmaxf(posControl.actualState.agl.pos.z, 0.0f), 65535.0f)
             );
-            sbufWriteU16(dst, agl);                      // pos 11 centimeters
+            sbufWriteU16(dst, agl);                      // pos 13 centimeters
 
-            // 28 bytes up to here
+            // 39 bytes up to here
 
-            const float test = posControl.desiredState.vel.x;
+            sbufWriteU8(dst, (uint8_t)gpsSol.numSat);    // pos 14 num sat 
+            sbufWriteU16(dst, gpsSol.groundSpeed);       // pos 15 cm/s
+            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 16 decidegrees (deg/10)
+            sbufWriteU16(dst, GPS_distanceToHome);       // pos 17 meters
+            sbufWriteU16(dst, GPS_directionToHome);      // pos 18 degrees !
 
-            sbufWriteU8(dst, (uint8_t)gpsSol.numSat);    // pos 12 num sat 
-            sbufWriteU16(dst, gpsSol.groundSpeed);       // pos 13 cm/s
-            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 14 decidegrees (deg/10)
-            sbufWriteU16(dst, GPS_distanceToHome);       // pos 15 meters
-            sbufWriteU16(dst, GPS_directionToHome);      // pos 16 degrees !
-
-            // 37 bytes payload up to here
-
+            // 48 bytes payload up to here
 
 
         }
