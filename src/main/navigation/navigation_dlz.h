@@ -32,46 +32,24 @@ extern NavDlzData_t NavDlzData;
 
 // Func prototypes
 
-fpVector2_t navigationDLZUpdateState(
-    navigationDesiredState_t* desiredState, 
-    const float posErrorX, 
-    const float posErrorY);
-
-
-const float navigationDLZLandingController(
-    const float vspd_in, 
-    const int32_t landingElevation);
-
 
 void mspSkyvisReceiveNewData(
     const uint8_t * bufferPtr, 
     unsigned int dataSize);
 
+// C wrappers for C++ DLZ navigation class (implemented in navigation/dlz/nav_dlz_wrapper.cpp)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+void adum_dlz_init(void);
+void adum_dlz_update(timeMs_t currentTime);
+void adum_dlz_reset(void);
 
-// Inline funcs
+#ifdef __cplusplus
+}
+#endif
 
-
-//static inline void navigationDLZFader(const float target)
-//{
-//
-//    static const float FADE_STEP = 0.05f;
-//
-//    if (NavDlzData.fadeValue < target) {
-//        NavDlzData.fadeValue += FADE_STEP;
-//        if (NavDlzData.fadeValue > target) {
-//            NavDlzData.fadeValue = target;
-//        }
-//    } else if (NavDlzData.fadeValue > target) {
-//        NavDlzData.fadeValue -= FADE_STEP;
-//        if (NavDlzData.fadeValue < target) {
-//            NavDlzData.fadeValue = target;
-//        }
-//    }
-//
-//    NavDlzData.fadeValue = constrainf(NavDlzData.fadeValue, 0.0f, 1.0f);
-//
-//}
 
 static inline void navigationDLZReset(void) {
     NavDlzData.active = false;

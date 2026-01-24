@@ -581,6 +581,8 @@ main_sources(COMMON_SRC
     navigation/navigation_rover_boat.c
     navigation/navigation_geozone.c
     navigation/navigation_dlz.c
+    navigation/dlz/nav_dlz.cpp
+    navigation/dlz/nav_dlz_wrapper.cpp
     navigation/sqrt_controller.c
     navigation/sqrt_controller.h
     navigation/rth_trackback.c
