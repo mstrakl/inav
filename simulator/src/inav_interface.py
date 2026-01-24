@@ -2,6 +2,7 @@ import os, sys, time
 import socket
 
 from rotorpy.environments import Environment
+from rotorpy.wind.dryden_winds import DrydenGust
 from rotorpy.vehicles.multirotor import Multirotor
 from rotorpy.vehicles.hummingbird_params import quad_params
 from rotorpy.sensors.imu import Imu
@@ -27,6 +28,19 @@ class InavSimulate:
         self.imu = Imu()
         self._enable_imu_noise = True  # Always add a bit of noise to avoid stale detection
         
+        
+        dt = 1.0 / 60.0
+        avg_wind = np.array([2.0, 1.5, 0.0])  # Mean wind speed (m/s)
+        sig_wind = np.array([2.7, 1.0, 0.5])  # Wind turbulence (m/s)
+        altitude = 20  # Altitude (m)
+
+        # Normal model
+        self.wind = DrydenGust(dt=dt, 
+                               avg_wind=avg_wind, 
+                               sig_wind=sig_wind, 
+                               altitude=altitude)
+
+            
         # Socket receive buffer for handling partial/multiple messages
         self._rx_buffer = ""
 
@@ -44,7 +58,7 @@ class InavSimulate:
         self.cmd_motor_targets = [0, 0, 0, 0]
         # motor lag time constant (seconds) for a first-order low-pass
         # smaller = faster response; realistic motors ~0.05-0.2s
-        self.motor_time_constant = 0.05
+        self.motor_time_constant = 0.07
         
         # Update once
         self.sim_state = self.vehicle.step(
@@ -146,6 +160,8 @@ class InavSimulate:
             # apply motor lag filter before stepping the vehicle
             if dt > 0:
                 self._apply_motor_lag(dt)
+                
+            self.sim_state["wind"] = self.wind.update(trel, self.sim_state["x"])
 
             self.sim_state = self.vehicle.step(self.sim_state, {'cmd_motor_speeds': self.cmd_motor_speeds}, dt)
             a_ned, omega_ned = self._imu(self.sim_state, self.vehicle.s_dot)

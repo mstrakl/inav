@@ -3,8 +3,8 @@ set -Eeuo pipefail
 
 # Setup cleanup handler
 cleanup() {
-    echo ""
-    echo "Shutting down..."
+    #echo ""
+    #echo "Shutting down..."
     # Kill all background processes in this script's process group
     kill -- -$$ 2>/dev/null || true
 }
