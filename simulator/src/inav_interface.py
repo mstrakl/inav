@@ -12,11 +12,14 @@ from scipy.spatial.transform import Rotation as R
 import src.sim_utils as sutil
 
 
-quad_params['mass'] = 0.500      # kg
-quad_params['Ixx']  = 3.65e-2    # kg*m^2
-quad_params['Iyy']  = 3.68e-2    # kg*m^2
-quad_params['Izz']  = 3.00e-2    # kg*m^2
+quad_params['mass'] = 1.500      # kg
+quad_params['Ixx']  = quad_params['mass'] * 3.65e-2    # kg*m^2
+quad_params['Iyy']  = quad_params['mass'] * 3.68e-2    # kg*m^2
+quad_params['Izz']  = quad_params['mass'] * 3.00e-2    # kg*m^2
 
+
+SIMULATE_SENSOR_NOISE = False
+SIMULATE_WIND = False
 
 class InavSimulate:
     
@@ -30,8 +33,9 @@ class InavSimulate:
         
         
         dt = 1.0 / 60.0
-        avg_wind = np.array([2.0, 1.5, 0.0])  # Mean wind speed (m/s)
-        sig_wind = np.array([2.7, 1.0, 0.5])  # Wind turbulence (m/s)
+        gain = 1.0
+        avg_wind = np.array([0.0, 0.0, 0.0]) * gain  # Mean wind speed (m/s)
+        sig_wind = np.array([0.2, 0.2, 0.05]) * gain  # Wind turbulence (m/s)
         altitude = 20  # Altitude (m)
 
         # Normal model
@@ -58,7 +62,7 @@ class InavSimulate:
         self.cmd_motor_targets = [0, 0, 0, 0]
         # motor lag time constant (seconds) for a first-order low-pass
         # smaller = faster response; realistic motors ~0.05-0.2s
-        self.motor_time_constant = 0.10
+        self.motor_time_constant = 0.02
         
         # Update once
         self.sim_state = self.vehicle.step(
@@ -139,8 +143,10 @@ class InavSimulate:
             # apply motor lag filter before stepping the vehicle
             if dt > 0:
                 self._apply_motor_lag(dt)
-                
-            self.sim_state["wind"] = self.wind.update(trel, self.sim_state["x"])
+            
+            if SIMULATE_WIND:
+                self.sim_state["wind"] = self.wind.update(trel, self.sim_state["x"])
+                print("Wind=", self.sim_state["wind"])
 
             self.sim_state = self.vehicle.step(self.sim_state, {'cmd_motor_speeds': self.cmd_motor_speeds}, dt)
             a_ned, omega_ned = self._imu(self.sim_state, self.vehicle.s_dot)
@@ -166,7 +172,7 @@ class InavSimulate:
         
         self.__updateState("trel",  trel)
         
-        T_ARM = 15.0
+        T_ARM = 7.0
         
         if not self.__isolatedRun:
             
@@ -185,9 +191,9 @@ class InavSimulate:
                 self.__updateState("ch5",  1.0) # Arm
             
             if trel > T_ARM + 1:
-                self.__updateState("ch3",  0.85) # Add power
+                self.__updateState("ch3",  0.90) # Add power
 
-            if trel > T_ARM + 4:
+            if trel > T_ARM + 5:
                 self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
                 #self.__updateState("ch2",  0.5)  # Tilt forward to get some momentum
                 
@@ -217,10 +223,17 @@ class InavSimulate:
         # Output States
         
         if writeOutputState:
-
-            # Apply sensor bias/noise/lag to published sensor values
-            lat_m, lon_m, alt_m, gvel_m, roll_m, pitch_m, a_ned_m, omega_ned_m = \
-                self._apply_sensor_errors(trel, dt, lat, lon, alt, gvel, roll, pitch, a_ned, omega_ned)
+            
+            if SIMULATE_SENSOR_NOISE:
+                # Apply sensor bias/noise/lag to published sensor values
+                lat_m, lon_m, alt_m, gvel_m, roll_m, pitch_m, a_ned_m, omega_ned_m = \
+                    self._apply_sensor_errors(trel, dt, lat, lon, alt, gvel, roll, pitch, a_ned, omega_ned)
+            else:
+                lat_m, lon_m, alt_m = lat, lon, alt
+                gvel_m = gvel
+                roll_m, pitch_m = roll, pitch
+                a_ned_m = a_ned
+                omega_ned_m = omega_ned
 
             self.__updateState("lat", lat_m)
             self.__updateState("lon", lon_m)
@@ -241,8 +254,8 @@ class InavSimulate:
             # Attitude: publish filtered/noisy roll/pitch; yaw/hdg remain true
             self.__updateState("roll", roll_m)
             self.__updateState("pitch", -pitch_m)
-            self.__updateState("yaw", -yaw + 90.0)
-            self.__updateState("hdg", -yaw + 90.0)
+            self.__updateState("yaw", -yaw)
+            self.__updateState("hdg", -yaw)
 
             # Accelerations: convert to g for published fields (apply sign conventions)
             self.__updateState("ax", a_ned_m[0] / 9.80665)
@@ -310,7 +323,7 @@ class InavSimulate:
         # Accelerometers: bias (g), noise_std (g), lag tau (s)
         self.sensor_params = {
             'accel': {
-                'bias': np.array([0.01, -0.01, 0.04], dtype=float),
+                'bias': np.array([0.01, -0.01, 0.00], dtype=float),
                 'noise_std': np.array([0.02, 0.001, 0.005], dtype=float),
                 'tau': 0.02
             },
@@ -465,7 +478,7 @@ class InavSimulate:
             if not line:
                 continue
             
-            GAIN = 800.0
+            GAIN = 1500.0
             vals = line.split(";")
             
             if len(vals) >= 4:
