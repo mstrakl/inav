@@ -1,6 +1,7 @@
 
 #include "nav_dlz.hpp"
 #include <stdio.h>
+#include <cstring>
 
 extern "C" {
 #include "common/maths.h"
@@ -38,7 +39,7 @@ void Navigation::readSkyvisData(const uint8_t* bufferPtr,
         return;
     }
 
-    m_skyvisData = *(const mspSensorSkyvis_t *)bufferPtr;
+    memcpy(&m_skyvisData, bufferPtr, sizeof(mspSensorSkyvis_t));
 
     m_lastMspRxTime = millis();
 }   
@@ -59,17 +60,17 @@ void Navigation::update(const float& centimeterPosX,
         return;
     }
 
-    const float cmdPitch = (float)m_skyvisData.cmdPitch * (3.14159265f / 180.0f) / 100.0f;   // convert to radians
-    const float cmdRoll = (float)m_skyvisData.cmdRoll * (3.14159265f / 180.0f) / 100.0f;     // convert to radians
+    const float skyvisCmdPitch = (float)m_skyvisData.cmdPitch * (3.14159265f / 180.0f) / 100.0f;   // convert to radians
+    const float skyvisCmdRoll = (float)m_skyvisData.cmdRoll * (3.14159265f / 180.0f) / 100.0f;     // convert to radians
 
     const float fade = constrainf((float)m_skyvisData.confidence / 1000.0f, 0.0f, 1.0f);
 
-    m_cmdPitch = fade * cmdPitch + (1.0f - fade) * navPitchCmd;
-    m_cmdRoll = fade * cmdRoll + (1.0f - fade) * navRollCmd;
+    m_cmdPitch = fade * skyvisCmdPitch + (1.0f - fade) * navPitchCmd;
+    m_cmdRoll = fade * skyvisCmdRoll + (1.0f - fade) * navRollCmd;
 
-    LOG_INFO(SYSTEM, "INAV: DLZ Update: Time=%u CmdPitchDeg=%f CmdRollDeg=%f VelX=%f VelY=%f",
+    LOG_INFO(SYSTEM, "INAV: DLZ Update: Time=%u CmdPitch=%f CmdRoll=%f VelX=%f VelY=%f Fade=%f",
              (unsigned)millis(), m_cmdPitch * (180.0f / 3.14159265f), m_cmdRoll * (180.0f / 3.14159265f),
-             centimeterVelX, centimeterVelY);
+             centimeterVelX/100.0, centimeterVelY/100.0, fade);
 
     m_lastUpdateTime = millis();
 }

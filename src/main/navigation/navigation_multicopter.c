@@ -30,6 +30,7 @@
 #include "common/maths.h"
 #include "common/filter.h"
 #include "common/utils.h"
+#include "common/log.h"
 
 #include "sensors/sensors.h"
 #include "sensors/acceleration.h"
@@ -698,6 +699,15 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
 
     desiredPitch = adum_dlz_getpitchcmd();
     desiredRoll = adum_dlz_getrollcmd();
+
+    LOG_INFO(SYSTEM, "INAV: PosEst.P= %f, %f, %f", 
+        navGetCurrentActualPositionAndVelocity()->pos.x,
+        navGetCurrentActualPositionAndVelocity()->pos.y,
+        navGetCurrentActualPositionAndVelocity()->pos.z);
+    LOG_INFO(SYSTEM, "INAV: VelEst.V= %f, %f, %f", 
+        navGetCurrentActualPositionAndVelocity()->vel.x,
+        navGetCurrentActualPositionAndVelocity()->vel.y,
+        navGetCurrentActualPositionAndVelocity()->vel.z);
 
     posControl.rcAdjustment[ROLL] = constrain(RADIANS_TO_DECIDEGREES(desiredRoll), -maxBankAngle, maxBankAngle);
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);

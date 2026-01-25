@@ -80,8 +80,9 @@ static pthread_t listenThread;
 static bool initalized = false;
 static bool useImu = false;
 
-static float lattitude = 0;
-static float longitude = 0;
+
+static int32_t lat_1e7 = 0;
+static int32_t lon_1e7 = 0;
 static float elevation = 0;
 static float agl = 0;
 static float local_vx = 0;
@@ -286,7 +287,7 @@ static void* listenWorker(void* arg)
             token = strtok(buf, ";");
             while (token != NULL) {
 
-                float value = atof(token);  // convert to float
+                double value = atof(token);  // convert to float
 
                 switch(index) {
                     case 0:
@@ -294,11 +295,11 @@ static void* listenWorker(void* arg)
                         break;
 
                     case 1:
-                        lattitude = value;
+                        lat_1e7 = atoi(token);
                         break;
                     
                     case 2:
-                        longitude = value;
+                        lon_1e7 = atoi(token);
                         break;
                     
                     case 3:
@@ -406,12 +407,14 @@ static void* listenWorker(void* arg)
 
             rxSimSetChannelValue(channelValues, ADUM_JOYSTICK_AXIS_COUNT);
 
+            //printf("Rx: lat=%d lon=%d \n",
+            //    lat_1e7, lon_1e7);
 
             gpsFakeSet(
                 GPS_FIX_3D,
                 16,
-                (int32_t)roundf(lattitude * 10000000),
-                (int32_t)roundf(longitude * 10000000),
+                lat_1e7,
+                lon_1e7,
                 (int32_t)roundf(elevation * 100),
                 (int16_t)roundf(groundspeed * 100),
                 (int16_t)roundf(hpath * 10),

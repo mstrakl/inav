@@ -31,9 +31,9 @@ class InavSimulate:
         
         
         dt = 1.0 / 60.0
-        gain = 0.10
-        avg_wind = np.array([1.0, 1.0, 0.0]) * gain  # Mean wind speed (m/s)
-        sig_wind = np.array([1.0, 1.0, 0.5]) * gain  # Wind turbulence (m/s)
+        gain = 2.00
+        avg_wind = np.array([0.71, 0.71, 0.0]) * gain  # Mean wind speed (m/s)
+        sig_wind = np.array([0.7, 0.7, 0.5]) * gain  # Wind turbulence (m/s)
         altitude = 20  # Altitude (m)
 
         # Normal model
@@ -361,7 +361,12 @@ class InavSimulate:
             
             if override is not None:
                 val = float(override)
-            self.msg += f"{val:.6f};"
+                
+            if key == "lat" or key == "lon":
+                val_1e7 = int(val * 1e7)
+                self.msg += f"{val_1e7};"
+            else:   
+                self.msg += f"{val:.6f};"
             
             
         self.msg = ""

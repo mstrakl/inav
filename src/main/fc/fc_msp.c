@@ -571,12 +571,24 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
             // 39 bytes up to here
 
             sbufWriteU8(dst, (uint8_t)gpsSol.numSat);    // pos 14 num sat 
-            sbufWriteU16(dst, gpsSol.groundSpeed);       // pos 15 cm/s
-            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 16 decidegrees (deg/10)
-            sbufWriteU16(dst, GPS_distanceToHome);       // pos 17 meters
-            sbufWriteU16(dst, GPS_directionToHome);      // pos 18 degrees !
 
-            // 48 bytes payload up to here
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->pos.x, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 15 NED Position X cm
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->pos.y, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 16 NED Position Y cm
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->pos.z, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 17 NED Position
+
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->vel.x, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 18 NED Velocity X cm/s
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->vel.y, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 19 NED Velocity Y cm/s
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->vel.z, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 20 NED Velocity Z cm/s
+
+            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 21 decidegrees (deg/10)
+
+            // 64 bytes up to here
 
 
         }

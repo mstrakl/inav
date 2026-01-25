@@ -36,9 +36,9 @@
         "**/downloads/**": true,
         "**/tools/**": true
     },
-    "C_Cpp.intelliSenseEngine": "disabled",
+    "C_Cpp.intelliSenseEngine": "enabled",
     "C_Cpp.autocomplete": "disabled",
-    "C_Cpp.errorSquiggles": "disabled",
+    "C_Cpp.errorSquiggles": "enabled",
     "github.copilot.enable": {
         "*": true,
         "plaintext": false,

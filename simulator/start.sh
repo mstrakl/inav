@@ -45,10 +45,10 @@ if [ ! -f "$BINARY" ]; then
     exit 1
 fi
 
-$BINARY \
+stdbuf -oL -eL $BINARY \
     --path=./eeprom.bin \
     --sim=adum \
-    --chanmap=M01-01,M02-02,M03-03,M04-04 &
+    --chanmap=M01-01,M02-02,M03-03,M04-04 > sitl.log 2>&1 &
 INAV_PID=$!
 
 
