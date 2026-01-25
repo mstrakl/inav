@@ -4521,7 +4521,7 @@ static mspResult_e mspProcessSensorCommand(uint16_t cmdMSP, sbuf_t *src)
 #endif
 
         case MSP2_SENSOR_SKYVIS:
-            mspSkyvisReceiveNewData(sbufPtr(src), dataSize);
+            adum_dlz_readskyvisdata(sbufPtr(src), dataSize);
             break;
 
 

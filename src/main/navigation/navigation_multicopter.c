@@ -680,19 +680,24 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
     lastAccelTargetY = newAccelY;
 
     // Rotate acceleration target into forward-right frame (aircraft)
-    const float accelForward = newAccelX * posControl.actualState.cosYaw + newAccelY * posControl.actualState.sinYaw;
-    const float accelRight = -newAccelX * posControl.actualState.sinYaw + newAccelY * posControl.actualState.cosYaw;
-
-
-    // Update nav dlz class here via C wrapper
-    adum_dlz_update(millis());
-    
-
-
+    float accelForward = newAccelX * posControl.actualState.cosYaw + newAccelY * posControl.actualState.sinYaw;
+    float accelRight = -newAccelX * posControl.actualState.sinYaw + newAccelY * posControl.actualState.cosYaw;
 
     // Calculate banking angles
-    const float desiredPitch = atan2_approx(accelForward, GRAVITY_CMSS);
-    const float desiredRoll = atan2_approx(accelRight * cos_approx(desiredPitch), GRAVITY_CMSS);
+    float desiredPitch = atan2_approx(accelForward, GRAVITY_CMSS);
+    float desiredRoll = atan2_approx(accelRight * cos_approx(desiredPitch), GRAVITY_CMSS);
+
+    // Update nav dlz class here via C wrapper
+    adum_dlz_update(navGetCurrentActualPositionAndVelocity()->pos.x,
+                    navGetCurrentActualPositionAndVelocity()->pos.y,
+                    navGetCurrentActualPositionAndVelocity()->vel.x,
+                    navGetCurrentActualPositionAndVelocity()->vel.y,
+                    desiredPitch,
+                    desiredRoll);
+
+
+    desiredPitch = adum_dlz_getpitchcmd();
+    desiredRoll = adum_dlz_getrollcmd();
 
     posControl.rcAdjustment[ROLL] = constrain(RADIANS_TO_DECIDEGREES(desiredRoll), -maxBankAngle, maxBankAngle);
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);

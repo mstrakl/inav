@@ -19,23 +19,9 @@ typedef struct {
 } NavDlzData_t;
 
 
-typedef struct __attribute__((packed)) {
-    int16_t  posX;
-    int16_t  posY;
-    int16_t  velZ;
-    int16_t  gpsFade;
-} mspSensorSkyvis_t;
-
-
 extern NavDlzData_t NavDlzData;
 
 
-// Func prototypes
-
-
-void mspSkyvisReceiveNewData(
-    const uint8_t * bufferPtr, 
-    unsigned int dataSize);
 
 // C wrappers for C++ DLZ navigation class (implemented in navigation/dlz/nav_dlz_wrapper.cpp)
 #ifdef __cplusplus
@@ -43,8 +29,22 @@ extern "C" {
 #endif
 
 void adum_dlz_init(void);
-void adum_dlz_update(timeMs_t currentTime);
+
+void adum_dlz_readskyvisdata(const uint8_t* bufferPtr, 
+                             unsigned int dataSize);
+
 void adum_dlz_reset(void);
+                        
+void adum_dlz_update(const float centimeterPosX, 
+                     const float centimeterPosY,
+                     const float centimeterVelX, 
+                     const float centimeterVelY,
+                     const float accFwd, 
+                     const float accRight);
+
+const float adum_dlz_getpitchcmd();
+
+const float adum_dlz_getrollcmd();
 
 #ifdef __cplusplus
 }
