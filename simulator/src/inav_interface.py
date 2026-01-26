@@ -16,7 +16,7 @@ quad_params['Ixx']  = 8.65e-2    # kg*m^2
 quad_params['Iyy']  = 11.68e-2   # kg*m^2
 quad_params['Izz']  = 9.00e-2    # kg*m^2
 
-#SIMULATE_SENSOR_NOISE = False
+SIMULATE_SENSOR_NOISE = False
 SIMULATE_WIND = True
 
 class InavSimulate:
@@ -31,7 +31,7 @@ class InavSimulate:
         
         
         dt = 1.0 / 60.0
-        gain = 2.00
+        gain = 0.50
         avg_wind = np.array([0.71, 0.71, 0.0]) * gain  # Mean wind speed (m/s)
         sig_wind = np.array([0.7, 0.7, 0.5]) * gain  # Wind turbulence (m/s)
         altitude = 20  # Altitude (m)

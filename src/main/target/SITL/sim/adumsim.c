@@ -37,9 +37,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <math.h>
-
 #include "platform.h"
-
 #include "target.h"
 #include "target/SITL/sim/adumsim.h"
 #include "target/SITL/sim/simHelper.h"
@@ -61,6 +59,14 @@
 #include "io/gps.h"
 #include "rx/sim.h"
 
+
+
+#define SIMULATE_SENSOR_NOISE 1
+
+#if SIMULATE_SENSOR_NOISE
+    #include "target/SITL/sim/adumsim_sensor_noise.h"
+#endif
+
 #define ADUM_XP_PORT 2323
 #define ADUM_JOYSTICK_AXIS_COUNT 8
 #define BUF_SIZE 1024
@@ -79,6 +85,8 @@ static int sockfd;
 static pthread_t listenThread;
 static bool initalized = false;
 static bool useImu = false;
+static timeUs_t s_lastNoiseTimeUs = 0;
+static float s_lastNoiseDt = 0.02f;
 
 
 static int32_t lat_1e7 = 0;
@@ -407,6 +415,27 @@ static void* listenWorker(void* arg)
 
             rxSimSetChannelValue(channelValues, ADUM_JOYSTICK_AXIS_COUNT);
 
+            // compute time delta for noise model and apply sensor noise
+            {
+                timeUs_t nowUs = micros();
+                float dt = (s_lastNoiseTimeUs == 0) ? 0.001f : ((nowUs - s_lastNoiseTimeUs) * 1e-6f);
+                s_lastNoiseTimeUs = nowUs;
+                s_lastNoiseDt = dt;
+#if SIMULATE_SENSOR_NOISE
+                // temporary mag vector placeholder (actual mag computed later using attitude)
+                float magx_temp = 0.0f, magy_temp = 0.0f, magz_temp = 0.0f;
+                adumSimApplySensorNoise(
+                    &accel_x, &accel_y, &accel_z,
+                    &gyro_x, &gyro_y, &gyro_z,
+                    &roll, &pitch,
+                    &magx_temp, &magy_temp, &magz_temp,
+                    &lat_1e7, &lon_1e7,
+                    &groundspeed, &hpath,
+                    dt
+                );
+#endif
+            }
+
             //printf("Rx: lat=%d lon=%d \n",
             //    lat_1e7, lon_1e7);
 
@@ -465,6 +494,14 @@ static void* listenWorker(void* arg)
             north.z = 0.0f;
             computeQuaternionFromRPY(&quat, roll_inav, pitch_inav, yaw_inav);
             transformVectorEarthToBody(&north, &quat);
+
+            // apply magnetometer noise to the transformed north vector
+#if SIMULATE_SENSOR_NOISE
+            north.x = adumSimApplySignalNoise(north.x, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[0], &s_magState.lagState[0], s_lastNoiseDt);
+            north.y = adumSimApplySignalNoise(north.y, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[1], &s_magState.lagState[1], s_lastNoiseDt);
+            north.z = adumSimApplySignalNoise(north.z, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[2], &s_magState.lagState[2], s_lastNoiseDt);
+#endif
+
             fakeMagSet(
                 constrainToInt16(north.x * 1024.0f),
                 constrainToInt16(north.y * 1024.0f),
@@ -520,6 +557,10 @@ bool simAdumInit(char* ip, int port, uint8_t* mapping, uint8_t mapCount, bool im
     memcpy(pwmMapping, mapping, mapCount);
     mappingCount = mapCount;
     useImu = imu;
+
+#if SIMULATE_SENSOR_NOISE
+    adumSimNoiseInit();
+#endif
 
     if (port == 0) {
         port = ADUM_XP_PORT; // use default port
