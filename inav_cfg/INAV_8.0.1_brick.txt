@@ -1,5 +1,7 @@
+diff all
+
 # version
-# INAV/MATEKF405SE 9.0.0 Jan 22 2026 / 13:31:18 (0a3be01f) 
+# INAV/MATEKF405SE 9.0.0 Jan 14 2026 / 12:44:11 (a7932b92) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -36,6 +38,7 @@ servo 7 1300 1850 1600 100
 # geozone vertices
 
 # features
+feature -OSD
 feature GPS
 feature BLACKBOX
 feature PWM_OUTPUT_ENABLE
@@ -76,8 +79,9 @@ aux 0 0 0 1875 2100
 aux 1 1 1 1725 2100
 aux 2 11 2 1700 2100
 aux 3 3 2 1300 2100
-aux 4 62 3 1350 2100
-aux 5 63 3 1350 1675
+aux 4 5 2 1750 2100
+aux 5 62 3 1350 2100
+aux 6 63 3 1350 1675
 
 # Adjustments [adjrange]
 
@@ -94,6 +98,7 @@ aux 5 63 3 1350 1675
 logic 0 1 -1 2 1 7 0 2000 0
 logic 1 1 -1 51 1 8 0 1500 0
 logic 2 1 -1 51 1 5 0 1500 0
+logic 50 1 -1 2 1 7 0 2000 0
 
 # Programming: global variables
 
@@ -107,28 +112,26 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 12
-set gyro_zero_y = -10
-set gyro_zero_z = -8
-set ins_gravity_cmss =  985.402
+set gyro_zero_x = 11
+set gyro_zero_y = -7
+set gyro_zero_z = 2
+set ins_gravity_cmss =  983.453
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
-set acczero_x = -3
-set acczero_z = -4
-set accgain_x = 4086
-set accgain_y = 4085
-set accgain_z = 4087
-set rangefinder_hardware = MSP
-set opflow_hardware = MSP
-set opflow_scale =  4.691
+set acczero_y = 4
+set acczero_z = -22
+set accgain_x = 4085
+set accgain_y = 4089
+set accgain_z = 4083
+set opflow_scale =  4.688
 set align_mag = CW270FLIP
-set mag_hardware = NONE
-set magzero_x = 61
-set magzero_y = 6
-set magzero_z = -1
-set maggain_x = 422
-set maggain_y = 405
-set maggain_z = 559
+set mag_hardware = IST8310
+set magzero_x = -222
+set magzero_y = 22
+set magzero_z = 156
+set maggain_x = 414
+set maggain_y = 431
+set maggain_z = 462
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
@@ -146,6 +149,7 @@ set inav_max_surface_altitude = 500
 set nav_wp_radius = 500
 set nav_wp_max_safe_distance = 500
 set nav_fw_wp_tracking_accuracy = 3
+set nav_fw_wp_turn_smoothing = ON-CUT
 set nav_rth_allow_landing = FS_ONLY
 set nav_rth_altitude = 5000
 set nav_fw_control_smoothness = 2
@@ -206,9 +210,6 @@ set fw_i_yaw = 0
 set fw_d_yaw = 20
 set fw_ff_yaw = 255
 set max_angle_inclination_pit = 300
-set nav_mc_vel_xy_i = 5
-set nav_mc_vel_xy_d = 75
-set nav_mc_vel_xy_ff = 70
 set fw_level_pitch_trim =  2.000
 set yaw_rate = 10
 
@@ -298,7 +299,7 @@ smix 9 2 38 -72 100 -1
 battery_profile 1
 
 set throttle_idle =  10.000
-set nav_mc_hover_thr = 1700
+set nav_mc_hover_thr = 1600
 
 # battery_profile
 battery_profile 2
@@ -317,3 +318,5 @@ battery_profile 1
 
 # save configuration
 save
+
+# 
