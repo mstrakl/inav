@@ -54,6 +54,9 @@
 #include "sensors/pitotmeter.h"
 #include "sensors/sensors.h"
 
+#include "common/log.h"
+#include "navigation/navigation_dlz.h"
+
 navigationPosEstimator_t posEstimator;
 static float initialBaroAltitudeOffset = 0.0f;
 
@@ -667,8 +670,21 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
             ctx->newEPH = posEstimator.gps.eph;
         }
         else {
-            const float gpsPosXResidual = posEstimator.gps.pos.x - posEstimator.est.pos.x;
-            const float gpsPosYResidual = posEstimator.gps.pos.y - posEstimator.est.pos.y;
+
+            adum_dlz_update();
+
+            const float fadedDlzGpsPosX = adum_dlz_get_fade() * adum_dlz_get_ned_pos_x() + 
+                (1.0f - adum_dlz_get_fade()) * posEstimator.gps.pos.x;
+            const float fadedDlzGpsPosY = adum_dlz_get_fade() * adum_dlz_get_ned_pos_y() + 
+                (1.0f - adum_dlz_get_fade()) * posEstimator.gps.pos.y;
+            
+            
+            LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
+                adum_dlz_get_fade(), posEstimator.gps.pos.x, fadedDlzGpsPosX,
+                posEstimator.gps.pos.y, fadedDlzGpsPosY);
+
+            const float gpsPosXResidual = fadedDlzGpsPosX - posEstimator.est.pos.x;
+            const float gpsPosYResidual = fadedDlzGpsPosY - posEstimator.est.pos.y;
             const float gpsVelXResidual = posEstimator.gps.vel.x - posEstimator.est.vel.x;
             const float gpsVelYResidual = posEstimator.gps.vel.y - posEstimator.est.vel.y;
             const float gpsPosResidualMag = calc_length_pythagorean_2D(gpsPosXResidual, gpsPosYResidual);
@@ -901,6 +917,8 @@ void initializePositionEstimator(void)
 
     pt1FilterInit(&posEstimator.baro.avgFilter, INAV_BARO_AVERAGE_HZ, 0.0f);
     pt1FilterInit(&posEstimator.surface.avgFilter, INAV_SURFACE_AVERAGE_HZ, 0.0f);
+
+    adum_dlz_init();
 }
 
 /**

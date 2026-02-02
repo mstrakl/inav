@@ -24,10 +24,13 @@ Navigation::Navigation() {
 void Navigation::reset() {
     m_lastMspRxTime = 0;
     m_lastUpdateTime = 0;
-    m_skyvisData = {0, 0, 0, 0};
+    m_skyvisData = {0, 0, 0, 0, 0};
 
-    //m_cmdPitchRL.reset();
-    //m_cmdRollRL.reset();
+    m_nedPosX = 0.0f;   
+    m_nedPosY = 0.0f;
+    m_nedVelX = 0.0f;
+    m_nedVelY = 0.0f;
+    m_fade = 0.0f;
 }        
 
 
@@ -36,6 +39,7 @@ void Navigation::readSkyvisData(const uint8_t* bufferPtr,
 
     if(dataSize != sizeof(mspSensorSkyvis_t)) {
         LOG_ERROR(SYSTEM, "mspSkyvisReceiveNewData: invalid data size %d", dataSize);
+        LOG_DEBUG(SYSTEM, "mspSkyvisReceiveNewData: invalid data size %d", dataSize);
         return;
     }
 
@@ -45,43 +49,48 @@ void Navigation::readSkyvisData(const uint8_t* bufferPtr,
 }   
 
 
-void Navigation::update(const float& centimeterPosX, 
-                        const float& centimeterPosY,
-                        const float& centimeterVelX, 
-                        const float& centimeterVelY,
-                        const float& navPitchCmd,
-                        const float& navRollCmd) {
+void Navigation::update() {
 
     if ((millis() - m_lastMspRxTime > UPDATE_TIMEOUT_MS) || 
         (logicConditionGetValue(DLZ_LOGIC_COND_ID) == 0)) {
-        m_cmdPitch = navPitchCmd;
-        m_cmdRoll = navRollCmd;
         LOG_INFO(SYSTEM, "INAV: DLZ Timeout! Time=%u", (unsigned)millis());
+        
+        // Disable DLZ guidance
+        m_nedPosX = 0.0f;
+        m_nedPosY = 0.0f;
+        m_nedVelX = 0.0f;
+        m_nedVelY = 0.0f;
+        m_fade = 0.0f;
         return;
     }
 
-    const float skyvisCmdPitch = (float)m_skyvisData.cmdPitch * (3.14159265f / 180.0f) / 100.0f;   // convert to radians
-    const float skyvisCmdRoll = (float)m_skyvisData.cmdRoll * (3.14159265f / 180.0f) / 100.0f;     // convert to radians
 
-    const float fade = constrainf((float)m_skyvisData.confidence / 1000.0f, 0.0f, 1.0f);
+    m_fade = constrainf((float)m_skyvisData.confidence / 1000.0f, 0.0f, 1.0f);
+    m_nedPosX = (float)m_skyvisData.nedPosX;
+    m_nedPosY = (float)m_skyvisData.nedPosY;
+    m_nedVelX = (float)m_skyvisData.nedVelX;
+    m_nedVelY = (float)m_skyvisData.nedVelY;
 
-    m_cmdPitch = fade * skyvisCmdPitch + (1.0f - fade) * navPitchCmd;
-    m_cmdRoll = fade * skyvisCmdRoll + (1.0f - fade) * navRollCmd;
 
-    LOG_INFO(SYSTEM, "INAV: DLZ Update: Time=%u CmdPitch=%f CmdRoll=%f VelX=%f VelY=%f Fade=%f",
-             (unsigned)millis(), m_cmdPitch * (180.0f / 3.14159265f), m_cmdRoll * (180.0f / 3.14159265f),
-             centimeterVelX/100.0, centimeterVelY/100.0, fade);
+    LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosX %f", m_nedPosX);
+    LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosY %f", m_nedPosY);
+    LOG_INFO(SYSTEM, "INAV: Skyvis.NedVelX %f", m_nedVelX);  
+    LOG_INFO(SYSTEM, "INAV: Skyvis.NedVelY %f", m_nedVelY);
+    LOG_INFO(SYSTEM, "INAV: Skyvis.Confidence %f, raw: %d", m_fade, m_skyvisData.confidence);
+
 
     m_lastUpdateTime = millis();
 }
 
 
-float Navigation::getPitchCmd() const {
-    return m_cmdPitch;
-}
+const float Navigation::getNedPosX() const { return m_nedPosX; }
 
-float Navigation::getRollCmd() const {
-    return m_cmdRoll;
-}
+const float Navigation::getNedPosY() const { return m_nedPosY; }
+
+const float Navigation::getNedVelX() const { return m_nedVelX; }
+
+const float Navigation::getNedVelY() const { return m_nedVelY; }
+
+const float Navigation::getFade() const { return m_fade; }
 
 

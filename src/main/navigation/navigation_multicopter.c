@@ -54,10 +54,6 @@
 
 #include "sensors/battery.h"
 
-#include "common/log.h"
-#include "navigation/navigation_dlz.h"
-
-
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
  *-----------------------------------------------------------*/

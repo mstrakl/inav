@@ -23,6 +23,7 @@ extern NavDlzData_t NavDlzData;
 
 
 
+
 // C wrappers for C++ DLZ navigation class (implemented in navigation/dlz/nav_dlz_wrapper.cpp)
 #ifdef __cplusplus
 extern "C" {
@@ -35,16 +36,14 @@ void adum_dlz_readskyvisdata(const uint8_t* bufferPtr,
 
 void adum_dlz_reset(void);
                         
-void adum_dlz_update(const float centimeterPosX, 
-                     const float centimeterPosY,
-                     const float centimeterVelX, 
-                     const float centimeterVelY,
-                     const float accFwd, 
-                     const float accRight);
+void adum_dlz_update(void);
 
-const float adum_dlz_getpitchcmd();
 
-const float adum_dlz_getrollcmd();
+const float adum_dlz_get_ned_pos_x(void);
+const float adum_dlz_get_ned_pos_y(void);
+const float adum_dlz_get_ned_vel_x(void);
+const float adum_dlz_get_ned_vel_y(void);
+const float adum_dlz_get_fade(void);
 
 #ifdef __cplusplus
 }

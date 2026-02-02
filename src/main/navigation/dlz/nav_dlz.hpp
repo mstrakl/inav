@@ -8,10 +8,11 @@
 namespace AdumDlz {
 
     typedef struct __attribute__((packed)) {
-        int16_t  cmdPitch;      // degress * 100
-        int16_t  cmdRoll;       // degrees * 100
-        int16_t  cmdAltitudeMm; // mm
-        int16_t  confidence; // 0 - 1000
+        int32_t nedPosX;  // cm
+        int32_t nedPosY;  // cm
+        int16_t nedVelX;  // cm/s
+        int16_t nedVelY;  // cm/s
+        int16_t confidence; // 0 - 1000
     } mspSensorSkyvis_t;
 
     class Navigation {
@@ -24,33 +25,31 @@ namespace AdumDlz {
         void readSkyvisData(const uint8_t* bufferPtr, 
                             unsigned int dataSize);
 
-        void update(const float& centimeterPosX, 
-                    const float& centimeterPosY,
-                    const float& centimeterVelX, 
-                    const float& centimeterVelY,
-                    const float& navPitchCmd, 
-                    const float& navRollCmd);
+        void update();
 
-        float getPitchCmd() const;
 
-        float getRollCmd() const;
-
+        const float getNedPosX() const;
+        const float getNedPosY() const;
+        const float getNedVelX() const;
+        const float getNedVelY() const;
+        const float getFade() const;
 
     private:
 
         timeMs_t    m_lastMspRxTime{0};
         timeMs_t    m_lastUpdateTime{0};
-        mspSensorSkyvis_t m_skyvisData{0, 0, 0, 0};
+        mspSensorSkyvis_t m_skyvisData{0, 0, 0, 0, 0};
 
-        float m_cmdPitch{0.0f};   // radians
-        float m_cmdRoll{0.0f};   // radians
-        
-        //AdumDlzUtils::RateLimiter m_cmdPitchRL{0.1f}; // radians per second
-        //AdumDlzUtils::RateLimiter m_cmdRollRL{0.1f};
 
+        float m_nedPosX{0.0f};
+        float m_nedPosY{0.0f};
+        float m_nedVelX{0.0f};
+        float m_nedVelY{0.0f};
+        float m_fade{0.0f};
 
     };
 
 } // namespace AdumDlz
+
 
 #endif // ADUM_NAV_DLZ_HPP
