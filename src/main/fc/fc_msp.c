@@ -537,18 +537,27 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
             const flightModeForTelemetry_e mode = getFlightModeForTelemetry();
             sbufWriteU8(dst, (uint8_t)mode);
 
-            for (int i = 0; i < 3; i++) {
-                sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));
-            }
-            for (int i = 0; i < 3; i++) {
-                sbufWriteU16(dst, gyroRateDps(i));
-            }
+            uint32_t u;
+
+            // Accelerations NEU in cm/s2 float 
+            memcpy(&u, &posEstimator.imu.accelNEU.x, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &posEstimator.imu.accelNEU.y, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &posEstimator.imu.accelNEU.z, sizeof(u));
+            sbufWriteU32(dst, u);
+
+            //for (int i = 0; i < 3; i++) {
+            //    sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));
+            //}
+            //for (int i = 0; i < 3; i++) {
+            //    sbufWriteU16(dst, gyroRateDps(i));
+            //}
             //sbufWriteU16(dst, attitude.values.roll); // decidegrees (deg/10)
             //sbufWriteU16(dst, attitude.values.pitch); // decidegrees (deg/10)
             //sbufWriteU16(dst, attitude.values.yaw); // decidegrees (deg/10)
             
             // Write orientation quaternion
-            uint32_t u;
             memcpy(&u, &orientation.q0, sizeof(u));
             sbufWriteU32(dst, u);
             memcpy(&u, &orientation.q1, sizeof(u));
