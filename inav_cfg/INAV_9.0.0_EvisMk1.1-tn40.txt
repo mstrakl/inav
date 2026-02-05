@@ -115,10 +115,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 4
+set gyro_zero_x = 3
 set gyro_zero_y = 1
-set gyro_zero_z = 5
-set ins_gravity_cmss =  982.043
+set gyro_zero_z = 4
+set ins_gravity_cmss =  982.783
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
@@ -196,18 +196,16 @@ set rate_dynamics_end_weight = 10
 # control_profile
 control_profile 2
 
-set mc_p_pitch = 41
-set mc_i_pitch = 60
-set mc_d_pitch = 26
-set mc_cd_pitch = 80
-set mc_p_roll = 23
-set mc_i_roll = 13
-set mc_d_roll = 7
-set mc_cd_roll = 53
-set mc_p_yaw = 56
-set mc_i_yaw = 15
-set mc_d_yaw = 16
-set mc_cd_yaw = 23
+set mc_i_pitch = 52
+set mc_d_pitch = 21
+set mc_cd_pitch = 54
+set mc_i_roll = 33
+set mc_d_roll = 14
+set mc_cd_roll = 58
+set mc_p_yaw = 55
+set mc_i_yaw = 29
+set mc_d_yaw = 47
+set mc_cd_yaw = 52
 set mc_p_level = 15
 set mc_d_level = 65
 set fw_p_pitch = 15
@@ -223,7 +221,7 @@ set fw_d_yaw = 20
 set fw_ff_yaw = 255
 set max_angle_inclination_pit = 300
 set fw_level_pitch_trim =  2.000
-set yaw_rate = 10
+set yaw_rate = 7
 
 # control_profile
 control_profile 3
@@ -326,8 +324,8 @@ battery_profile 3
 set throttle_idle =  5.000
 
 # restore original profile selection
-control_profile 2
-mixer_profile 2
+control_profile 1
+mixer_profile 1
 battery_profile 1
 
 # save configuration
