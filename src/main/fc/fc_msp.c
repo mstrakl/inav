@@ -539,22 +539,32 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
 
             uint32_t u;
 
-            // Accelerations NEU in cm/s2 float 
-            //memcpy(&u, &posEstimator.imu.accelNEU.x, sizeof(u));
-            //sbufWriteU32(dst, u);
-            //memcpy(&u, &posEstimator.imu.accelNEU.y, sizeof(u));
-            //sbufWriteU32(dst, u);
-            //memcpy(&u, &posEstimator.imu.accelNEU.z, sizeof(u));
-            //sbufWriteU32(dst, u);
+            const flightModeForTelemetry_e mode = getFlightModeForTelemetry();
+            sbufWriteU8(dst, (uint8_t)mode);
 
-            // Body accel in cm/s2 float
-            memcpy(&u, &imuMeasuredAccelBF.x, sizeof(u));
-            sbufWriteU32(dst, u);
-            memcpy(&u, &imuMeasuredAccelBF.y, sizeof(u));
-            sbufWriteU32(dst, u);
-            memcpy(&u, &imuMeasuredAccelBF.z, sizeof(u));
-            sbufWriteU32(dst, u);
+            for (int i = 0; i < 3; i++) {
+                sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));
+            }
             
+//            for (int i = 0; i < 3; i++) {
+//                sbufWriteU16(dst, gyroRateDps(i));
+//            }
+
+//            // Accelerations NEU in cm/s2 float 
+//            //memcpy(&u, &posEstimator.imu.accelNEU.x, sizeof(u));
+//            //sbufWriteU32(dst, u);
+//            //memcpy(&u, &posEstimator.imu.accelNEU.y, sizeof(u));
+//            //sbufWriteU32(dst, u);
+//            //memcpy(&u, &posEstimator.imu.accelNEU.z, sizeof(u));
+//            //sbufWriteU32(dst, u);
+//
+//            // Body accel in cm/s2 float
+//            memcpy(&u, &imuMeasuredAccelBF.x, sizeof(u));
+//            sbufWriteU32(dst, u);
+//            memcpy(&u, &imuMeasuredAccelBF.y, sizeof(u));
+//            sbufWriteU32(dst, u);
+//            memcpy(&u, &imuMeasuredAccelBF.z, sizeof(u));
+//            sbufWriteU32(dst, u);         
 
             //for (int i = 0; i < 3; i++) {
             //    sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));

@@ -103,11 +103,6 @@
 #define ICM426XX_RA_ACCEL_CONFIG_STATIC3            0x04  // User Bank 2
 #define ICM426XX_RA_ACCEL_CONFIG_STATIC4            0x05  // User Bank 2
 
-#define ICM_42688_ACCEL_FS_16G (0b000 << 5)
-#define ICM_42688_ACCEL_FS_8G  (0b001 << 5)
-#define ICM_42688_ACCEL_FS_4G  (0b010 << 5)
-#define ICM_42688_ACCEL_FS_2G  (0b011 << 5)
-
 static bool is42688P = false;
 
 typedef struct aafConfig_s {
@@ -159,7 +154,7 @@ static void setUserBank(const busDevice_t *dev, const uint8_t user_bank)
 
 static void icm42605AccInit(accDev_t *acc)
 {
-    acc->acc_1G = 512 * 8;
+    acc->acc_1G = 512 * 4;
 }
 
 static bool icm42605AccRead(accDev_t *acc)
@@ -223,7 +218,7 @@ static void icm42605AccAndGyroInit(gyroDev_t *gyro)
     busWrite(dev, ICM42605_RA_GYRO_CONFIG0, (0x00) << 5 | (config->gyroConfigValues[1] & 0x0F));    /* 2000 deg/s */
     delay(15);
 
-    busWrite(dev, ICM42605_RA_ACCEL_CONFIG0,  ICM_42688_ACCEL_FS_8G | (config->gyroConfigValues[1] & 0x0F));    /* 8 G */
+    busWrite(dev, ICM42605_RA_ACCEL_CONFIG0, (0x00) << 5 | (config->gyroConfigValues[1] & 0x0F));    /* 16 G deg/s */
     delay(15);
 
     /* LPF bandwidth */
