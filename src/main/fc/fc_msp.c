@@ -576,10 +576,26 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
             memcpy(&u, &orientation.q3, sizeof(u));
             sbufWriteU32(dst, u);
 
-            // 29 bytes up to here, positions 0 - 10
 
-            sbufWriteU32(dst, gpsSol.llh.lat);           // pos 11 * 1e+7
-            sbufWriteU32(dst, gpsSol.llh.lon);           // pos 12 * 1e+7
+            // Active waypoint position in cm float. We will send
+            // position only with lasp WP, this will indicate to
+            // Skyvis that camera activation is in order
+
+            if (isLastMissionWaypoint()) {
+                memcpy(&u, &posControl.activeWaypoint.pos.x, sizeof(u));
+                sbufWriteU32(dst, u);
+                memcpy(&u, &posControl.activeWaypoint.pos.y, sizeof(u));
+                sbufWriteU32(dst, u);
+
+                
+            } else {
+                const float dum = 0.0;
+                memcpy(&u, &dum, sizeof(u));
+                sbufWriteU32(dst, u);
+                memcpy(&u, &dum, sizeof(u));
+                sbufWriteU32(dst, u);
+            }
+
 
             uint16_t agl = (unsigned int)lroundf(
                 fminf(fmaxf(posControl.actualState.agl.pos.z, 0.0f), 65535.0f)

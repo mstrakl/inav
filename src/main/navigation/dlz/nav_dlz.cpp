@@ -72,11 +72,11 @@ void Navigation::update() {
     m_nedVelY = (float)m_skyvisData.nedVelY;
 
 
-    LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosX %f", m_nedPosX);
-    LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosY %f", m_nedPosY);
-    LOG_INFO(SYSTEM, "INAV: Skyvis.NedVelX %f", m_nedVelX);  
-    LOG_INFO(SYSTEM, "INAV: Skyvis.NedVelY %f", m_nedVelY);
-    LOG_INFO(SYSTEM, "INAV: Skyvis.Confidence %f, raw: %d", m_fade, m_skyvisData.confidence);
+    //LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosX %f", m_nedPosX);
+    //LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosY %f", m_nedPosY);
+    //LOG_INFO(SYSTEM, "INAV: Skyvis.NedVelX %f", m_nedVelX);  
+    //LOG_INFO(SYSTEM, "INAV: Skyvis.NedVelY %f", m_nedVelY);
+    //LOG_INFO(SYSTEM, "INAV: Skyvis.Confidence %f, raw: %d", m_fade, m_skyvisData.confidence);
 
 
     m_lastUpdateTime = millis();

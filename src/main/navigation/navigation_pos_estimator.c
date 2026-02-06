@@ -673,15 +673,39 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
 
             adum_dlz_update();
 
-            const float fadedDlzGpsPosX = adum_dlz_get_fade() * adum_dlz_get_ned_pos_x() + 
-                (1.0f - adum_dlz_get_fade()) * posEstimator.gps.pos.x;
-            const float fadedDlzGpsPosY = adum_dlz_get_fade() * adum_dlz_get_ned_pos_y() + 
-                (1.0f - adum_dlz_get_fade()) * posEstimator.gps.pos.y;
+            const float adum_fade = constrainf(adum_dlz_get_fade(), 0.0f, 1.0f);
+
+            const float fadedDlzGpsPosX = adum_fade * adum_dlz_get_ned_pos_x() + 
+                (1.0f - adum_fade) * posEstimator.gps.pos.x;
+            const float fadedDlzGpsPosY = adum_fade * adum_dlz_get_ned_pos_y() + 
+                (1.0f - adum_fade) * posEstimator.gps.pos.y;
+
+
+            // Use velocity xy fading, conditionally, only if != 0.0, at least one
+
+            float adum_vx = adum_dlz_get_ned_vel_x();
+            float adum_vy = adum_dlz_get_ned_vel_y();
+
+            int useVel = 0;
+
+            float fadedDlzGpsVelX = posEstimator.gps.vel.x;
+            float fadedDlzGpsVelY = posEstimator.gps.vel.y;
+
+            if (adum_vx != 0.0f || adum_vy != 0.0f) {
+
+                const float fadedDlzGpsVelX = adum_fade * adum_vx + 
+                    (1.0f - adum_fade) * posEstimator.gps.vel.x;
+                const float fadedDlzGpsVelY = adum_fade * adum_vy + 
+                    (1.0f - adum_fade) * posEstimator.gps.vel.y;
+                
+                useVel = 1;
+
+            } 
 
             const float gpsPosXResidual = fadedDlzGpsPosX - posEstimator.est.pos.x;
             const float gpsPosYResidual = fadedDlzGpsPosY - posEstimator.est.pos.y;
-            const float gpsVelXResidual = posEstimator.gps.vel.x - posEstimator.est.vel.x;
-            const float gpsVelYResidual = posEstimator.gps.vel.y - posEstimator.est.vel.y;
+            const float gpsVelXResidual = fadedDlzGpsVelX - posEstimator.est.vel.x;
+            const float gpsVelYResidual = fadedDlzGpsVelY - posEstimator.est.vel.y;
             const float gpsPosResidualMag = calc_length_pythagorean_2D(gpsPosXResidual, gpsPosYResidual);
 
             //const float gpsWeightScaler = scaleRangef(bellCurve(gpsPosResidualMag, INAV_GPS_ACCEPTANCE_EPE), 0.0f, 1.0f, 0.1f, 1.0f);
@@ -704,11 +728,20 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
 
             /* Adjust EPH */
             ctx->newEPH = updateEPE(posEstimator.est.eph, ctx->dt, MAX(posEstimator.gps.eph, gpsPosResidualMag), w_xy_gps_p);
-            
-            LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f, Eph: %f",
-                adum_dlz_get_fade(), posEstimator.gps.pos.x, fadedDlzGpsPosX,
-                posEstimator.gps.pos.y, fadedDlzGpsPosY, ctx->newEPH);
 
+
+            LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, Use Vel: %d, Eph: %f",
+                adum_fade, useVel, ctx->newEPH);
+            
+            LOG_DEBUG(POS_ESTIMATOR, "GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
+                posEstimator.gps.pos.x, fadedDlzGpsPosX,
+                posEstimator.gps.pos.y, fadedDlzGpsPosY);
+
+            LOG_DEBUG(POS_ESTIMATOR, "GPS VelX: %f, Faded VelX: %f, GPS VelY: %f, Faded VelY: %f",
+                posEstimator.gps.vel.x, fadedDlzGpsVelX,
+                posEstimator.gps.vel.y, fadedDlzGpsVelY);
+            
+            LOG_DEBUG(POS_ESTIMATOR, "#----------------------------------#");
         }
 
         return true;
