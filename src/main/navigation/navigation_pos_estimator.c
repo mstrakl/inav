@@ -677,11 +677,6 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
                 (1.0f - adum_dlz_get_fade()) * posEstimator.gps.pos.x;
             const float fadedDlzGpsPosY = adum_dlz_get_fade() * adum_dlz_get_ned_pos_y() + 
                 (1.0f - adum_dlz_get_fade()) * posEstimator.gps.pos.y;
-            
-            
-            LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
-                adum_dlz_get_fade(), posEstimator.gps.pos.x, fadedDlzGpsPosX,
-                posEstimator.gps.pos.y, fadedDlzGpsPosY);
 
             const float gpsPosXResidual = fadedDlzGpsPosX - posEstimator.est.pos.x;
             const float gpsPosYResidual = fadedDlzGpsPosY - posEstimator.est.pos.y;
@@ -709,6 +704,11 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
 
             /* Adjust EPH */
             ctx->newEPH = updateEPE(posEstimator.est.eph, ctx->dt, MAX(posEstimator.gps.eph, gpsPosResidualMag), w_xy_gps_p);
+            
+            LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f, Eph: %f",
+                adum_dlz_get_fade(), posEstimator.gps.pos.x, fadedDlzGpsPosX,
+                posEstimator.gps.pos.y, fadedDlzGpsPosY, ctx->newEPH);
+
         }
 
         return true;
