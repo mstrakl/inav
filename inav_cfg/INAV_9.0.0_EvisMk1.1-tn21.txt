@@ -115,10 +115,9 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 13
-set gyro_zero_y = -5
-set gyro_zero_z = -6
-set ins_gravity_cmss =  977.789
+set gyro_zero_x = 8
+set gyro_zero_y = -6
+set ins_gravity_cmss =  978.057
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -169,27 +168,30 @@ set log_topics = 4294967295
 # control_profile
 control_profile 1
 
-set fw_p_pitch = 18
-set fw_i_pitch = 37
-set fw_d_pitch = 4
-set fw_ff_pitch = 46
-set fw_p_roll = 7
+set fw_p_pitch = 21
+set fw_i_pitch = 51
+set fw_d_pitch = 7
+set fw_ff_pitch = 70
+set fw_p_roll = 10
 set fw_i_roll = 37
 set fw_d_roll = 9
-set fw_ff_roll = 46
+set fw_ff_roll = 65
 set fw_p_yaw = 46
 set fw_i_yaw = 17
 set fw_d_yaw = 7
 set fw_ff_yaw = 79
 set fw_p_level = 15
-set rc_expo = 30
-set rc_yaw_expo = 30
-set roll_rate = 12
-set pitch_rate = 9
-set yaw_rate = 4
-set rate_dynamics_center_correction = 15
-set rate_dynamics_end_correction = 20
-set rate_dynamics_center_weight = 2
+set fw_d_level = 50
+set fw_level_pitch_trim =  3.000
+set rc_expo = 25
+set rc_yaw_expo = 25
+set roll_rate = 22
+set pitch_rate = 15
+set yaw_rate = 6
+set manual_rc_yaw_expo = 30
+set rate_dynamics_end_sensitivity = 120
+set rate_dynamics_center_correction = 20
+set rate_dynamics_center_weight = 20
 set rate_dynamics_end_weight = 10
 
 # control_profile
@@ -267,12 +269,12 @@ mmix 2 -1.000  0.000  0.000  0.000
 # Mixer: servo mixer
 smix reset
 
-smix 0 3 0 75 0 -1
-smix 1 4 0 75 0 -1
+smix 0 3 0 90 0 -1
+smix 1 4 0 90 0 -1
 smix 2 5 1 -75 0 -1
-smix 3 5 2 -50 0 -1
+smix 3 5 2 -30 0 -1
 smix 4 6 1 75 0 -1
-smix 5 6 2 -50 0 -1
+smix 5 6 2 -30 0 -1
 smix 6 7 6 100 0 -1
 smix 7 1 29 100 100 -1
 smix 8 2 29 -97 100 -1
@@ -329,5 +331,44 @@ battery_profile 1
 
 # save configuration
 save
+
+# status
+INAV/MATEKF405SE 9.0.0 Jan 14 2026 / 12:44:11 (a7932b92) 
+GCC-13.2.1 20231009
+System Uptime: 39 seconds
+Current Time: 2026-02-07T13:14:40.752+00:00
+Voltage: 0.00V (0S battery - NOT PRESENT)
+CPU Clock=168MHz, GYRO=ICM42605, ACC=ICM42605, BARO=SPL06, MAG=IST8310
+STM32 system clocks:
+  SYSCLK = 168 MHz
+  HCLK   = 168 MHz
+  PCLK1  = 42 MHz
+  PCLK2  = 84 MHz
+Sensor status: GYRO=OK, ACC=OK, MAG=OK, BARO=OK, RANGEFINDER=NONE, OPFLOW=NONE, GPS=OK
+SD card: Manufacturer 0xad, 3891200kB, 12/2022, v1.0, 'USD00'
+Filesystem: Ready
+Stack size: 6144, Stack address: 0x10010000, Heap available: 1428
+I2C Errors: 0, config size: 13507, max available config: 131072
+ADC channel usage:
+   BATTERY : configured = ADC 1, used = ADC 1
+      RSSI : configured = ADC 3, used = none
+   CURRENT : configured = ADC 2, used = ADC 2
+  AIRSPEED : configured = none, used = none
+System load: 13, cycle time: 513, PID rate: 1949, RX rate: 327, System rate: 9
+Arming disabled flags: CLI
+OSD: not enabled
+VTX: not detected
+GPS: HW Version: UBLOX10 Proto: 34.09 Baud: 115200
+  SATS: 17
+  HDOP:  1.260
+  EPH :  0.720 m
+  EPV :  1.080 m
+  GNSS Capabilities:
+    GNSS Provider active/default
+    GPS 1/1
+    Galileo 1/1
+    BeiDou 0/1
+    Glonass 0/0
+    Max concurrent: 3
 
 # 
