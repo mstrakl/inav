@@ -539,13 +539,10 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
 
             uint32_t u;
 
-            const flightModeForTelemetry_e mode = getFlightModeForTelemetry();
-            sbufWriteU8(dst, (uint8_t)mode);
-
             for (int i = 0; i < 3; i++) {
                 sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));
             }
-            
+
 //            for (int i = 0; i < 3; i++) {
 //                sbufWriteU16(dst, gyroRateDps(i));
 //            }
