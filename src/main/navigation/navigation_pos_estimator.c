@@ -60,6 +60,8 @@
 navigationPosEstimator_t posEstimator;
 static float initialBaroAltitudeOffset = 0.0f;
 
+static int ilog = 0;
+
 PG_REGISTER_WITH_RESET_TEMPLATE(positionEstimationConfig_t, positionEstimationConfig, PG_POSITION_ESTIMATION_CONFIG, 8);
 
 PG_RESET_TEMPLATE(positionEstimationConfig_t, positionEstimationConfig,
@@ -741,7 +743,7 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
                     posEstimator.gps.pos.y, fadedDlzGpsPosY);
 
             } else if (ilog >= 60) {
-                
+
                 LOG_DEBUG(POS_ESTIMATOR, "GPS VelX: %f, Faded VelX: %f, GPS VelY: %f, Faded VelY: %f",
                     posEstimator.gps.vel.x, fadedDlzGpsVelX,
                     posEstimator.gps.vel.y, fadedDlzGpsVelY);
