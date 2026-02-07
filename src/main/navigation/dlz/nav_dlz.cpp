@@ -39,7 +39,6 @@ void Navigation::readSkyvisData(const uint8_t* bufferPtr,
 
     if(dataSize != sizeof(mspSensorSkyvis_t)) {
         LOG_ERROR(SYSTEM, "mspSkyvisReceiveNewData: invalid data size %d", dataSize);
-        LOG_DEBUG(SYSTEM, "mspSkyvisReceiveNewData: invalid data size %d", dataSize);
         return;
     }
 
@@ -53,7 +52,7 @@ void Navigation::update() {
 
     if ((millis() - m_lastMspRxTime > UPDATE_TIMEOUT_MS) || 
         (logicConditionGetValue(DLZ_LOGIC_COND_ID) == 0)) {
-        LOG_INFO(SYSTEM, "INAV: DLZ Timeout! Time=%u", (unsigned)millis());
+        //LOG_INFO(SYSTEM, "INAV: DLZ Timeout! Time=%u", (unsigned)millis());
         
         // Disable DLZ guidance
         m_nedPosX = 0.0f;

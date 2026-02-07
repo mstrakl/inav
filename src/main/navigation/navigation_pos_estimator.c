@@ -729,19 +729,25 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
             /* Adjust EPH */
             ctx->newEPH = updateEPE(posEstimator.est.eph, ctx->dt, MAX(posEstimator.gps.eph, gpsPosResidualMag), w_xy_gps_p);
 
+            if (ilog >= 50) {
 
-            LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, Use Vel: %d, Eph: %f",
-                adum_fade, useVel, ctx->newEPH);
-            
-            LOG_DEBUG(POS_ESTIMATOR, "GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
-                posEstimator.gps.pos.x, fadedDlzGpsPosX,
-                posEstimator.gps.pos.y, fadedDlzGpsPosY);
+                LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, Use Vel: %d, Eph: %f",
+                    adum_fade, useVel, ctx->newEPH);
+                
+                LOG_DEBUG(POS_ESTIMATOR, "GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
+                    posEstimator.gps.pos.x, fadedDlzGpsPosX,
+                    posEstimator.gps.pos.y, fadedDlzGpsPosY);
 
-            LOG_DEBUG(POS_ESTIMATOR, "GPS VelX: %f, Faded VelX: %f, GPS VelY: %f, Faded VelY: %f",
-                posEstimator.gps.vel.x, fadedDlzGpsVelX,
-                posEstimator.gps.vel.y, fadedDlzGpsVelY);
-            
-            LOG_DEBUG(POS_ESTIMATOR, "#----------------------------------#");
+                LOG_DEBUG(POS_ESTIMATOR, "GPS VelX: %f, Faded VelX: %f, GPS VelY: %f, Faded VelY: %f",
+                    posEstimator.gps.vel.x, fadedDlzGpsVelX,
+                    posEstimator.gps.vel.y, fadedDlzGpsVelY);
+                
+                LOG_DEBUG(POS_ESTIMATOR, "#----------------------------------#");
+
+                ilog = 0;
+            }
+
+            ilog++;
         }
 
         return true;
@@ -923,6 +929,8 @@ bool isEstimatedAglTrusted(void) {
 void initializePositionEstimator(void)
 {
     int axis;
+
+    ilog = 0;
 
     posEstimator.est.eph = positionEstimationConfig()->max_eph_epv + 0.001f;
     posEstimator.est.epv = positionEstimationConfig()->max_eph_epv + 0.001f;
