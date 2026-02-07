@@ -731,29 +731,35 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
             /* Adjust EPH */
             ctx->newEPH = updateEPE(posEstimator.est.eph, ctx->dt, MAX(posEstimator.gps.eph, gpsPosResidualMag), w_xy_gps_p);
 
-            if (ilog >= 20) {
 
-                LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, Use Vel: %d, Eph: %f",
-                    adum_fade, useVel, ctx->newEPH);
+            const flightModeForTelemetry_e mode = getFlightModeForTelemetry(); 
 
-            } else if (ilog >= 40) {
+            if (mode >= 5 && mode <= 10) {
+                if (ilog >= 20) {
 
-                LOG_DEBUG(POS_ESTIMATOR, "GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
-                    posEstimator.gps.pos.x, fadedDlzGpsPosX,
-                    posEstimator.gps.pos.y, fadedDlzGpsPosY);
+                    LOG_DEBUG(POS_ESTIMATOR, "DLZ fade: %f, Use Vel: %d, Eph: %f",
+                        adum_fade, useVel, ctx->newEPH);
 
-            } else if (ilog >= 60) {
+                } else if (ilog >= 40) {
 
-                LOG_DEBUG(POS_ESTIMATOR, "GPS VelX: %f, Faded VelX: %f, GPS VelY: %f, Faded VelY: %f",
-                    posEstimator.gps.vel.x, fadedDlzGpsVelX,
-                    posEstimator.gps.vel.y, fadedDlzGpsVelY);
-                
-                LOG_DEBUG(POS_ESTIMATOR, "#--");
+                    LOG_DEBUG(POS_ESTIMATOR, "GPS PosX: %f, Faded PosX: %f, GPS PosY: %f, Faded PosY: %f",
+                        posEstimator.gps.pos.x, fadedDlzGpsPosX,
+                        posEstimator.gps.pos.y, fadedDlzGpsPosY);
 
-                ilog = 0;
+                } else if (ilog >= 60) {
+
+                    LOG_DEBUG(POS_ESTIMATOR, "GPS VelX: %f, Faded VelX: %f, GPS VelY: %f, Faded VelY: %f",
+                        posEstimator.gps.vel.x, fadedDlzGpsVelX,
+                        posEstimator.gps.vel.y, fadedDlzGpsVelY);
+                    
+                    LOG_DEBUG(POS_ESTIMATOR, "#--");
+
+                    ilog = 0;
+                }
+
+                ilog++;
             }
 
-            ilog++;
         }
 
         return true;
