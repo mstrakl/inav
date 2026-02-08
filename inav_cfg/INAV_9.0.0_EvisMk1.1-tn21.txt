@@ -116,15 +116,17 @@ set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
 set gyro_zero_x = 8
-set gyro_zero_y = -6
-set ins_gravity_cmss =  978.057
+set gyro_zero_y = -5
+set gyro_zero_z = -1
+set ins_gravity_cmss =  981.570
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
+set acczero_x = -3
 set acczero_y = 4
-set acczero_z = -22
-set accgain_x = 4085
-set accgain_y = 4089
-set accgain_z = 4083
+set acczero_z = -18
+set accgain_x = 4083
+set accgain_y = 4090
+set accgain_z = 4084
 set opflow_scale =  4.688
 set align_mag = CW270FLIP
 set mag_hardware = IST8310
@@ -331,44 +333,5 @@ battery_profile 1
 
 # save configuration
 save
-
-# status
-INAV/MATEKF405SE 9.0.0 Jan 14 2026 / 12:44:11 (a7932b92) 
-GCC-13.2.1 20231009
-System Uptime: 39 seconds
-Current Time: 2026-02-07T13:14:40.752+00:00
-Voltage: 0.00V (0S battery - NOT PRESENT)
-CPU Clock=168MHz, GYRO=ICM42605, ACC=ICM42605, BARO=SPL06, MAG=IST8310
-STM32 system clocks:
-  SYSCLK = 168 MHz
-  HCLK   = 168 MHz
-  PCLK1  = 42 MHz
-  PCLK2  = 84 MHz
-Sensor status: GYRO=OK, ACC=OK, MAG=OK, BARO=OK, RANGEFINDER=NONE, OPFLOW=NONE, GPS=OK
-SD card: Manufacturer 0xad, 3891200kB, 12/2022, v1.0, 'USD00'
-Filesystem: Ready
-Stack size: 6144, Stack address: 0x10010000, Heap available: 1428
-I2C Errors: 0, config size: 13507, max available config: 131072
-ADC channel usage:
-   BATTERY : configured = ADC 1, used = ADC 1
-      RSSI : configured = ADC 3, used = none
-   CURRENT : configured = ADC 2, used = ADC 2
-  AIRSPEED : configured = none, used = none
-System load: 13, cycle time: 513, PID rate: 1949, RX rate: 327, System rate: 9
-Arming disabled flags: CLI
-OSD: not enabled
-VTX: not detected
-GPS: HW Version: UBLOX10 Proto: 34.09 Baud: 115200
-  SATS: 17
-  HDOP:  1.260
-  EPH :  0.720 m
-  EPV :  1.080 m
-  GNSS Capabilities:
-    GNSS Provider active/default
-    GPS 1/1
-    Galileo 1/1
-    BeiDou 0/1
-    Glonass 0/0
-    Max concurrent: 3
 
 # 
