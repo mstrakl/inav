@@ -695,9 +695,9 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
 
             if (adum_vx != 0.0f || adum_vy != 0.0f) {
 
-                const float fadedDlzGpsVelX = adum_fade * adum_vx + 
+                fadedDlzGpsVelX = adum_fade * adum_vx + 
                     (1.0f - adum_fade) * posEstimator.gps.vel.x;
-                const float fadedDlzGpsVelY = adum_fade * adum_vy + 
+                fadedDlzGpsVelY = adum_fade * adum_vy + 
                     (1.0f - adum_fade) * posEstimator.gps.vel.y;
                 
                 useVel = 1;
