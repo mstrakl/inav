@@ -21,13 +21,13 @@ timer_output_mode 7 SERVOS
 timer_output_mode 11 SERVOS
 
 # Outputs [servo]
-servo 1 1150 1970 1500 -100
-servo 2 1150 1925 1580 -100
+servo 1 1100 1970 1500 -100
+servo 2 1150 1975 1580 -100
 servo 3 1200 1825 1575 100
 servo 4 1170 2050 1645 100
-servo 5 1000 1800 1470 100
-servo 6 1050 2040 1530 100
-servo 7 1300 1500 1400 100
+servo 5 1000 1800 1530 100
+servo 6 1050 2040 1450 100
+servo 7 1220 1420 1320 100
 
 # safehome
 
@@ -115,26 +115,24 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 14
-set gyro_zero_y = -4
-set gyro_zero_z = -2
-set ins_gravity_cmss =  978.565
+set gyro_zero_x = 13
+set gyro_zero_y = -5
+set gyro_zero_z = -6
+set ins_gravity_cmss =  981.106
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
+set acczero_x = -3
 set acczero_y = 4
-set acczero_z = -22
-set accgain_x = 4085
-set accgain_y = 4089
-set accgain_z = 4083
+set acczero_z = -18
+set accgain_x = 4083
+set accgain_y = 4090
+set accgain_z = 4084
 set opflow_scale =  4.688
-set align_mag = CW270FLIP
-set mag_hardware = IST8310
-set magzero_x = -222
-set magzero_y = 22
-set magzero_z = 156
-set maggain_x = 414
-set maggain_y = 431
-set maggain_z = 462
+set align_mag = CW90FLIP
+set mag_hardware = NONE
+set maggain_x = 270
+set maggain_y = 162
+set maggain_z = 699
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
@@ -169,27 +167,30 @@ set log_topics = 4294967295
 # control_profile
 control_profile 1
 
-set fw_p_pitch = 26
-set fw_i_pitch = 10
-set fw_d_pitch = 4
-set fw_ff_pitch = 100
-set fw_p_roll = 13
-set fw_i_roll = 24
-set fw_d_roll = 9
-set fw_ff_roll = 63
+set fw_p_pitch = 21
+set fw_i_pitch = 51
+set fw_d_pitch = 7
+set fw_ff_pitch = 70
+set fw_p_roll = 31
+set fw_i_roll = 26
+set fw_d_roll = 13
+set fw_ff_roll = 65
 set fw_p_yaw = 46
 set fw_i_yaw = 17
 set fw_d_yaw = 7
 set fw_ff_yaw = 79
 set fw_p_level = 15
-set rc_expo = 30
-set rc_yaw_expo = 30
-set roll_rate = 18
-set pitch_rate = 9
-set yaw_rate = 4
-set rate_dynamics_center_correction = 15
-set rate_dynamics_end_correction = 20
-set rate_dynamics_center_weight = 2
+set fw_d_level = 50
+set fw_level_pitch_trim =  3.000
+set rc_expo = 25
+set rc_yaw_expo = 25
+set roll_rate = 19
+set pitch_rate = 15
+set yaw_rate = 6
+set manual_rc_yaw_expo = 30
+set rate_dynamics_end_sensitivity = 120
+set rate_dynamics_center_correction = 20
+set rate_dynamics_center_weight = 20
 set rate_dynamics_end_weight = 10
 
 # control_profile
@@ -252,30 +253,30 @@ set yaw_rate = 3
 # mixer_profile
 mixer_profile 1
 
-set platform_type = TRICOPTER
-set model_preview_type = 1
+set has_flaps = ON
+set model_preview_type = 28
 set mixer_control_profile_linking = ON
 
 # Mixer: motor mixer
 
 mmix reset
 
-mmix 0  0.800  1.000 -0.667  0.000
-mmix 1  0.800 -1.000 -0.667  0.000
-mmix 2  1.000  0.000  1.330  0.000
+mmix 0  1.000  0.000  0.000  0.000
+mmix 1  1.000  0.000  0.000  0.000
+mmix 2 -1.000  0.000  0.000  0.000
 
 # Mixer: servo mixer
 smix reset
 
-smix 0 3 0 100 0 -1
-smix 1 4 0 100 0 -1
-smix 2 5 1 75 0 -1
-smix 3 5 2 -50 0 -1
-smix 4 6 1 -75 0 -1
-smix 5 6 2 -50 0 -1
+smix 0 3 0 90 0 -1
+smix 1 4 0 90 0 -1
+smix 2 5 1 -75 0 -1
+smix 3 5 2 -30 0 -1
+smix 4 6 1 75 0 -1
+smix 5 6 2 -30 0 -1
 smix 6 7 6 100 0 -1
 smix 7 1 29 100 100 -1
-smix 8 2 29 -100 100 -1
+smix 8 2 29 -97 100 -1
 
 # mixer_profile
 mixer_profile 2
@@ -295,8 +296,8 @@ mmix 2  1.000  0.000  1.330  0.000
 # Mixer: servo mixer
 smix reset
 
-smix 0 1 2 -30 0 -1
-smix 1 2 2 -30 0 -1
+smix 0 1 2 -60 0 -1
+smix 1 2 2 -60 0 -1
 smix 2 1 29 -72 100 -1
 smix 3 2 29 71 100 -1
 smix 4 5 1 -50 0 -1
