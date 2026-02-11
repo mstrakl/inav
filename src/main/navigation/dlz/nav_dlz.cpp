@@ -4,14 +4,17 @@
 #include <cstring>
 
 extern "C" {
+
 #include "common/maths.h"
 #include "common/log.h"
 #include "programming/logic_condition.h"
+
+#include "navigation/navigation_pos_estimator_private.h"
+
 }
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_POS_CMD_METERS 20.0f
-#define DLZ_LOGIC_COND_ID 50  // Logic condition ID to check if DLZ is active
 
 using namespace AdumDlz;
 
@@ -69,6 +72,9 @@ void Navigation::update() {
     m_nedPosY = (float)m_skyvisData.nedPosY;
     m_nedVelX = (float)m_skyvisData.nedVelX;
     m_nedVelY = (float)m_skyvisData.nedVelY;
+
+
+    auto const test = posEstimator.gps.pos.x;
 
 
     //LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosX %f", m_nedPosX);

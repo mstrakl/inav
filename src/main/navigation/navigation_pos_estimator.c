@@ -54,6 +54,9 @@
 #include "sensors/pitotmeter.h"
 #include "sensors/sensors.h"
 
+#include "common/log.h"
+#include "navigation/navigation_dlz.h"
+
 navigationPosEstimator_t posEstimator;
 static float initialBaroAltitudeOffset = 0.0f;
 
@@ -667,6 +670,12 @@ static bool estimationCalculateCorrection_XY_GPS(estimationContext_t * ctx)
             ctx->newEPH = posEstimator.gps.eph;
         }
         else {
+
+            if (logicConditionGetValue(DLZ_LOGIC_COND_ID) == 0) {
+
+            }
+
+
             const float gpsPosXResidual = posEstimator.gps.pos.x - posEstimator.est.pos.x;
             const float gpsPosYResidual = posEstimator.gps.pos.y - posEstimator.est.pos.y;
             const float gpsVelXResidual = posEstimator.gps.vel.x - posEstimator.est.vel.x;

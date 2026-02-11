@@ -5,6 +5,8 @@
 #include "drivers/time.h"
 //#include "nav_dlz_utils.hpp"
 
+static const int LOGIC_COND_GUIDANCE = 50;
+
 namespace AdumDlz {
 
     typedef struct __attribute__((packed)) {

@@ -58,6 +58,10 @@
 #define RANGEFINDER_RELIABILITY_LOW_THRESHOLD   (0.33f)
 #define RANGEFINDER_RELIABILITY_HIGH_THRESHOLD  (0.75f)
 
+
+#define DLZ_LOGIC_COND_ID 50  // Logic condition ID to check if DLZ is active
+
+
 typedef struct {
     timeUs_t    lastTriggeredTime;
     timeUs_t    deltaTime;
