@@ -1,9 +1,14 @@
 #include "nav_dlz.hpp"
 #include "drivers/time.h"
+#include <cstring>
 
 using namespace AdumDlz;
 
 static Navigation *g_nav = nullptr;
+
+// Driver buffer + flag (driver/ISR writes here, main loop performs handoff)
+static mspSensorSkyvis_t g_skyvisDrv{};
+static volatile bool g_skyvisNewData = false;
 
 extern "C" {
 
@@ -21,13 +26,24 @@ extern "C" {
     void adum_dlz_readskyvisdata(const uint8_t* bufferPtr, 
                                 unsigned int dataSize)
     {
-        if (!g_nav) return;
-        g_nav->readSkyvisData(bufferPtr, dataSize);
-    } // extern "C"
+        // Fast driver-side copy into driver buffer; main-loop will perform the authoritative handoff.
+        if (dataSize != sizeof(g_skyvisDrv) || bufferPtr == nullptr) {
+            return;
+        }
+        memcpy(&g_skyvisDrv, bufferPtr, sizeof(g_skyvisDrv));
+        g_skyvisNewData = true;
+    }
 
 
     void adum_dlz_update()  {
         if (!g_nav) adum_dlz_init();
+
+        // If driver supplied new data, copy it into the Navigation object from main context.
+        if (g_skyvisNewData) {
+            g_nav->readSkyvisData(reinterpret_cast<const uint8_t*>(&g_skyvisDrv), sizeof(g_skyvisDrv));
+            g_skyvisNewData = false;
+        }
+
         g_nav->update();
     }
 
