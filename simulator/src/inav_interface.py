@@ -212,15 +212,40 @@ class InavSimulate:
 
             if trel > T_ARM + 5:
                 self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
-                #self.__updateState("ch2",  0.5)  # Tilt forward to get some momentum
+                self.__updateState("ch2",  0.50)  # Tilt forward to get some momentum
                 
             if trel > T_ARM + 10:
-                self.__updateState("ch2",  0.50) 
+                self.__updateState("ch2",  0.00)  
                 
             # Switch to WP mode
             if trel > T_ARM + 12:
                 self.__updateState("ch7",  0.75) # WP Mode
+                
+
+            # Wobble around for testing
+            if trel > T_ARM + 45:
+                #val = np.sin((trel - (T_ARM + 30)) * 0.5)
+                val = 1.0
+                self.__updateState("ch1",  val) 
+                
+                #val2 = np.sin((trel - (T_ARM + 30)) * 0.5)
+                val2 = 0.0
+                self.__updateState("ch2",  val2) 
             
+            
+            
+            # Wobble around for testing
+            if trel > T_ARM + 50:
+                #val = np.sin((trel - (T_ARM + 30)) * 0.5)
+                val = 0.0
+                self.__updateState("ch1",  val) 
+                
+                #val2 = np.sin((trel - (T_ARM + 30)) * 0.5)
+                val2 = 0.0
+                self.__updateState("ch2",  val2) 
+                
+                
+                
             # Switch to POS HOLD 
             #if trel > T_ARM + 12:
             #    self.__updateState("ch8",  0.75)

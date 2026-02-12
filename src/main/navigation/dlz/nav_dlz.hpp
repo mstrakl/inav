@@ -32,6 +32,8 @@ namespace AdumDlz {
 
         const float getNedPosX() const;
         const float getNedPosY() const;
+        const float getWeighedNedPosX() const;
+        const float getWeighedNedPosY() const;
         const float getNedVelX() const;
         const float getNedVelY() const;
         const float getFade() const;
@@ -48,6 +50,10 @@ namespace AdumDlz {
         float m_nedVelX{0.0f};
         float m_nedVelY{0.0f};
         float m_fade{0.0f};
+
+
+        float m_weighedNedPosX{0.0f};
+        float m_weighedNedPosY{0.0f};
 
     };
 

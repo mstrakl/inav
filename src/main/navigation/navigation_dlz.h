@@ -21,6 +21,8 @@ void adum_dlz_update(void);
 
 const float adum_dlz_get_ned_pos_x(void);
 const float adum_dlz_get_ned_pos_y(void);
+const float adum_dlz_get_weighed_ned_pos_x(void);
+const float adum_dlz_get_weighed_ned_pos_y(void);
 const float adum_dlz_get_ned_vel_x(void);
 const float adum_dlz_get_ned_vel_y(void);
 const float adum_dlz_get_fade(void);

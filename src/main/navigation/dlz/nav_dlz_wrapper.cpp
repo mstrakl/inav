@@ -56,6 +56,14 @@ extern "C" {
         if (!g_nav) return 0.0f;
         return g_nav->getNedPosY();
     }
+    const float adum_dlz_get_weighed_ned_pos_x(void) {
+        if (!g_nav) return 0.0f;
+        return g_nav->getWeighedNedPosX();
+    }
+    const float adum_dlz_get_weighed_ned_pos_y(void) {
+        if (!g_nav) return 0.0f;
+        return g_nav->getWeighedNedPosY();
+    }
     const float adum_dlz_get_ned_vel_x(void) {
         if (!g_nav) return 0.0f;
         return g_nav->getNedVelX();

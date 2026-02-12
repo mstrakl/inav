@@ -11,6 +11,11 @@ extern "C" {
 
 #include "navigation/navigation_pos_estimator_private.h"
 
+// FIX ME REMOVE
+#include "rx/rx.h"
+#include "fc/runtime_config.h"
+
+
 }
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
@@ -34,6 +39,9 @@ void Navigation::reset() {
     m_nedVelX = 0.0f;
     m_nedVelY = 0.0f;
     m_fade = 0.0f;
+
+    m_weighedNedPosX = 0.0f;
+    m_weighedNedPosY = 0.0f;
 }        
 
 
@@ -53,8 +61,9 @@ void Navigation::readSkyvisData(const uint8_t* bufferPtr,
 
 void Navigation::update() {
 
-    if ((millis() - m_lastMspRxTime > UPDATE_TIMEOUT_MS) || 
-        (logicConditionGetValue(DLZ_LOGIC_COND_ID) == 0)) {
+
+    if(!ARMING_FLAG(SIMULATOR_MODE_SITL) && 
+        (millis() - m_lastMspRxTime > UPDATE_TIMEOUT_MS)) {
         //LOG_INFO(SYSTEM, "INAV: DLZ Timeout! Time=%u", (unsigned)millis());
         
         // Disable DLZ guidance
@@ -63,19 +72,63 @@ void Navigation::update() {
         m_nedVelX = 0.0f;
         m_nedVelY = 0.0f;
         m_fade = 0.0f;
+
+        m_weighedNedPosX = 0.0f;
+        m_weighedNedPosY = 0.0f;
         return;
     }
 
 
-    m_fade = constrainf((float)m_skyvisData.confidence / 1000.0f, 0.0f, 1.0f);
+    const float dt = MS2S(millis() - m_lastUpdateTime);
+
+    const float fade = constrainf((float)m_skyvisData.confidence / 1000.0f, 0.0f, 1.0f);
+
+    if (isfinite(fade)) {
+        m_fade = fade;
+    } else {
+        m_fade = 0.0f;
+        reset();
+        return;
+    }
+
     m_nedPosX = (float)m_skyvisData.nedPosX;
     m_nedPosY = (float)m_skyvisData.nedPosY;
     m_nedVelX = (float)m_skyvisData.nedVelX;
     m_nedVelY = (float)m_skyvisData.nedVelY;
 
 
-    auto const test = posEstimator.gps.pos.x;
 
+    // FIX ME REMOVE HERE ------------------------------------------------- //
+
+    // Simulate offset coordinates for testing
+    // Read primary RC channels (processed values). Channels are 0-based.
+    int16_t rcX = rxGetChannelValue(9);  
+    int16_t rcY = rxGetChannelValue(10);  
+
+    const float WEIGHT = 0.02f;
+
+    // Scale RC input to max position command in cm
+    m_nedPosX = ((float)rcX - 1500.0f);
+    m_nedPosY = ((float)rcY - 1500.0f);
+
+    m_weighedNedPosX += m_nedPosX * WEIGHT * dt;
+    m_weighedNedPosY += m_nedPosY * WEIGHT * dt;
+
+    m_fade = 1.0f;
+
+    // REMOVE UP TO HERE ------------------------------------------------- //
+
+
+    if ( 
+        (FLIGHT_MODE(NAV_POSHOLD_MODE) || FLIGHT_MODE(NAV_WP_MODE)) &&
+        logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0
+    ) {
+
+        LOG_DEBUG(SYSTEM, "DLZ.Ch10: %f", m_nedPosX);
+        LOG_DEBUG(SYSTEM, "DLZ.Ch11: %f", m_nedPosY);
+        LOG_DEBUG(SYSTEM, "DLZ.Z: dt %f", dt);
+
+    }
 
     //LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosX %f", m_nedPosX);
     //LOG_INFO(SYSTEM, "INAV: Skyvis.NedPosY %f", m_nedPosY);
@@ -91,6 +144,10 @@ void Navigation::update() {
 const float Navigation::getNedPosX() const { return m_nedPosX; }
 
 const float Navigation::getNedPosY() const { return m_nedPosY; }
+
+const float Navigation::getWeighedNedPosX() const { return m_weighedNedPosX; }
+
+const float Navigation::getWeighedNedPosY() const { return m_weighedNedPosY; }
 
 const float Navigation::getNedVelX() const { return m_nedVelX; }
 

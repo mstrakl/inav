@@ -54,6 +54,12 @@
 
 #include "sensors/battery.h"
 
+
+#include "common/log.h"
+#include "navigation/navigation_dlz.h"
+
+#define DLZ_LOGIC_COND_ID 50
+
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
  *-----------------------------------------------------------*/
@@ -390,6 +396,8 @@ void resetMulticopterPositionController(void)
         lastAccelTargetX = 0.0f;
         lastAccelTargetY = 0.0f;
     }
+
+    adum_dlz_reset();
 }
 
 static bool adjustMulticopterCruiseSpeed(int16_t rcPitchAdjustment)
@@ -483,7 +491,7 @@ static float getVelocityExpoAttenuationFactor(float velTotal, float velMax)
     return 1.0f - posControl.posResponseExpo * (1.0f - (velScale * velScale));  // x^3 expo factor
 }
 
-static void updatePositionVelocityController_MC(const float maxSpeed)
+static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const float maxSpeed)
 {
     if (FLIGHT_MODE(NAV_COURSE_HOLD_MODE)) {
         // Position held at cruise speeds below 0.5 m/s, otherwise desired neu velocities set directly from cruise speed
@@ -498,8 +506,45 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
         }
     }
 
-    const float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
-    const float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
+    float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
+    float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
+
+
+    // Here Skyvis start
+
+    // Only in position hold and waypoint modes we use DLZ corrections,
+    // provided that DLZ_LOGIC_COND_ID is set true
+    if ( 
+        (FLIGHT_MODE(NAV_POSHOLD_MODE) || FLIGHT_MODE(NAV_WP_MODE)) &&
+        logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0
+    ) {
+
+        adum_dlz_update();
+
+        const float adum_fade = constrainf(adum_dlz_get_fade(), 0.0f, 1.0f);
+
+        if (adum_fade > 0.01f) {
+
+            LOG_DEBUG(SYSTEM, "DLZ.fade: %f", adum_fade);
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
+
+            posErrorX += adum_dlz_get_weighed_ned_pos_x();
+            posErrorY += adum_dlz_get_weighed_ned_pos_y();
+
+            LOG_DEBUG(SYSTEM, "DLZ.wx.px: %f", adum_dlz_get_weighed_ned_pos_x());
+            LOG_DEBUG(SYSTEM, "DLZ.wy.py: %f", adum_dlz_get_weighed_ned_pos_y());
+
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
+
+        }
+        
+    } else {
+        adum_dlz_reset();
+    }
+
+    // Here skyvis end
 
     // Calculate target velocity
     float neuVelX = posErrorX * posControl.pids.pos[X].param.kP;
@@ -723,7 +768,7 @@ static void applyMulticopterPositionController(timeUs_t currentTimeUs)
         if (deltaMicrosPositionUpdate < MAX_POSITION_UPDATE_INTERVAL_US) {
             // Get max speed for current NAV mode
             float maxSpeed = getActiveSpeed();
-            updatePositionVelocityController_MC(maxSpeed);
+            updatePositionVelocityController_MC(deltaMicrosPositionUpdate, maxSpeed);
             updatePositionAccelController_MC(deltaMicrosPositionUpdate, NAV_ACCELERATION_XY_MAX, maxSpeed);
 
             navDesiredVelocity[X] = constrain(lrintf(posControl.desiredState.vel.x), -32678, 32767);
