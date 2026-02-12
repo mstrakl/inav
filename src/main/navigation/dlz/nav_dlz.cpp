@@ -62,21 +62,21 @@ void Navigation::readSkyvisData(const uint8_t* bufferPtr,
 void Navigation::update() {
 
 
-    if(!ARMING_FLAG(SIMULATOR_MODE_SITL) && 
-        (millis() - m_lastMspRxTime > UPDATE_TIMEOUT_MS)) {
-        //LOG_INFO(SYSTEM, "INAV: DLZ Timeout! Time=%u", (unsigned)millis());
-        
-        // Disable DLZ guidance
-        m_nedPosX = 0.0f;
-        m_nedPosY = 0.0f;
-        m_nedVelX = 0.0f;
-        m_nedVelY = 0.0f;
-        m_fade = 0.0f;
-
-        m_weighedNedPosX = 0.0f;
-        m_weighedNedPosY = 0.0f;
-        return;
-    }
+//    if(!ARMING_FLAG(SIMULATOR_MODE_SITL) && 
+//        (millis() - m_lastMspRxTime > UPDATE_TIMEOUT_MS)) {
+//        //LOG_INFO(SYSTEM, "INAV: DLZ Timeout! Time=%u", (unsigned)millis());
+//        
+//        // Disable DLZ guidance
+//        m_nedPosX = 0.0f;
+//        m_nedPosY = 0.0f;
+//        m_nedVelX = 0.0f;
+//        m_nedVelY = 0.0f;
+//        m_fade = 0.0f;
+//
+//        m_weighedNedPosX = 0.0f;
+//        m_weighedNedPosY = 0.0f;
+//        return;
+//    }
 
 
     const float dt = MS2S(millis() - m_lastUpdateTime);
@@ -114,7 +114,7 @@ void Navigation::update() {
         rcY = 1500;
     }
 
-    const float WEIGHT = 0.02f;
+    const float WEIGHT = 0.10f;
 
     // Scale RC input to max position command in cm
     m_nedPosX = ((float)rcX - 1500.0f);

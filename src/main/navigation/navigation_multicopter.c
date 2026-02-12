@@ -529,9 +529,10 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
             LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
             LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
 
-            // Limit to 5m initally
-            const float wp_x = constrainf(adum_dlz_get_weighed_ned_pos_x(), -500.0f, 500.0f);
-            const float wp_y = constrainf(adum_dlz_get_weighed_ned_pos_y(), -500.0f, 500.0f);
+            // Limit 
+            #define MAX_DLZ_CORRECTION 1000.0f
+            const float wp_x = constrainf(adum_dlz_get_weighed_ned_pos_x(), -MAX_DLZ_CORRECTION, MAX_DLZ_CORRECTION);
+            const float wp_y = constrainf(adum_dlz_get_weighed_ned_pos_y(), -MAX_DLZ_CORRECTION, MAX_DLZ_CORRECTION);
 
             posErrorX += wp_x;
             posErrorY += wp_y;
@@ -547,6 +548,8 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
         }
         
     } else {
+        LOG_DEBUG(SYSTEM, "DLZ.Reset");
+
         adum_dlz_reset();
     }
 
