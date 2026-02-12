@@ -105,6 +105,15 @@ void Navigation::update() {
     int16_t rcX = rxGetChannelValue(9);  
     int16_t rcY = rxGetChannelValue(10);  
 
+    // implement deadband
+    if (ABS(rcX - 1500) < 20) {
+        rcX = 1500;
+    }
+
+    if (ABS(rcY - 1500) < 20) {
+        rcY = 1500;
+    }
+
     const float WEIGHT = 0.02f;
 
     // Scale RC input to max position command in cm

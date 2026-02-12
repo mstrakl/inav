@@ -529,14 +529,20 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
             LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
             LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
 
-            posErrorX += adum_dlz_get_weighed_ned_pos_x();
-            posErrorY += adum_dlz_get_weighed_ned_pos_y();
+            // Limit to 5m initally
+            const float wp_x = constrainf(adum_dlz_get_weighed_ned_pos_x(), -500.0f, 500.0f);
+            const float wp_y = constrainf(adum_dlz_get_weighed_ned_pos_y(), -500.0f, 500.0f);
 
-            LOG_DEBUG(SYSTEM, "DLZ.wx.px: %f", adum_dlz_get_weighed_ned_pos_x());
-            LOG_DEBUG(SYSTEM, "DLZ.wy.py: %f", adum_dlz_get_weighed_ned_pos_y());
+            posErrorX += wp_x;
+            posErrorY += wp_y;
+
+            LOG_DEBUG(SYSTEM, "DLZ.wx.px: %f", wp_x);
+            LOG_DEBUG(SYSTEM, "DLZ.wy.py: %f", wp_y);
 
             LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
             LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
+
+            LOG_DEBUG(SYSTEM, "# --------------------------- #");
 
         }
         
