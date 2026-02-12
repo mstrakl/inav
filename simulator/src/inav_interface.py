@@ -17,7 +17,7 @@ quad_params['Iyy']  = 11.68e-2   # kg*m^2
 quad_params['Izz']  = 9.00e-2    # kg*m^2
 
 SIMULATE_SENSOR_NOISE = False
-SIMULATE_WIND = True
+SIMULATE_WIND = False
 
 class InavSimulate:
     
@@ -100,7 +100,14 @@ class InavSimulate:
             "ch6": 0,
             "ch7": 0,
             "ch8": 0,
-
+            "ch9": 0,
+            "ch10": 0,
+            "ch11": 0,
+            "ch12": 0,
+            "ch13": 0,
+            "ch14": 0,
+            "ch15": 0,
+            "ch16": 0,
         }
         
         self.msg = ""
@@ -119,6 +126,7 @@ class InavSimulate:
             
         self.__lastTime = None
         
+        self.__TARM = 9999999.0
 
     def __updateState(self, k, v, operation=""):
         
@@ -146,7 +154,7 @@ class InavSimulate:
         return a_frd, omega_frd
     
 
-    def update(self, trel:float):
+    def update(self, trel:float, tx:dict):
         
         if self.__lastTime is None:
             self.__lastTime = 0.0
@@ -188,76 +196,84 @@ class InavSimulate:
         # --------------------------------------- #
         
         self.__updateState("trel",  trel)
-        
-        T_ARM = 8.0
-        
+
         if not self.__isolatedRun:
             
             self.__updateState("ch3",  0)
             self.__updateState("ch5",  0)
             self.__updateState("ch6", -1)
             
+            if (tx["swD"] == 2 and self.__TARM >= 9999998.0):
+                self.__TARM = trel
             
-            if trel > T_ARM - 1.0:
+            print("self.__TARM:", self.__TARM)
+            
+            if trel > self.__TARM - 1.0:
                 self.__moveDrone = True
                 
-            if trel > T_ARM - 0.8:
+            if trel > self.__TARM - 0.8:
                 writeOutputState = True
             
-            if trel > T_ARM:
+            if trel > self.__TARM + 1:
                 self.__updateState("ch5",  1.0) # Arm
             
-            if trel > T_ARM + 1:
+            if trel > self.__TARM + 2:
                 self.__updateState("ch3",  0.99) # Add power
 
-            if trel > T_ARM + 5:
+            if trel > self.__TARM + 5:
                 self.__updateState("ch6",  0.75) # Angle mode + Alt Hold
                 self.__updateState("ch2",  0.50)  # Tilt forward to get some momentum
                 
-            if trel > T_ARM + 10:
+            if trel > self.__TARM + 10:
                 self.__updateState("ch2",  0.00)  
                 
-            # Switch to WP mode
-            if trel > T_ARM + 12:
+            # Switch to WP mode, also listen to joystick commands now
+            if trel > self.__TARM + 12:
                 self.__updateState("ch7",  0.75) # WP Mode
                 
+                self.__updateState("ch10",  tx["potS1"]) 
+                self.__updateState("ch11",  tx["potS2"]) 
+                self.__updateState("ch12",  tx["swA"]) 
 
-            # Wobble around for testing
-            if trel > T_ARM + 45:
-                #val = np.sin((trel - (T_ARM + 30)) * 0.5)
-                val = 1.0
-                self.__updateState("ch1",  val) 
                 
-                #val2 = np.sin((trel - (T_ARM + 30)) * 0.5)
-                val2 = 0.0
-                self.__updateState("ch2",  val2) 
-            
-            
-            
-            # Wobble around for testing
-            if trel > T_ARM + 50:
-                #val = np.sin((trel - (T_ARM + 30)) * 0.5)
-                val = 0.0
-                self.__updateState("ch1",  val) 
-                
-                #val2 = np.sin((trel - (T_ARM + 30)) * 0.5)
-                val2 = 0.0
-                self.__updateState("ch2",  val2) 
-                
+
+#
+#            # Wobble around for testing
+#            if trel > self.__TARM + 45:
+#                #val = np.sin((trel - (self.__TARM + 30)) * 0.5)
+#                val = 1.0
+#                self.__updateState("ch1",  val) 
+#                
+#                #val2 = np.sin((trel - (self.__TARM + 30)) * 0.5)
+#                val2 = 0.0
+#                self.__updateState("ch2",  val2) 
+#            
+#            
+#            
+#            # Wobble around for testing
+#            if trel > self.__TARM + 50:
+#                #val = np.sin((trel - (self.__TARM + 30)) * 0.5)
+#                val = 0.0
+#                self.__updateState("ch1",  val) 
+#                
+#                #val2 = np.sin((trel - (self.__TARM + 30)) * 0.5)
+#                val2 = 0.0
+#                self.__updateState("ch2",  val2) 
+#                
                 
                 
             # Switch to POS HOLD 
-            #if trel > T_ARM + 12:
+            #if trel > self.__TARM + 12:
             #    self.__updateState("ch8",  0.75)
 
-            #if trel > T_ARM + 14:
+            #if trel > self.__TARM + 14:
             #    self.__updateState("ch2",  -0.25) 
 
-            #if trel > T_ARM + 20:
+            #if trel > self.__TARM + 20:
             #    self.__updateState("ch2",  0.0) 
                 
         # Stop drone on landing
-        if trel > T_ARM + 5 and state["x"][2] < 0.0:
+        if trel > self.__TARM + 5 and state["x"][2] < 0.0:
             self.__moveDrone = False
 
         # Output States
@@ -429,7 +445,15 @@ class InavSimulate:
         appendToMsg("ch6")          #24
         appendToMsg("ch7")          #25
         appendToMsg("ch8")          #26
-            
+           
+        appendToMsg("ch9")          #27
+        appendToMsg("ch10")         #28              
+        appendToMsg("ch11")         #29
+        appendToMsg("ch12")         #30
+        appendToMsg("ch13")         #31
+        appendToMsg("ch14")         #32
+        appendToMsg("ch15")         #33
+        appendToMsg("ch16")         #34
 
         # Finish line
         msg = self.msg.rsplit(";", 1)[0] + "\n"

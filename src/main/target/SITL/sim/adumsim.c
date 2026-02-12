@@ -68,7 +68,7 @@
 #endif
 
 #define ADUM_XP_PORT 2323
-#define ADUM_JOYSTICK_AXIS_COUNT 8
+#define ADUM_JOYSTICK_AXIS_COUNT 16
 #define BUF_SIZE 1024
 
 #define PWM_TO_FLOAT_0_1(x) ((float)(((int)x - 1000) / 1000.0f))
@@ -403,6 +403,38 @@ static void* listenWorker(void* arg)
 
                     case 26:
                         channelValues[7] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+
+                    case 27:
+                        channelValues[8] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+
+                    case 28:
+                        channelValues[9] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+                    
+                    case 29:
+                        channelValues[10] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+                    
+                    case 30:
+                        channelValues[11] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+                    
+                    case 31:
+                        channelValues[12] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+                    
+                    case 32:
+                        channelValues[13] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+
+                    case 33:
+                        channelValues[14] = FLOAT_MINUS_1_1_TO_PWM(value);
+                        break;
+
+                    case 34:
+                        channelValues[15] = FLOAT_MINUS_1_1_TO_PWM(value);
                         break;
 
                     default:

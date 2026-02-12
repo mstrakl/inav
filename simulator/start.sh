@@ -3,8 +3,8 @@ set -Eeuo pipefail
 
 # Setup cleanup handler
 cleanup() {
-    echo ""
-    echo "Shutting down..."
+    #echo ""
+    #echo "Shutting down..."
     # Kill all background processes in this script's process group
     kill -- -$$ 2>/dev/null || true
 }
@@ -30,7 +30,7 @@ fi
 
 # Start Python simulator
 echo "Starting Python simulator..."
-$PYTHON_BIN main.py --sim=inav & #> rotsim.log 2>&1 &
+$PYTHON_BIN main.py --sim=inav --joy & #> rotsim.log 2>&1 &
 PYTHON_PID=$!
 
 sleep 1
