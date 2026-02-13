@@ -514,42 +514,49 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
 
     // Only in position hold and waypoint modes we use DLZ corrections,
     // provided that DLZ_LOGIC_COND_ID is set true
-    if ( 
+
+    bool dlz_allowed =
         (FLIGHT_MODE(NAV_POSHOLD_MODE) || FLIGHT_MODE(NAV_WP_MODE)) &&
-        logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0
-    ) {
+        logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
+
+
+    if (dlz_allowed) {
 
         adum_dlz_update();
 
-        const float adum_fade = constrainf(adum_dlz_get_fade(), 0.0f, 1.0f);
+        const float fade = constrainf(adum_dlz_get_fade(), 0.0f, 1.0f);
 
-        if (adum_fade > 0.01f) {
-
-            LOG_DEBUG(SYSTEM, "DLZ.fade: %f", adum_fade);
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
-
-            // Limit 
-            #define MAX_DLZ_CORRECTION 1000.0f
-            const float wp_x = constrainf(adum_dlz_get_weighed_ned_pos_x(), -MAX_DLZ_CORRECTION, MAX_DLZ_CORRECTION);
-            const float wp_y = constrainf(adum_dlz_get_weighed_ned_pos_y(), -MAX_DLZ_CORRECTION, MAX_DLZ_CORRECTION);
-
-            posErrorX += wp_x;
-            posErrorY += wp_y;
-
-            LOG_DEBUG(SYSTEM, "DLZ.wx.px: %f", wp_x);
-            LOG_DEBUG(SYSTEM, "DLZ.wy.py: %f", wp_y);
-
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
-
-            LOG_DEBUG(SYSTEM, "# --------------------------- #");
-
+        if (!isfinite(fade)) {
+            adum_dlz_reset();
+            return;
         }
-        
-    } else {
-        LOG_DEBUG(SYSTEM, "DLZ.Reset");
 
+        #define MAX_DLZ_CORRECTION 1000.0f
+
+        const float camErrX = constrainf(
+            adum_dlz_get_weighed_ned_pos_x(),
+            -MAX_DLZ_CORRECTION,
+            MAX_DLZ_CORRECTION
+        );
+        const float camErrY = constrainf(
+            adum_dlz_get_weighed_ned_pos_y(),
+            -MAX_DLZ_CORRECTION,
+            MAX_DLZ_CORRECTION
+        );
+
+        LOG_DEBUG(SYSTEM, "DLZ.fade: %f", fade);
+        LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
+        LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
+        LOG_DEBUG(SYSTEM, "DLZ.camErrX: %f", camErrX);
+        LOG_DEBUG(SYSTEM, "DLZ.camErrY: %f", camErrY);
+
+        posErrorX = (1.0f - fade) * posErrorX + fade * camErrX;
+        posErrorY = (1.0f - fade) * posErrorY + fade * camErrY;
+
+        LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
+        LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
+
+    } else {
         adum_dlz_reset();
     }
 

@@ -49,9 +49,9 @@ namespace AdumDlz {
         float m_nedPosY{0.0f};
         float m_nedVelX{0.0f};
         float m_nedVelY{0.0f};
+
         float m_fade{0.0f};
-
-
+        
         float m_weighedNedPosX{0.0f};
         float m_weighedNedPosY{0.0f};
 
