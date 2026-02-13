@@ -46,7 +46,11 @@
 #define MC_LAND_SAFE_SURFACE                5.0f    // cm
 
 #define MAX_POSITION_UPDATE_INTERVAL_US     HZ2US(MIN_POSITION_UPDATE_RATE_HZ)        // convenience macro
+#if defined(__cplusplus)
+static_assert(MAX_POSITION_UPDATE_INTERVAL_US <= TIMEDELTA_MAX, "deltaMicros can overflow!");
+#else
 _Static_assert(MAX_POSITION_UPDATE_INTERVAL_US <= TIMEDELTA_MAX, "deltaMicros can overflow!");
+#endif
 
 typedef enum {
     NAV_POS_UPDATE_NONE                 = 0,

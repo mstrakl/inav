@@ -100,9 +100,9 @@ void Navigation::update() {
 
     if (logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0) {
 
-        LOG_DEBUG(SYSTEM, "DLZ.Ch10: %f", m_nedPosX);
-        LOG_DEBUG(SYSTEM, "DLZ.Ch11: %f", m_nedPosY);
-        LOG_DEBUG(SYSTEM, "DLZ.Z: dt %f", dt);
+        //LOG_DEBUG(SYSTEM, "DLZ.Ch10: %f", m_nedPosX);
+        //LOG_DEBUG(SYSTEM, "DLZ.Ch11: %f", m_nedPosY);
+        //LOG_DEBUG(SYSTEM, "DLZ.Z: dt %f", dt);
 
         m_fade = 0.95f;
 
@@ -144,8 +144,8 @@ void Navigation::update() {
 
     const float WEIGHT = 500.0f; // max 500 cm correction
 
-    m_weighedNedPosX += m_nedPosX * WEIGHT * dt;
-    m_weighedNedPosY += m_nedPosY * WEIGHT * dt;
+    m_weighedNedPosX = m_nedPosX * WEIGHT * dt;
+    m_weighedNedPosY = m_nedPosY * WEIGHT * dt;
 
 
     // REMOVE UP TO HERE ------------------------------------------------- //
