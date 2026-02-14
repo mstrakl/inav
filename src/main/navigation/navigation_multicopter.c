@@ -60,6 +60,9 @@
 
 #define DLZ_LOGIC_COND_ID 50
 
+static unsigned long t_dbg_last = 0;
+#define PRINT_TIME_MS 500
+
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
  *-----------------------------------------------------------*/
@@ -544,17 +547,23 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
             MAX_DLZ_CORRECTION
         );
 
-        LOG_DEBUG(SYSTEM, "DLZ.fade: %f", fade);
-        LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
-        LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
-        LOG_DEBUG(SYSTEM, "DLZ.camErrX: %f", camErrX);
-        LOG_DEBUG(SYSTEM, "DLZ.camErrY: %f", camErrY);
+        if (millis() - t_dbg_last > PRINT_TIME_MS) {
+            LOG_DEBUG(SYSTEM, "DLZ.fade: %f", fade);
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
+            LOG_DEBUG(SYSTEM, "DLZ.camErrX: %f", camErrX);
+            LOG_DEBUG(SYSTEM, "DLZ.camErrY: %f", camErrY);
+        }
 
         posErrorX = (1.0f - fade) * posErrorX + fade * camErrX;
         posErrorY = (1.0f - fade) * posErrorY + fade * camErrY;
 
-        LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
-        LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
+        if (millis() - t_dbg_last > PRINT_TIME_MS) {
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
+            LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
+        }
+
+        t_dbg_last = millis();
 
     } else {
         adum_dlz_reset();
