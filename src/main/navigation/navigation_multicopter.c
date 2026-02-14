@@ -534,7 +534,7 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
             return;
         }
 
-        #define MAX_DLZ_CORRECTION 1000.0f
+        #define MAX_DLZ_CORRECTION 500.0f
 
         const float camErrX = constrainf(
             adum_dlz_get_weighed_ned_pos_x(),
