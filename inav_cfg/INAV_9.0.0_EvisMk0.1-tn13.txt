@@ -106,7 +106,7 @@ logic 50 0 -1 2 1 7 0 2000 0
 # OSD: custom elements
 
 # master
-set gyro_main_lpf_hz = 75
+set gyro_main_lpf_hz = 90
 set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
@@ -191,20 +191,19 @@ set rate_dynamics_end_weight = 10
 # control_profile
 control_profile 2
 
-set mc_p_pitch = 22
-set mc_i_pitch = 17
-set mc_d_pitch = 12
-set mc_cd_pitch = 32
-set mc_p_roll = 35
-set mc_i_roll = 28
-set mc_d_roll = 19
-set mc_cd_roll = 46
-set mc_p_yaw = 60
-set mc_i_yaw = 23
-set mc_d_yaw = 3
-set mc_cd_yaw = 75
-set mc_p_level = 12
-set rc_expo = 40
+set mc_i_pitch = 52
+set mc_d_pitch = 21
+set mc_cd_pitch = 54
+set mc_i_roll = 33
+set mc_d_roll = 14
+set mc_cd_roll = 58
+set mc_p_yaw = 55
+set mc_i_yaw = 29
+set mc_d_yaw = 47
+set mc_cd_yaw = 52
+set mc_p_level = 15
+set mc_d_level = 65
+set rc_expo = 50
 set roll_rate = 12
 set pitch_rate = 12
 set yaw_rate = 7
