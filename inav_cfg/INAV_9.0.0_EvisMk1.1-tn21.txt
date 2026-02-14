@@ -101,6 +101,8 @@ aux 8 63 3 1350 1675
 logic 0 1 -1 2 1 7 0 2000 0
 logic 1 1 -1 51 1 8 0 1500 0
 logic 2 1 -1 51 1 5 0 1500 0
+logic 10 1 -1 51 1 8 0 1500 0
+logic 11 1 -1 12 4 10 0 0 0
 logic 50 0 -1 2 1 7 0 2000 0
 
 # Programming: global variables
@@ -115,10 +117,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 13
-set gyro_zero_y = -5
-set gyro_zero_z = -6
-set ins_gravity_cmss =  981.106
+set gyro_zero_x = 14
+set gyro_zero_y = -4
+set gyro_zero_z = -2
+set ins_gravity_cmss =  978.468
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -3
@@ -128,11 +130,14 @@ set accgain_x = 4083
 set accgain_y = 4090
 set accgain_z = 4084
 set opflow_scale =  4.688
-set align_mag = CW90FLIP
-set mag_hardware = NONE
-set maggain_x = 270
-set maggain_y = 162
-set maggain_z = 699
+set align_mag = CW0FLIP
+set mag_hardware = IST8310
+set magzero_x = -173
+set magzero_y = -27
+set magzero_z = 256
+set maggain_x = 463
+set maggain_y = 468
+set maggain_z = 560
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
@@ -296,16 +301,20 @@ mmix 2  1.000  0.000  1.330  0.000
 # Mixer: servo mixer
 smix reset
 
-smix 0 1 2 -60 0 -1
-smix 1 2 2 -60 0 -1
+smix 0 1 2 -60 0 11
+smix 1 2 2 -60 0 11
 smix 2 1 29 -72 100 -1
 smix 3 2 29 71 100 -1
 smix 4 5 1 -50 0 -1
-smix 5 5 2 -20 0 -1
+smix 5 5 2 -40 0 -1
 smix 6 6 1 50 0 -1
-smix 7 6 2 -20 0 -1
+smix 7 6 2 -40 0 -1
 smix 8 1 38 72 100 -1
 smix 9 2 38 -71 100 -1
+smix 10 1 2 -20 0 10
+smix 11 2 2 -20 0 10
+smix 12 3 0 50 0 -1
+smix 13 4 0 50 0 -1
 
 # battery_profile
 battery_profile 1
@@ -324,8 +333,8 @@ battery_profile 3
 set throttle_idle =  5.000
 
 # restore original profile selection
-control_profile 1
-mixer_profile 1
+control_profile 2
+mixer_profile 2
 battery_profile 1
 
 # save configuration
