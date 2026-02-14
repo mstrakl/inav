@@ -561,9 +561,11 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
         if (millis() - t_dbg_last > PRINT_TIME_MS) {
             LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
             LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
+
+            t_dbg_last = millis();
         }
 
-        t_dbg_last = millis();
+        //t_dbg_last = millis();
 
     } else {
         adum_dlz_reset();

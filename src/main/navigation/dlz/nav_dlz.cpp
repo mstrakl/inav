@@ -144,8 +144,8 @@ void Navigation::update() {
 
     const float WEIGHT = 500.0f; // max 500 cm correction
 
-    m_weighedNedPosX = m_nedPosX * WEIGHT * dt;
-    m_weighedNedPosY = m_nedPosY * WEIGHT * dt;
+    m_weighedNedPosX = m_nedPosX * WEIGHT;
+    m_weighedNedPosY = m_nedPosY * WEIGHT;
 
 
     // REMOVE UP TO HERE ------------------------------------------------- //
