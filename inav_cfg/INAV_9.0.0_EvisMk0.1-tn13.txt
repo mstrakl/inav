@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/MATEKF405SE 9.0.0 Feb  9 2026 / 12:11:35 (31bb99e8) 
+# INAV/MATEKF405SE 9.0.0 Feb 13 2026 / 15:25:15 (a047ee02) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -21,8 +21,8 @@ timer_output_mode 7 SERVOS
 timer_output_mode 11 SERVOS
 
 # Outputs [servo]
-servo 1 880 2200 1500 100
-servo 2 900 2160 1500 -100
+servo 1 1200 2000 1700 100
+servo 2 1000 1750 1250 100
 servo 3 1325 1825 1500 100
 servo 4 1220 1720 1420 100
 servo 5 1230 2050 1500 -100
@@ -106,15 +106,15 @@ logic 50 0 -1 2 1 7 0 2000 0
 # OSD: custom elements
 
 # master
-set gyro_main_lpf_hz = 110
+set gyro_main_lpf_hz = 75
 set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 13
-set gyro_zero_y = -10
-set gyro_zero_z = -5
-set ins_gravity_cmss =  973.295
+set gyro_zero_x = 11
+set gyro_zero_y = -11
+set gyro_zero_z = -3
+set ins_gravity_cmss =  971.731
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -125,17 +125,22 @@ set accgain_z = 4083
 set opflow_scale =  4.688
 set align_mag = CW0FLIP
 set mag_hardware = QMC5883
-set magzero_x = -13
-set magzero_y = -767
-set magzero_z = 21
-set maggain_x = 1498
-set maggain_y = 1470
-set maggain_z = 1651
+set magzero_x = -22
+set magzero_y = -831
+set magzero_z = -47
+set maggain_x = 1430
+set maggain_y = 1500
+set maggain_z = 1516
+set align_mag_roll = -10
+set align_mag_pitch = 1790
+set align_mag_yaw = 1850
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = STANDARD
 set failsafe_delay = 10
+set align_board_roll = 10
+set align_board_pitch = -10
 set align_board_yaw = 1800
 set current_meter_scale = 150
 set servo_pwm_rate = 100
@@ -186,31 +191,22 @@ set rate_dynamics_end_weight = 10
 # control_profile
 control_profile 2
 
-set mc_i_pitch = 52
-set mc_d_pitch = 21
-set mc_cd_pitch = 54
-set mc_i_roll = 33
-set mc_d_roll = 14
-set mc_cd_roll = 58
-set mc_p_yaw = 55
-set mc_i_yaw = 29
-set mc_d_yaw = 47
-set mc_cd_yaw = 52
-set mc_p_level = 15
-set mc_d_level = 65
-set fw_p_pitch = 15
-set fw_i_pitch = 5
-set fw_d_pitch = 5
-set fw_ff_pitch = 80
-set fw_p_roll = 15
-set fw_i_roll = 3
-set fw_d_roll = 7
-set fw_p_yaw = 50
-set fw_i_yaw = 0
-set fw_d_yaw = 20
-set fw_ff_yaw = 255
-set max_angle_inclination_pit = 300
-set fw_level_pitch_trim =  2.000
+set mc_p_pitch = 22
+set mc_i_pitch = 17
+set mc_d_pitch = 12
+set mc_cd_pitch = 32
+set mc_p_roll = 35
+set mc_i_roll = 28
+set mc_d_roll = 19
+set mc_cd_roll = 46
+set mc_p_yaw = 60
+set mc_i_yaw = 23
+set mc_d_yaw = 3
+set mc_cd_yaw = 75
+set mc_p_level = 12
+set rc_expo = 40
+set roll_rate = 12
+set pitch_rate = 12
 set yaw_rate = 7
 
 # control_profile
@@ -284,16 +280,16 @@ mmix 2  1.000  0.000  1.330  0.000
 # Mixer: servo mixer
 smix reset
 
-smix 0 1 2 -30 0 -1
-smix 1 2 2 -30 0 -1
-smix 2 1 29 -66 100 -1
-smix 3 2 29 72 100 -1
+smix 0 1 2 -40 0 -1
+smix 1 2 2 -40 0 -1
+smix 2 1 29 -86 100 -1
+smix 3 2 29 86 100 -1
 smix 4 5 1 20 0 -1
 smix 5 5 2 20 0 -1
 smix 6 6 1 -20 0 -1
 smix 7 6 2 20 0 -1
-smix 8 1 38 66 100 -1
-smix 9 2 38 -72 100 -1
+smix 8 1 38 86 100 -1
+smix 9 2 38 -86 100 -1
 
 # battery_profile
 battery_profile 1
