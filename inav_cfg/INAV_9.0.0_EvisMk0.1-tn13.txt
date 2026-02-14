@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/MATEKF405SE 9.0.0 Feb 13 2026 / 15:25:15 (a047ee02) 
+# INAV/MATEKF405SE 9.0.0 Feb 14 2026 / 07:36:28 (17f4db70) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -32,6 +32,7 @@ servo 7 1300 1850 1600 100
 # safehome
 
 # Fixed Wing Approach
+fwapproach 8 1000 500 0 0 0 0
 
 # geozone
 
@@ -77,10 +78,10 @@ serial 30 0 115200 115200 0 115200
 # Modes [aux]
 aux 0 0 0 1750 2100
 aux 1 1 1 1750 2100
-aux 2 28 2 1775 2100
-aux 3 3 2 1750 2100
-aux 4 62 3 1350 2100
-aux 5 63 3 1350 1675
+aux 2 11 2 1800 2100
+aux 3 28 4 1800 2100
+aux 4 3 2 1750 2100
+aux 5 62 3 900 2100
 
 # Adjustments [adjrange]
 
@@ -89,7 +90,9 @@ aux 5 63 3 1350 1675
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 0 invalid
+#wp 2 valid
+wp 0 1 466311056 161776735 1000 0 0 0 0
+wp 1 8 466313122 161773799 1000 0 0 0 165
 
 # OSD [osd_layout]
 
@@ -97,7 +100,7 @@ aux 5 63 3 1350 1675
 logic 0 1 -1 2 1 7 0 2000 0
 logic 1 1 -1 51 1 8 0 1500 0
 logic 2 1 -1 51 1 5 0 1500 0
-logic 50 0 -1 2 1 7 0 2000 0
+logic 50 0 -1 2 1 7 0 3000 0
 
 # Programming: global variables
 
@@ -113,8 +116,8 @@ set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
 set gyro_zero_x = 11
 set gyro_zero_y = -11
-set gyro_zero_z = -3
-set ins_gravity_cmss =  971.731
+set gyro_zero_z = -2
+set ins_gravity_cmss =  972.431
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -153,12 +156,18 @@ set airmode_type = STICK_CENTER_ONCE
 set inav_allow_dead_reckoning = ON
 set inav_max_surface_altitude = 500
 set inav_default_alt_sensor = BARO
-set nav_wp_radius = 500
+set nav_wp_load_on_boot = ON
+set nav_wp_radius = 200
 set nav_wp_max_safe_distance = 500
 set nav_fw_wp_tracking_accuracy = 3
 set nav_fw_wp_turn_smoothing = ON-CUT
+set nav_auto_speed = 300
+set nav_max_auto_speed = 500
+set nav_manual_speed = 500
 set nav_rth_allow_landing = FS_ONLY
 set nav_rth_altitude = 5000
+set nav_mc_auto_climb_rate = 250
+set nav_mc_braking_boost_factor = 50
 set nav_fw_control_smoothness = 2
 set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
@@ -191,18 +200,23 @@ set rate_dynamics_end_weight = 10
 # control_profile
 control_profile 2
 
-set mc_i_pitch = 52
-set mc_d_pitch = 21
+set mc_p_pitch = 43
+set mc_i_pitch = 31
+set mc_d_pitch = 40
 set mc_cd_pitch = 54
-set mc_i_roll = 33
-set mc_d_roll = 14
+set mc_p_roll = 36
+set mc_i_roll = 23
+set mc_d_roll = 45
 set mc_cd_roll = 58
-set mc_p_yaw = 55
-set mc_i_yaw = 29
-set mc_d_yaw = 47
-set mc_cd_yaw = 52
-set mc_p_level = 15
+set mc_p_yaw = 60
+set mc_i_yaw = 0
+set mc_d_yaw = 90
+set mc_p_level = 12
+set mc_i_level = 12
 set mc_d_level = 65
+set max_angle_inclination_rll = 300
+set max_angle_inclination_pit = 300
+set nav_mc_pos_xy_p = 30
 set rc_expo = 50
 set roll_rate = 12
 set pitch_rate = 12
@@ -279,16 +293,16 @@ mmix 2  1.000  0.000  1.330  0.000
 # Mixer: servo mixer
 smix reset
 
-smix 0 1 2 -40 0 -1
-smix 1 2 2 -40 0 -1
-smix 2 1 29 -86 100 -1
-smix 3 2 29 86 100 -1
+smix 0 1 2 -50 0 -1
+smix 1 2 2 -50 0 -1
+smix 2 1 29 -88 100 -1
+smix 3 2 29 84 100 -1
 smix 4 5 1 20 0 -1
 smix 5 5 2 20 0 -1
 smix 6 6 1 -20 0 -1
 smix 7 6 2 20 0 -1
-smix 8 1 38 86 100 -1
-smix 9 2 38 -86 100 -1
+smix 8 1 38 88 100 -1
+smix 9 2 38 -84 100 -1
 
 # battery_profile
 battery_profile 1

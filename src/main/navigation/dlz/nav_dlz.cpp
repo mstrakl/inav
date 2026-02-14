@@ -71,6 +71,7 @@ void Navigation::update() {
         m_nedVelX = 0.0f;
         m_nedVelY = 0.0f;
         m_fade = 0.0f;
+
         m_weighedNedPosX = 0.0f;
         m_weighedNedPosY = 0.0f;
         return;
@@ -88,11 +89,13 @@ void Navigation::update() {
     }
 
 
-    const float WEIGHT = 1.0f; 
+    m_nedPosX = m_skyvisData.nedPosX;
+    m_nedPosY = m_skyvisData.nedPosY;
 
-    m_weighedNedPosX = m_skyvisData.nedPosX * WEIGHT;
-    m_weighedNedPosY = m_skyvisData.nedPosY * WEIGHT;
+    const float WEIGHT = 1.0f;
 
+    m_weighedNedPosX = m_nedPosX * WEIGHT;
+    m_weighedNedPosY = m_nedPosY * WEIGHT;
 
     m_lastUpdateTime = millis();
 }
