@@ -50,13 +50,12 @@
 #include "drivers/pwm_mapping.h"
 #include "drivers/timer.h"
 #include "drivers/serial.h"
-#include "drivers/serial_tcp.h"
 #include "config/config_streamer.h"
 #include "build/version.h"
 
 #include "target/SITL/sim/realFlight.h"
 #include "target/SITL/sim/xplane.h"
-
+#include "target/SITL/sim/adumsim.h"
 #include "target/SITL/serial_proxy.h"
 
 // More dummys
@@ -130,9 +129,35 @@ void systemInit(void) {
                 fprintf(stderr, "[SIM] Connection with X-PLane NOT established.\n");
             }
             break;
+
+        case SITL_SIM_ADUM:
+            if (mappingCount > XP_MAX_PWM_OUTS) {
+                fprintf(stderr, "[SIM] Mapping error. Adum supports a maximum of %i PWM outputs.", XP_MAX_PWM_OUTS);
+                sitlSim = SITL_SIM_NONE;
+                break;
+            }
+            if (simAdumInit(simIp, simPort, pwmMapping, mappingCount, useImu)) {
+                fprintf(stderr, "[SIM] Connection with Adum successfully established.\n");
+            } else {
+                fprintf(stderr, "[SIM] Connection with Adum NOT established.\n");
+            }
+            break;
+
         default:
-          fprintf(stderr, "[SIM] No interface specified. Configurator only.\n");
-          break;
+            fprintf(stderr, "[SIM] No interface specified. Starting Adum.\n");
+
+            //if (mappingCount > XP_MAX_PWM_OUTS) {
+            //    fprintf(stderr, "[SIM] Mapping error. Adum supports a maximum of %i PWM outputs.", XP_MAX_PWM_OUTS);
+            //    sitlSim = SITL_SIM_NONE;
+            //    break;
+            //}
+            //if (simAdumInit(simIp, simPort, pwmMapping, mappingCount, useImu)) {
+            //    fprintf(stderr, "[SIM] Connection with Adum successfully established.\n");
+            //} else {
+            //    fprintf(stderr, "[SIM] Connection with Adum NOT established.\n");
+            //}
+            //break;
+
     }
 
     rescheduleTask(TASK_SERIAL, SITL_SERIAL_TASK_US);
@@ -200,7 +225,7 @@ void printCmdLineOptions(void)
     printVersion();
     fprintf(stderr, "Avaiable options:\n");
     fprintf(stderr, "--path=[path]                  Path and filename of eeprom.bin. If not specified 'eeprom.bin' in program directory is used.\n");
-    fprintf(stderr, "--sim=[rf|xp]                  Simulator interface: rf = RealFligt, xp = XPlane. Example: --sim=rf\n");
+    fprintf(stderr, "--sim=[rf|xp|adum]                  Simulator interface: rf = RealFligt, xp = XPlane. Example: --sim=rf\n");
     fprintf(stderr, "--simip=[ip]                   IP-Address oft the simulator host. If not specified localhost (127.0.0.1) is used.\n");
     fprintf(stderr, "--simport=[port]               Port oft the simulator host.\n");
     fprintf(stderr, "--useimu                       Use IMU sensor data from the simulator instead of using attitude data from the simulator directly (experimental, not recommended).\n");
@@ -210,7 +235,6 @@ void printCmdLineOptions(void)
     fprintf(stderr, "--stopbits=[None|One|Two]      Serial receiver stopbits (default: One).\n");
     fprintf(stderr, "--parity=[Even|None|Odd]       Serial receiver parity (default: None).\n");
     fprintf(stderr, "--fcproxy                      Use inav/betaflight FC as a proxy for serial receiver.\n");
-    fprintf(stderr, "--tcpbaseport=[port]           Base TCP port for UART sockets (default: 5760)\n");
     fprintf(stderr, "--chanmap=[mapstring]          Channel mapping. Maps INAVs motor and servo PWM outputs to the virtual receiver output in the simulator.\n");
     fprintf(stderr, "                               The mapstring has the following format: M(otor)|S(servo)<INAV-OUT>-<RECEIVER-OUT>,... All numbers must have two digits\n");
     fprintf(stderr, "                               For example: Map motor 1 to virtal receiver output 1, servo 1 to output 2 and servo 2 to output 3:\n");
@@ -241,7 +265,6 @@ void parseArguments(int argc, char *argv[])
             {"stopbits", required_argument, 0, '3'},
             {"parity", required_argument, 0, '4'},
             {"fcproxy", no_argument, 0, '5'},
-            {"tcpbaseport", required_argument, 0, '6'},
             {NULL, 0, NULL, 0}
         };
 
@@ -255,6 +278,8 @@ void parseArguments(int argc, char *argv[])
                     sitlSim = SITL_SIM_REALFLIGHT;
                 } else if (strcmp(optarg, "xp") == 0){
                     sitlSim = SITL_SIM_XPLANE;
+                } else if (strcmp(optarg, "adum") == 0){
+                    sitlSim = SITL_SIM_ADUM;
                 } else {
                     fprintf(stderr, "[SIM] Unsupported simulator %s.\n", optarg);
                 }
@@ -327,16 +352,6 @@ void parseArguments(int argc, char *argv[])
             case '5':
                 serialFCProxy = true;
                 break;
-            case '6': {
-                char *endptr = NULL;
-                long basePort = strtol(optarg, &endptr, 10);
-                if ((endptr == NULL) || (*endptr != '\0') || basePort <= 0 || basePort > UINT16_MAX || basePort + SERIAL_PORT_COUNT - 1 > UINT16_MAX) {
-                    fprintf(stderr, "[tcpbaseport] Invalid argument\n.");
-                    exit(0);
-                }
-                tcpBasePort = (uint16_t)basePort;
-                break;
-            }
 
             default:
                 printCmdLineOptions();
