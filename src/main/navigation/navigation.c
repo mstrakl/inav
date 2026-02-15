@@ -2808,26 +2808,31 @@ void updateActualHorizontalPositionAndVelocity(bool estPosValid, bool estVelVali
 
     posControl.actualState.velXY = calc_length_pythagorean_2D(newVelX, newVelY);
 
-    // CASE 1: POS & VEL valid
-    if (estPosValid && estVelValid) {
-        posControl.flags.estPosStatus = EST_TRUSTED;
-        posControl.flags.estVelStatus = EST_TRUSTED;
-        posControl.flags.horizontalPositionDataNew = true;
-        posControl.lastValidPositionTimeMs = millis();
-    }
-    // CASE 1: POS invalid, VEL valid
-    else if (!estPosValid && estVelValid) {
-        posControl.flags.estPosStatus = EST_USABLE;     // Pos usable, but not trusted
-        posControl.flags.estVelStatus = EST_TRUSTED;
-        posControl.flags.horizontalPositionDataNew = true;
-        posControl.lastValidPositionTimeMs = millis();
-    }
-    // CASE 3: can't use pos/vel data
-    else {
-        posControl.flags.estPosStatus = EST_NONE;
-        posControl.flags.estVelStatus = EST_NONE;
-        posControl.flags.horizontalPositionDataNew = false;
-    }
+//    // CASE 1: POS & VEL valid
+//    if (estPosValid && estVelValid) {
+//        posControl.flags.estPosStatus = EST_TRUSTED;
+//        posControl.flags.estVelStatus = EST_TRUSTED;
+//        posControl.flags.horizontalPositionDataNew = true;
+//        posControl.lastValidPositionTimeMs = millis();
+//    }
+//    // CASE 1: POS invalid, VEL valid
+//    else if (!estPosValid && estVelValid) {
+//        posControl.flags.estPosStatus = EST_USABLE;     // Pos usable, but not trusted
+//        posControl.flags.estVelStatus = EST_TRUSTED;
+//        posControl.flags.horizontalPositionDataNew = true;
+//        posControl.lastValidPositionTimeMs = millis();
+//    }
+//    // CASE 3: can't use pos/vel data
+//    else {
+//        posControl.flags.estPosStatus = EST_NONE;
+//        posControl.flags.estVelStatus = EST_NONE;
+//        posControl.flags.horizontalPositionDataNew = false;
+//    }
+//
+
+    posControl.flags.estPosStatus = EST_TRUSTED;   
+    posControl.flags.estVelStatus = EST_TRUSTED;
+    posControl.lastValidPositionTimeMs = millis();
 
     //Update blackbox data
     navLatestActualPosition[X] = newX;
@@ -2923,7 +2928,7 @@ void updateActualHeading(bool headingValid, int32_t newHeading, int32_t newGroun
 
     posControl.actualState.yaw = newHeading;
     posControl.actualState.cog = newGroundCourse;
-    posControl.flags.estHeadingStatus = newEstHeading;
+    posControl.flags.estHeadingStatus = EST_TRUSTED;
 
     /* Precompute sin/cos of yaw angle */
     posControl.actualState.sinYaw = sin_approx(CENTIDEGREES_TO_RADIANS(newHeading));
