@@ -54,6 +54,9 @@
 
 #include "sensors/battery.h"
 
+#define DLZ_LOGIC_COND_ID 50
+float dlzPosCtrlFade = 0.0;
+
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
  *-----------------------------------------------------------*/
@@ -498,8 +501,27 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
         }
     }
 
-    const float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
-    const float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
+    float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
+    float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
+
+    // Dlz here
+
+    bool dlz_allowed = logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
+
+    if (dlz_allowed) {
+
+        posErrorX += dlzPosCtrlFade * navigatioDlzGetConfidence() * navigatioDlzGetNedPx();
+        posErrorY += dlzPosCtrlFade * navigatioDlzGetConfidence() * navigatioDlzGetNedPy();
+        
+        dlzPosCtrlFade += 0.01f;
+
+    } else {
+        navigationDlzInit();
+        dlzPosCtrlFade = 0.0f;
+    }
+
+
+    // End Dlz here
 
     // Calculate target velocity
     float neuVelX = posErrorX * posControl.pids.pos[X].param.kP;
@@ -732,6 +754,7 @@ static void applyMulticopterPositionController(timeUs_t currentTimeUs)
         else {
             // Position update has not occurred in time (first start or glitch), reset position controller
             resetMulticopterPositionController();
+            dlzPosCtrlFade = 0.0f;
         }
     } else if (bypassPositionController) {
         return;

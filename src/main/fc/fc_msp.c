@@ -110,6 +110,7 @@
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h" //for MSP_SIMULATOR
 #include "navigation/navigation_pos_estimator_private.h" //for MSP_SIMULATOR
+#include "navigation/navigation_dlz.h"
 
 #include "rx/rx.h"
 #include "rx/msp.h"
@@ -528,6 +529,112 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
             }
         }
         break;
+
+    // Skyvis custom message
+    case MSP_SKYVIS_STATE:
+        {
+
+            const flightModeForTelemetry_e mode = getFlightModeForTelemetry();
+            sbufWriteU8(dst, (uint8_t)mode);
+
+            uint32_t u;
+
+            for (int i = 0; i < 3; i++) {
+                sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));
+            }
+
+//            for (int i = 0; i < 3; i++) {
+//                sbufWriteU16(dst, gyroRateDps(i));
+//            }
+
+//            // Accelerations NEU in cm/s2 float 
+//            //memcpy(&u, &posEstimator.imu.accelNEU.x, sizeof(u));
+//            //sbufWriteU32(dst, u);
+//            //memcpy(&u, &posEstimator.imu.accelNEU.y, sizeof(u));
+//            //sbufWriteU32(dst, u);
+//            //memcpy(&u, &posEstimator.imu.accelNEU.z, sizeof(u));
+//            //sbufWriteU32(dst, u);
+//
+//            // Body accel in cm/s2 float
+//            memcpy(&u, &imuMeasuredAccelBF.x, sizeof(u));
+//            sbufWriteU32(dst, u);
+//            memcpy(&u, &imuMeasuredAccelBF.y, sizeof(u));
+//            sbufWriteU32(dst, u);
+//            memcpy(&u, &imuMeasuredAccelBF.z, sizeof(u));
+//            sbufWriteU32(dst, u);         
+
+            //for (int i = 0; i < 3; i++) {
+            //    sbufWriteU16(dst, (int16_t)lrintf(acc.accADCf[i] * 2048));
+            //}
+            //for (int i = 0; i < 3; i++) {
+            //    sbufWriteU16(dst, gyroRateDps(i));
+            //}
+            //sbufWriteU16(dst, attitude.values.roll); // decidegrees (deg/10)
+            //sbufWriteU16(dst, attitude.values.pitch); // decidegrees (deg/10)
+            //sbufWriteU16(dst, attitude.values.yaw); // decidegrees (deg/10)
+            
+            // Write orientation quaternion
+            memcpy(&u, &orientation.q0, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &orientation.q1, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &orientation.q2, sizeof(u));
+            sbufWriteU32(dst, u);
+            memcpy(&u, &orientation.q3, sizeof(u));
+            sbufWriteU32(dst, u);
+
+
+            // Active waypoint position in cm float. We will send
+            // position only with lasp WP, this will indicate to
+            // Skyvis that camera activation is in order
+
+            if (isLastMissionWaypoint()) {
+                memcpy(&u, &posControl.activeWaypoint.pos.x, sizeof(u));
+                sbufWriteU32(dst, u);
+                memcpy(&u, &posControl.activeWaypoint.pos.y, sizeof(u));
+                sbufWriteU32(dst, u);
+
+                
+            } else {
+                const float dum = 0.0;
+                memcpy(&u, &dum, sizeof(u));
+                sbufWriteU32(dst, u);
+                memcpy(&u, &dum, sizeof(u));
+                sbufWriteU32(dst, u);
+            }
+
+
+            uint16_t agl = (unsigned int)lroundf(
+                fminf(fmaxf(posControl.actualState.agl.pos.z, 0.0f), 65535.0f)
+            );
+            sbufWriteU16(dst, agl);                      // pos 13 centimeters
+
+            // 39 bytes up to here
+
+            sbufWriteU8(dst, (uint8_t)gpsSol.numSat);    // pos 14 num sat 
+
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->pos.x, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 15 NED Position X cm
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->pos.y, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 16 NED Position Y cm
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->pos.z, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 17 NED Position
+
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->vel.x, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 18 NED Velocity X cm/s
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->vel.y, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 19 NED Velocity Y cm/s
+            memcpy(&u, &navGetCurrentActualPositionAndVelocity()->vel.z, sizeof(u));
+            sbufWriteU32(dst, u);  // pos 20 NED Velocity Z cm/s
+
+            sbufWriteU16(dst, gpsSol.groundCourse);      // pos 21 decidegrees (deg/10)
+
+            // 64 bytes up to here
+
+
+        }
+        break;
+    // End Skyvis custom message
 
     case MSP_SERVO:
         sbufWriteData(dst, &servo, MAX_SUPPORTED_SERVOS * 2);
@@ -4465,6 +4572,13 @@ static mspResult_e mspProcessSensorCommand(uint16_t cmdMSP, sbuf_t *src)
             mspHeadTrackerReceiverNewData(sbufPtr(src), dataSize);
             break;
 #endif
+
+        case MSP2_SENSOR_SKYVIS:
+            navigationDlzReceiveNewData(sbufPtr(src), dataSize);
+            break;
+
+
+
     }
 
     return MSP_RESULT_NO_REPLY;

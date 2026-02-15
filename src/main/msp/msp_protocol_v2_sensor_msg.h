@@ -25,6 +25,14 @@
 #pragma once
 
 typedef struct __attribute__((packed)) {
+    int32_t nedPx;
+    int32_t nedPy;
+    int16_t dum1;
+    int16_t dum2;
+    int16_t confidence;
+} mspSensorDlz_t;
+
+typedef struct __attribute__((packed)) {
     uint8_t quality;    // [0;255]
     int32_t motionX;
     int32_t motionY;

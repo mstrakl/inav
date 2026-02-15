@@ -573,6 +573,7 @@ main_sources(COMMON_SRC
     navigation/navigation_fw_launch.c
     navigation/navigation_geo.c
     navigation/navigation_multicopter.c
+    navigation/navigation_dlz.c
     navigation/navigation_pos_estimator.c
     navigation/navigation_pos_estimator_private.h
     navigation/navigation_pos_estimator_agl.c
