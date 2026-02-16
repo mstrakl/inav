@@ -30,6 +30,7 @@
 #include "common/maths.h"
 #include "common/filter.h"
 #include "common/utils.h"
+#include "common/log.h"
 
 #include "sensors/sensors.h"
 #include "sensors/acceleration.h"
@@ -50,15 +51,19 @@
 
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h"
-#include "navigation/navigation_dlz.h"
 #include "navigation/sqrt_controller.h"
 
 #include "sensors/battery.h"
 
 #include "programming/logic_condition.h"
+#include "navigation/navigation_dlz.h"
 
 #define DLZ_LOGIC_COND_ID 50
+#define PRINT_TIME 500
+
 static float dlzPosCtrlFade = 0.0;
+static uint32_t lastPrintTime = 0;
+
 
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
@@ -511,18 +516,25 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
 
     bool dlz_allowed = logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
 
+    dlzPosCtrlFade = constrainf(dlzPosCtrlFade, 0.0f, 1.0f);
+
+    navigationDlzUpdate();
+
     if (dlz_allowed) {
 
         posErrorX += dlzPosCtrlFade * navigatioDlzGetConfidence() * navigatioDlzGetNedPx();
         posErrorY += dlzPosCtrlFade * navigatioDlzGetConfidence() * navigatioDlzGetNedPy();
         
-        dlzPosCtrlFade += 0.01f;
+        if (dlzPosCtrlFade < 1.0f) dlzPosCtrlFade += 0.01f;
 
     } else {
-        navigationDlzInit();
         dlzPosCtrlFade = 0.0f;
     }
 
+    if (millis() - lastPrintTime > PRINT_TIME) {
+        LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy());
+        LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f, conf: %f, fade: %f", posErrorX, posErrorY, navigatioDlzGetConfidence(), dlzPosCtrlFade);
+    }
 
     // End Dlz here
 
@@ -711,8 +723,17 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
     const float desiredPitch = atan2_approx(accelForward, GRAVITY_CMSS);
     const float desiredRoll = atan2_approx(accelRight * cos_approx(desiredPitch), GRAVITY_CMSS);
 
+    maxBankAngle = 150; // decidegrees, 35 degrees
+
     posControl.rcAdjustment[ROLL] = constrain(RADIANS_TO_DECIDEGREES(desiredRoll), -maxBankAngle, maxBankAngle);
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);
+
+    if (millis() - lastPrintTime > PRINT_TIME) {
+        LOG_DEBUG(SYSTEM, "DLZ: rollcmd %d, pitchcmd: %d", posControl.rcAdjustment[ROLL], posControl.rcAdjustment[PITCH]);
+        LOG_DEBUG(SYSTEM, "#------------#");
+        lastPrintTime = millis();
+    }
+
 }
 
 static void applyMulticopterPositionController(timeUs_t currentTimeUs)
