@@ -88,14 +88,14 @@ void navigationDlzUpdate(void) {
 
             imuTransformVectorBodyToEarth(&pos);
 
-            conditionedNavDlzPosX = pos.x;
-            conditionedNavDlzPosY = pos.y;
+            conditionedNavDlzPosX = -pos.x; // So that position regulation works correct
+            conditionedNavDlzPosY = -pos.y; // So that position regulation works correct
             conditionedNavDlzPosZ = pos.z;
 
         } else {
             conditionedNavDlzPosX = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST);
             conditionedNavDlzPosY = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST);
-            conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, 0, 10000); // max 100m altitude
+            conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, -100000, 10000); // max 100m altitude
 
         }
 
