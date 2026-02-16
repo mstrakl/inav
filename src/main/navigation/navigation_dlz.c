@@ -5,6 +5,7 @@
 #include "common/maths.h"
 #include "drivers/time.h"
 #include "navigation/navigation_dlz.h"
+#include "sensors/sensors.h"
 #include "common/log.h"
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
@@ -19,6 +20,14 @@ static float conditionedNavDlzPosX = 0.0f;
 static float conditionedNavDlzPosY = 0.0f;
 static float conditionedNavDlzPosZ = 0.0f;
 static float conditionedNavDlzConfidence = 0.0f;
+
+
+// Skyvis status flag
+//  UNDEFINED = 0
+//  NO_RESPONSE = 10
+//  COMMS_OK = 20
+//  TAG_DETECTED = 30
+
 
 /* forward declaration so callers before the definition see the correct type */
 static bool copyMspSensorData(navDlzData_t * data);
@@ -37,6 +46,8 @@ void navigationDlzInit(void) {
     conditionedNavDlzConfidence = 0.0f;
 
     isNewDataReady = false;
+
+    setSkyvisFlag(0);
 
 }
 
@@ -57,16 +68,25 @@ void navigationDlzUpdate(void) {
         conditionedNavDlzConfidence = 0.0f;
 
         isNewDataReady = false;
+
+        setSkyvisFlag(10); // No response
         return;
     }
 
     const bool status = copyMspSensorData(&navDlzData);
 
     if (status) {
+
         conditionedNavDlzPosX = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST);
         conditionedNavDlzPosY = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST);
         conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, 0, 10000); // max 100m altitude
         conditionedNavDlzConfidence = (float)constrainf(navDlzData.confidence, 0, 1000) / 1000.0f;
+
+        if (navDlzData.confidence > 0) {
+            setSkyvisFlag(30); // Tag detected
+        } else {
+            setSkyvisFlag(20); // Comms ok, but no tag detected
+        }
     }
 
 }

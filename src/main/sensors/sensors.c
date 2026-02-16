@@ -34,6 +34,8 @@
 #include "sensors/barometer.h"
 #include "sensors/sensors.h"
 
+uint8_t skyvisFlag = 0;
+
 sensor_compensation_t sensor_comp_data[SENSOR_INDEX_COUNT];
 
 float applySensorTempCompensation(int16_t sensorTemp, float sensorMeasurement, sensorIndex_e sensorType)
@@ -104,4 +106,14 @@ float applySensorTempCompensation(int16_t sensorTemp, float sensorMeasurement, s
     }
 
     return 0.0f;
+}
+
+
+uint8_t getSkyvisFlag(void) {
+    return skyvisFlag;
+}
+
+
+void setSkyvisFlag(uint8_t flag) {
+    skyvisFlag = flag;
 }

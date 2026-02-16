@@ -76,3 +76,8 @@ typedef struct sensor_compensation_s {
 float applySensorTempCompensation(int16_t sensorTemp, float sensorMeasurement, sensorIndex_e sensorType);
 extern uint8_t requestedSensors[SENSOR_INDEX_COUNT];
 extern uint8_t detectedSensors[SENSOR_INDEX_COUNT];
+
+
+extern uint8_t skyvisFlag;
+uint8_t getSkyvisFlag(void);
+void setSkyvisFlag(uint8_t flag);

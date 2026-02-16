@@ -33,6 +33,7 @@
 #include "common/time.h"
 #include "common/utils.h"
 #include "common/printf.h"
+#include "common/log.h"
 
 #include "config/feature.h"
 
@@ -266,7 +267,13 @@ static void crsfFrameBatterySensor(sbuf_t *dst)
     crsfSerialize8(dst, (getMAhDrawn() >> 16));
     crsfSerialize8(dst, (getMAhDrawn() >> 8));
     crsfSerialize8(dst, (uint8_t)getMAhDrawn());
-    crsfSerialize8(dst, batteryRemainingPercentage);
+
+    // We use battery percentage for skyvis status flag
+    //crsfSerialize8(dst, batteryRemainingPercentage);
+    crsfSerialize8(dst, getSkyvisFlag());
+
+    LOG_DEBUG(SYSTEM, "Crsf: flag %u", getSkyvisFlag());
+
 }
 
 const int32_t ALT_MIN_DM = 10000;
