@@ -10,7 +10,7 @@
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_DIST 250
 
-static bool isNewDataReady = false;
+static volatile bool isNewDataReady = false;
 static uint32_t lastDataRx = 0;
 static navDlzData_t _mspData = {0};
 static navDlzData_t navDlzData = {0};
@@ -86,6 +86,9 @@ void navigationDlzReceiveNewData(uint8_t *bufferPtr, unsigned int dataSize)
     _mspData.nedPz = pkt->nedPz;
     _mspData.confidence = pkt->confidence;
 
+    //LOG_DEBUG(SYSTEM, "Received DLZ data: nedPx=%d, nedPy=%d, nedPz=%d, confidence=%d", 
+    //    _mspData.nedPx, _mspData.nedPy, _mspData.nedPz, _mspData.confidence);
+
     isNewDataReady = true;
     lastDataRx = millis();
 
@@ -93,7 +96,10 @@ void navigationDlzReceiveNewData(uint8_t *bufferPtr, unsigned int dataSize)
 
 static bool copyMspSensorData(navDlzData_t * data) {
 
+
+
     if (isNewDataReady) {
+        //LOG_DEBUG(SYSTEM, "Copying DLZ data to output struct");
         *data = _mspData;
         isNewDataReady = false;
         return true;

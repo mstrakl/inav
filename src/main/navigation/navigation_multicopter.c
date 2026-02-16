@@ -790,7 +790,7 @@ static void applyMulticopterPositionController(timeUs_t currentTimeUs)
                                     navConfig()->general.flags.user_control_mode == NAV_GPS_ATTI &&
                                     posControl.flags.isAdjustingPosition;
 
-    if (posControl.flags.horizontalPositionDataNew) {
+    if (true) {
         // Indicate that information is no longer usable
         posControl.flags.horizontalPositionDataConsumed = true;
 
@@ -798,12 +798,9 @@ static void applyMulticopterPositionController(timeUs_t currentTimeUs)
         const timeDeltaLarge_t deltaMicrosPositionUpdate = currentTimeUs - previousTimePositionUpdate;
         previousTimePositionUpdate = currentTimeUs;
 
-        if (bypassPositionController) {
-            return;
-        }
 
         // If we have new position data - update velocity and acceleration controllers
-        if (deltaMicrosPositionUpdate < MAX_POSITION_UPDATE_INTERVAL_US) {
+        if (true) {
             // Get max speed for current NAV mode
             float maxSpeed = getActiveSpeed();
             updatePositionVelocityController_MC(maxSpeed);
@@ -1090,6 +1087,7 @@ static void applyMulticopterHeadingController(void)
 
 void applyMulticopterNavigationController(navigationFSMStateFlags_t navStateFlags, timeUs_t currentTimeUs)
 {
+
     if (navStateFlags & NAV_CTL_EMERG) {
         applyMulticopterEmergencyLandingController(currentTimeUs);
     }
@@ -1102,5 +1100,6 @@ void applyMulticopterNavigationController(navigationFSMStateFlags_t navStateFlag
 
         if (navStateFlags & NAV_CTL_YAW)
             applyMulticopterHeadingController();
+
     }
 }
