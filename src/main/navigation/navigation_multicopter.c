@@ -50,12 +50,15 @@
 
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h"
+#include "navigation/navigation_dlz.h"
 #include "navigation/sqrt_controller.h"
 
 #include "sensors/battery.h"
 
+#include "programming/logic_condition.h"
+
 #define DLZ_LOGIC_COND_ID 50
-float dlzPosCtrlFade = 0.0;
+static float dlzPosCtrlFade = 0.0;
 
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft

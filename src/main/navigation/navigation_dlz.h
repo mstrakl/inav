@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 
 typedef struct {
@@ -15,13 +16,13 @@ void navigationDlzInit(void);
 void navigationDlzUpdate(void);
 
 void navigationDlzReceiveNewData(
-    uint8_t *bufferPtr, 
+    uint8_t *bufferPtr,
     unsigned int dataSize);
 
+/* Internal helper is static in the C file and should not be declared here. */
 
+float navigatioDlzGetNedPx(void);
 
-const float navigatioDlzGetNedPx(void);
+float navigatioDlzGetNedPy(void);
 
-const float navigatioDlzGetNedPy(void);
-
-const float navigatioDlzGetConfidence(void);
+float navigatioDlzGetConfidence(void);
