@@ -3,6 +3,7 @@
 #include "msp/msp.h"
 #include "msp/msp_protocol_v2_sensor_msg.h"
 #include "common/maths.h"
+#include "common/vector.h"
 #include "drivers/time.h"
 #include "navigation/navigation_dlz.h"
 #include "sensors/sensors.h"
@@ -10,6 +11,7 @@
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_DIST 250
+#define USE_DLZ_COORDS_BODY true
 
 static volatile bool isNewDataReady = false;
 static uint32_t lastDataRx = 0;
@@ -20,7 +22,6 @@ static float conditionedNavDlzPosX = 0.0f;
 static float conditionedNavDlzPosY = 0.0f;
 static float conditionedNavDlzPosZ = 0.0f;
 static float conditionedNavDlzConfidence = 0.0f;
-
 
 // Skyvis status flag
 //  UNDEFINED = 0
@@ -77,11 +78,30 @@ void navigationDlzUpdate(void) {
 
     if (status) {
 
-        conditionedNavDlzPosX = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST);
-        conditionedNavDlzPosY = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST);
-        conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, 0, 10000); // max 100m altitude
+        if (USE_DLZ_COORDS_BODY) {
+
+            fpVector3_t pos = {
+                .x = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST),
+                .y = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST),
+                .z = (float)constrainf(navDlzData.nedPz, 0, 10000)
+            };
+
+            imuTransformVectorBodyToEarth(&pos);
+
+            conditionedNavDlzPosX = pos.x;
+            conditionedNavDlzPosY = pos.y;
+            conditionedNavDlzPosZ = pos.z;
+
+        } else {
+            conditionedNavDlzPosX = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST);
+            conditionedNavDlzPosY = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST);
+            conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, 0, 10000); // max 100m altitude
+
+        }
+
         conditionedNavDlzConfidence = (float)constrainf(navDlzData.confidence, 0, 1000) / 1000.0f;
 
+        // For telemetry 
         if (conditionedNavDlzConfidence > 0.95f) {
             setSkyvisFlag(30); // Tag detected
         } else {
