@@ -27,7 +27,7 @@
 typedef struct __attribute__((packed)) {
     int32_t nedPx;
     int32_t nedPy;
-    int16_t dum1;
+    int32_t nedPz;
     int16_t dum2;
     int16_t confidence;
 } mspSensorDlz_t;

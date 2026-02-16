@@ -7,6 +7,7 @@
 typedef struct {
     int32_t nedPx;
     int32_t nedPy;
+    int32_t nedPz;
     int16_t confidence;
 } navDlzData_t;
 
@@ -24,5 +25,7 @@ void navigationDlzReceiveNewData(
 float navigatioDlzGetNedPx(void);
 
 float navigatioDlzGetNedPy(void);
+
+float navigatioDlzGetNedPz(void);
 
 float navigatioDlzGetConfidence(void);

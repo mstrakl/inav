@@ -17,6 +17,7 @@ static navDlzData_t navDlzData = {0};
 
 static float conditionedNavDlzPosX = 0.0f;
 static float conditionedNavDlzPosY = 0.0f;
+static float conditionedNavDlzPosZ = 0.0f;
 static float conditionedNavDlzConfidence = 0.0f;
 
 /* forward declaration so callers before the definition see the correct type */
@@ -27,10 +28,12 @@ void navigationDlzInit(void) {
 
     navDlzData.nedPx = 0;
     navDlzData.nedPy = 0;
+    navDlzData.nedPz = 0;
     navDlzData.confidence = 0;
 
     conditionedNavDlzPosX = 0.0f;
     conditionedNavDlzPosY = 0.0f;
+    conditionedNavDlzPosZ = 0.0f;
     conditionedNavDlzConfidence = 0.0f;
 
     isNewDataReady = false;
@@ -45,10 +48,12 @@ void navigationDlzUpdate(void) {
 
         navDlzData.nedPx = 0;
         navDlzData.nedPy = 0;
+        navDlzData.nedPz = 0;
         navDlzData.confidence = 0;
 
         conditionedNavDlzPosX = 0.0f;
         conditionedNavDlzPosY = 0.0f;
+        conditionedNavDlzPosZ = 0.0f;
         conditionedNavDlzConfidence = 0.0f;
 
         isNewDataReady = false;
@@ -60,6 +65,7 @@ void navigationDlzUpdate(void) {
     if (status) {
         conditionedNavDlzPosX = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST);
         conditionedNavDlzPosY = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST);
+        conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, 0, 10000); // max 100m altitude
         conditionedNavDlzConfidence = (float)constrainf(navDlzData.confidence, 0, 1000) / 1000.0f;
     }
 
@@ -77,6 +83,7 @@ void navigationDlzReceiveNewData(uint8_t *bufferPtr, unsigned int dataSize)
 
     _mspData.nedPx = pkt->nedPx; 
     _mspData.nedPy = pkt->nedPy; 
+    _mspData.nedPz = pkt->nedPz;
     _mspData.confidence = pkt->confidence;
 
     isNewDataReady = true;
@@ -102,6 +109,10 @@ float navigatioDlzGetNedPx(void) {
 
 float navigatioDlzGetNedPy(void) {
     return conditionedNavDlzPosY;
+}
+
+float navigatioDlzGetNedPz(void) {
+    return conditionedNavDlzPosZ;
 }
 
 float navigatioDlzGetConfidence(void) {

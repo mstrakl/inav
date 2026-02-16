@@ -532,8 +532,9 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
     }
 
     if (millis() - lastPrintTime > PRINT_TIME) {
-        LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy());
-        LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f, conf: %f, fade: %f", posErrorX, posErrorY, navigatioDlzGetConfidence(), dlzPosCtrlFade);
+        LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f, dpz: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy(), navigatioDlzGetNedPz());
+        LOG_DEBUG(SYSTEM, "DLZ: conf: %f, fade: %f", navigatioDlzGetConfidence(), dlzPosCtrlFade);
+        LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f", posErrorX, posErrorY);
     }
 
     // End Dlz here
