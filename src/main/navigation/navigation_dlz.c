@@ -8,7 +8,7 @@
 #include "common/log.h"
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
-#define MAX_DIST 500
+#define MAX_DIST 250
 
 static bool isNewDataReady = false;
 static uint32_t lastDataRx = 0;

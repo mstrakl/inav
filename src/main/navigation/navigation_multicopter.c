@@ -62,6 +62,8 @@
 #define PRINT_TIME 500
 
 static float dlzPosCtrlFade = 0.0;
+static float dlzOldBiasX = 0.0f;
+static float dlzOldBiasY = 0.0f;
 static uint32_t lastPrintTime = 0;
 
 
@@ -514,25 +516,61 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
 
     // Dlz here
 
+    // True when we're on the final LAND waypoint and it has been reached
+
+    bool landingPntReached = false;
+
+    if (FLIGHT_MODE(NAV_WP_MODE) && 
+        (posControl.activeWaypointIndex == posControl.waypointCount - 1) &&
+        (posControl.wpDistance < 500.0f)) {
+            landingPntReached = true;
+        }
+
+
     bool dlz_allowed = logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
 
-    dlzPosCtrlFade = constrainf(dlzPosCtrlFade, 0.0f, 1.0f);
+    float biasX = 0.0f;
+    float biasY = 0.0f;
+
+    //dlzPosCtrlFade = constrainf(dlzPosCtrlFade, 0.0f, 1.0f);
 
     navigationDlzUpdate();
 
     if (dlz_allowed) {
 
-        posErrorX += dlzPosCtrlFade * navigatioDlzGetConfidence() * navigatioDlzGetNedPx();
-        posErrorY += dlzPosCtrlFade * navigatioDlzGetConfidence() * navigatioDlzGetNedPy();
+        const float fade = navigatioDlzGetConfidence();
+
+        biasX = fade * (navigatioDlzGetNedPx() - posErrorX);
+        biasY = fade * (navigatioDlzGetNedPy() - posErrorY);
+
+        if(landingPntReached && navGetCurrentActualPositionAndVelocity()->pos.z < 200.0f && fade < 0.95f) {
+            biasX = dlzOldBiasX;
+            biasY = dlzOldBiasY;
+        } else {
+            if (fade > 0.95f) {
+                dlzOldBiasX = biasX;
+                dlzOldBiasY = biasY;
+            }
+        }
+
+        posErrorX += biasX;
+        posErrorY += biasY;
         
-        if (dlzPosCtrlFade < 1.0f) dlzPosCtrlFade += 0.01f;
+        //if (dlzPosCtrlFade < 1.0f) dlzPosCtrlFade += 0.01f;
 
     } else {
-        dlzPosCtrlFade = 0.0f;
+        dlzOldBiasX = 0.0f;
+        dlzOldBiasY = 0.0f;
+        //dlzPosCtrlFade = 0.0f;
     }
 
     if (millis() - lastPrintTime > PRINT_TIME) {
+        LOG_DEBUG(SYSTEM, "DLZ: allowed: %d", dlz_allowed);
+        LOG_DEBUG(SYSTEM, "DLZ: fin wp reached: %d", landingPntReached);
+        LOG_DEBUG(SYSTEM, "DLZ: dist: %f", posControl.wpDistance);
         LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f, dpz: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy(), navigatioDlzGetNedPz());
+        LOG_DEBUG(SYSTEM, "DLZ: biasX: %f, biasY: %f", biasX, biasY);
+        LOG_DEBUG(SYSTEM, "DLZ: navpos z: %f", navGetCurrentActualPositionAndVelocity()->pos.z);
         LOG_DEBUG(SYSTEM, "DLZ: conf: %f, fade: %f", navigatioDlzGetConfidence(), dlzPosCtrlFade);
         LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f", posErrorX, posErrorY);
     }
