@@ -38,7 +38,7 @@ sleep 1
 
 # Start INAV SITL simulator
 echo "Starting INAV SITL..."
-BINARY="../build/build_SITL/inav_9.0.0_SITL"
+BINARY="../build/build_SITL/inav_9.0.1_SITL"
 if [ ! -f "$BINARY" ]; then
     echo "✗ Error: SITL binary not found at $BINARY"
     echo "  Run: bash ../build_sitl_mac.sh (macOS) or bash ../build.sh (Linux)"
