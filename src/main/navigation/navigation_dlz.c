@@ -82,7 +82,7 @@ void navigationDlzUpdate(void) {
         conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, 0, 10000); // max 100m altitude
         conditionedNavDlzConfidence = (float)constrainf(navDlzData.confidence, 0, 1000) / 1000.0f;
 
-        if (navDlzData.confidence > 0) {
+        if (conditionedNavDlzConfidence > 0.95f) {
             setSkyvisFlag(30); // Tag detected
         } else {
             setSkyvisFlag(20); // Comms ok, but no tag detected
