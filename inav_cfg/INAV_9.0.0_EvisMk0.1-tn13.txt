@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/MATEKF405SE 9.0.0 Feb 14 2026 / 07:36:28 (17f4db70) 
+# INAV/MATEKF405SE 9.0.1 Feb 15 2026 / 12:33:15 (6c5595fb) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -21,8 +21,7 @@ timer_output_mode 7 SERVOS
 timer_output_mode 11 SERVOS
 
 # Outputs [servo]
-servo 1 1200 2000 1700 100
-servo 2 1000 1750 1250 100
+servo 2 1000 2000 1500 -100
 servo 3 1325 1825 1500 100
 servo 4 1220 1720 1420 100
 servo 5 1230 2050 1500 -100
@@ -90,9 +89,7 @@ aux 5 62 3 900 2100
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 2 valid
-wp 0 1 466311056 161776735 1000 0 0 0 0
-wp 1 8 466313122 161773799 1000 0 0 0 165
+#wp 0 invalid
 
 # OSD [osd_layout]
 
@@ -100,7 +97,7 @@ wp 1 8 466313122 161773799 1000 0 0 0 165
 logic 0 1 -1 2 1 7 0 2000 0
 logic 1 1 -1 51 1 8 0 1500 0
 logic 2 1 -1 51 1 5 0 1500 0
-logic 50 0 -1 2 1 7 0 3000 0
+logic 50 1 -1 2 1 12 0 1800 0
 
 # Programming: global variables
 
@@ -114,10 +111,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 11
-set gyro_zero_y = -11
-set gyro_zero_z = -2
-set ins_gravity_cmss =  972.431
+set gyro_zero_x = 14
+set gyro_zero_y = -10
+set gyro_zero_z = -1
+set ins_gravity_cmss =  972.315
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -126,17 +123,14 @@ set accgain_x = 4085
 set accgain_y = 4089
 set accgain_z = 4083
 set opflow_scale =  4.688
-set align_mag = CW0FLIP
+set align_mag = CW90FLIP
 set mag_hardware = QMC5883
-set magzero_x = -22
-set magzero_y = -831
-set magzero_z = -47
-set maggain_x = 1430
-set maggain_y = 1500
-set maggain_z = 1516
-set align_mag_roll = -10
-set align_mag_pitch = 1790
-set align_mag_yaw = 1850
+set magzero_x = 35
+set magzero_y = -823
+set magzero_z = -4
+set maggain_x = 1465
+set maggain_y = 1385
+set maggain_z = 1441
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
@@ -173,7 +167,6 @@ set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
 set nav_fw_launch_climb_angle = 25
 set debug_mode = FLOW_RAW
-set log_level = DEBUG
 set log_topics = 4294967295
 
 # control_profile
@@ -295,14 +288,14 @@ smix reset
 
 smix 0 1 2 -50 0 -1
 smix 1 2 2 -50 0 -1
-smix 2 1 29 -88 100 -1
-smix 3 2 29 84 100 -1
+smix 2 1 29 -71 100 -1
+smix 3 2 29 75 100 -1
 smix 4 5 1 20 0 -1
 smix 5 5 2 20 0 -1
 smix 6 6 1 -20 0 -1
 smix 7 6 2 20 0 -1
-smix 8 1 38 88 100 -1
-smix 9 2 38 -84 100 -1
+smix 8 1 38 71 100 -1
+smix 9 2 38 -75 100 -1
 
 # battery_profile
 battery_profile 1

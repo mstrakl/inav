@@ -11,6 +11,7 @@ PORT = 2323
 RATE_HZ = 60.0
 
 _tx_state = {
+    "enable": False,
     "swA": 0,
     "swB": 0,
     "swC": 0,
@@ -103,6 +104,13 @@ def read_tx_thread(device="/dev/input/js0"):
 
     JS_EVENT_FORMAT = "IhBB"
     JS_EVENT_SIZE = struct.calcsize(JS_EVENT_FORMAT)
+    
+    try:
+        js = open(device, "rb")
+        _tx_state["enable"] = True
+    except FileNotFoundError:
+        print(f"Joystick device {device} not found. Joystick input will be disabled.")
+        return
 
     with open(device, "rb") as js:
         while True:

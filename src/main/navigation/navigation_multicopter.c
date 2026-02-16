@@ -30,6 +30,7 @@
 #include "common/maths.h"
 #include "common/filter.h"
 #include "common/utils.h"
+#include "common/log.h"
 
 #include "sensors/sensors.h"
 #include "sensors/acceleration.h"
@@ -54,14 +55,17 @@
 
 #include "sensors/battery.h"
 
-
-#include "common/log.h"
+#include "programming/logic_condition.h"
 #include "navigation/navigation_dlz.h"
 
 #define DLZ_LOGIC_COND_ID 50
+#define PRINT_TIME 500
 
-static unsigned long t_dbg_last = 0;
-#define PRINT_TIME_MS 500
+static float dlzPosCtrlFade = 0.0;
+static float dlzOldBiasX = 0.0f;
+static float dlzOldBiasY = 0.0f;
+static uint32_t lastPrintTime = 0;
+
 
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
@@ -399,8 +403,6 @@ void resetMulticopterPositionController(void)
         lastAccelTargetX = 0.0f;
         lastAccelTargetY = 0.0f;
     }
-
-    adum_dlz_reset();
 }
 
 static bool adjustMulticopterCruiseSpeed(int16_t rcPitchAdjustment)
@@ -494,7 +496,7 @@ static float getVelocityExpoAttenuationFactor(float velTotal, float velMax)
     return 1.0f - posControl.posResponseExpo * (1.0f - (velScale * velScale));  // x^3 expo factor
 }
 
-static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const float maxSpeed)
+static void updatePositionVelocityController_MC(const float maxSpeed)
 {
     if (FLIGHT_MODE(NAV_COURSE_HOLD_MODE)) {
         // Position held at cruise speeds below 0.5 m/s, otherwise desired neu velocities set directly from cruise speed
@@ -512,66 +514,68 @@ static void updatePositionVelocityController_MC(timeDelta_t deltaMicros, const f
     float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
     float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
 
+    // Dlz here
 
-    // Here Skyvis start
+    // True when we're on the final LAND waypoint and it has been reached
 
-    // Only in position hold and waypoint modes we use DLZ corrections,
-    // provided that DLZ_LOGIC_COND_ID is set true
+    bool landingPntReached = false;
 
-    bool dlz_allowed =
-        (FLIGHT_MODE(NAV_POSHOLD_MODE) || FLIGHT_MODE(NAV_WP_MODE)) &&
-        logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
+    if (FLIGHT_MODE(NAV_WP_MODE) && 
+        (posControl.activeWaypointIndex == posControl.waypointCount - 1) &&
+        (posControl.wpDistance < 500.0f)) {
+            landingPntReached = true;
+        }
 
+
+    bool dlz_allowed = logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
+
+    float biasX = 0.0f;
+    float biasY = 0.0f;
+
+    //dlzPosCtrlFade = constrainf(dlzPosCtrlFade, 0.0f, 1.0f);
+
+    navigationDlzUpdate();
 
     if (dlz_allowed) {
 
-        adum_dlz_update();
+        const float fade = navigatioDlzGetConfidence();
 
-        const float fade = constrainf(adum_dlz_get_fade(), 0.0f, 1.0f);
+        biasX = fade * (navigatioDlzGetNedPx() - posErrorX);
+        biasY = fade * (navigatioDlzGetNedPy() - posErrorY);
 
-        if (!isfinite(fade)) {
-            adum_dlz_reset();
-            return;
+        if(landingPntReached && navGetCurrentActualPositionAndVelocity()->pos.z < 200.0f && fade < 0.95f) {
+            biasX = dlzOldBiasX;
+            biasY = dlzOldBiasY;
+        } else {
+            if (fade > 0.95f) {
+                dlzOldBiasX = biasX;
+                dlzOldBiasY = biasY;
+            }
         }
 
-        #define MAX_DLZ_CORRECTION 500.0f
-
-        const float camErrX = constrainf(
-            adum_dlz_get_weighed_ned_pos_x(),
-            -MAX_DLZ_CORRECTION,
-            MAX_DLZ_CORRECTION
-        );
-        const float camErrY = constrainf(
-            adum_dlz_get_weighed_ned_pos_y(),
-            -MAX_DLZ_CORRECTION,
-            MAX_DLZ_CORRECTION
-        );
-
-        if (millis() - t_dbg_last > PRINT_TIME_MS) {
-            LOG_DEBUG(SYSTEM, "DLZ.fade: %f", fade);
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorX: %f", posErrorX);
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorY: %f", posErrorY);
-            LOG_DEBUG(SYSTEM, "DLZ.camErrX: %f", camErrX);
-            LOG_DEBUG(SYSTEM, "DLZ.camErrY: %f", camErrY);
-        }
-
-        posErrorX = (1.0f - fade) * posErrorX + fade * camErrX;
-        posErrorY = (1.0f - fade) * posErrorY + fade * camErrY;
-
-        if (millis() - t_dbg_last > PRINT_TIME_MS) {
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorX2: %f", posErrorX);
-            LOG_DEBUG(SYSTEM, "DLZ.posErrorY2: %f", posErrorY);
-
-            t_dbg_last = millis();
-        }
-
-        //t_dbg_last = millis();
+        posErrorX += biasX;
+        posErrorY += biasY;
+        
+        //if (dlzPosCtrlFade < 1.0f) dlzPosCtrlFade += 0.01f;
 
     } else {
-        adum_dlz_reset();
+        dlzOldBiasX = 0.0f;
+        dlzOldBiasY = 0.0f;
+        //dlzPosCtrlFade = 0.0f;
     }
 
-    // Here skyvis end
+    if (millis() - lastPrintTime > PRINT_TIME) {
+        LOG_DEBUG(SYSTEM, "DLZ: allowed: %d", dlz_allowed);
+        LOG_DEBUG(SYSTEM, "DLZ: fin wp reached: %d", landingPntReached);
+        LOG_DEBUG(SYSTEM, "DLZ: dist: %f", posControl.wpDistance);
+        LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f, dpz: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy(), navigatioDlzGetNedPz());
+        LOG_DEBUG(SYSTEM, "DLZ: biasX: %f, biasY: %f", biasX, biasY);
+        LOG_DEBUG(SYSTEM, "DLZ: navpos z: %f", navGetCurrentActualPositionAndVelocity()->pos.z);
+        LOG_DEBUG(SYSTEM, "DLZ: conf: %f, fade: %f", navigatioDlzGetConfidence(), dlzPosCtrlFade);
+        LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f", posErrorX, posErrorY);
+    }
+
+    // End Dlz here
 
     // Calculate target velocity
     float neuVelX = posErrorX * posControl.pids.pos[X].param.kP;
@@ -761,6 +765,12 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
     posControl.rcAdjustment[ROLL] = constrain(RADIANS_TO_DECIDEGREES(desiredRoll), -maxBankAngle, maxBankAngle);
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);
 
+    if (millis() - lastPrintTime > PRINT_TIME) {
+        LOG_DEBUG(SYSTEM, "DLZ: rollcmd %d, pitchcmd: %d", posControl.rcAdjustment[ROLL], posControl.rcAdjustment[PITCH]);
+        LOG_DEBUG(SYSTEM, "#------------#");
+        lastPrintTime = millis();
+    }
+
 }
 
 static void applyMulticopterPositionController(timeUs_t currentTimeUs)
@@ -796,7 +806,7 @@ static void applyMulticopterPositionController(timeUs_t currentTimeUs)
         if (deltaMicrosPositionUpdate < MAX_POSITION_UPDATE_INTERVAL_US) {
             // Get max speed for current NAV mode
             float maxSpeed = getActiveSpeed();
-            updatePositionVelocityController_MC(deltaMicrosPositionUpdate, maxSpeed);
+            updatePositionVelocityController_MC(maxSpeed);
             updatePositionAccelController_MC(deltaMicrosPositionUpdate, NAV_ACCELERATION_XY_MAX, maxSpeed);
 
             navDesiredVelocity[X] = constrain(lrintf(posControl.desiredState.vel.x), -32678, 32767);
@@ -805,6 +815,7 @@ static void applyMulticopterPositionController(timeUs_t currentTimeUs)
         else {
             // Position update has not occurred in time (first start or glitch), reset position controller
             resetMulticopterPositionController();
+            dlzPosCtrlFade = 0.0f;
         }
     } else if (bypassPositionController) {
         return;
