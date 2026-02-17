@@ -4573,9 +4573,9 @@ static mspResult_e mspProcessSensorCommand(uint16_t cmdMSP, sbuf_t *src)
             break;
 #endif
 
-        case MSP2_SENSOR_SKYVIS:
-            navigationDlzReceiveNewData(sbufPtr(src), dataSize);
-            break;
+        //case MSP2_SENSOR_SKYVIS:
+        //    navigationDlzReceiveNewData(sbufPtr(src), dataSize);
+        //    break;
 
 
 

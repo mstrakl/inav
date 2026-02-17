@@ -37,6 +37,7 @@
 #include "common/maths.h"
 #include "common/utils.h"
 #include "common/string_light.h"
+#include "common/log.h"
 
 #include "config/feature.h"
 
@@ -156,6 +157,9 @@ typedef enum APM_COPTER_MODE
    COPTER_MODE_SMART_RTL=21,
    COPTER_MODE_ENUM_END=22,
 } APM_COPTER_MODE;
+
+
+mavlinkSensorDlz_t mavlinkDlzData = {0};
 
 static serialPort_t *mavlinkPort = NULL;
 static serialPortConfig_t *portConfig;
@@ -1163,71 +1167,17 @@ static bool handleIncoming_COMMAND_INT(void)
     mavlink_command_int_t msg;
     mavlink_msg_command_int_decode(&mavRecvMsg, &msg);
 
-    if (msg.target_system == mavSystemId) {
+    LOG_DEBUG(SYSTEM, "Received COMMAND_INT message from sysid %d compid %d command %d", mavRecvMsg.sysid, mavRecvMsg.compid, msg.command);
+    LOG_DEBUG(SYSTEM, "  Params: %f %f %f %f %f %f %f", msg.param1, msg.param2, msg.param3, msg.param4, msg.x, msg.y, msg.z);
 
-        if (msg.command == MAV_CMD_DO_REPOSITION) {
-            
-            if (!(msg.frame == MAV_FRAME_GLOBAL)) { //|| msg.frame == MAV_FRAME_GLOBAL_RELATIVE_ALT || msg.frame == MAV_FRAME_GLOBAL_TERRAIN_ALT)) {
+    mavlinkDlzData.nedPx = msg.param1;
+    mavlinkDlzData.nedPy = msg.param2;
+    mavlinkDlzData.nedPz = msg.param3;
+    mavlinkDlzData.confidence = msg.param4;
 
-                    mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                                msg.command,
-                                                MAV_RESULT_UNSUPPORTED,
-                                                0,  // progress
-                                                0,  // result_param2
-                                                mavRecvMsg.sysid,
-                                                mavRecvMsg.compid);
-                    mavlinkSendMessage();
-                    return true;
-                }
+    return true;
 
-            if (isGCSValid()) {
-                navWaypoint_t wp;
-                wp.action = NAV_WP_ACTION_WAYPOINT;
-                wp.lat = (int32_t)msg.x;
-                wp.lon = (int32_t)msg.y;
-                wp.alt = msg.z * 100.0f;
-                if (!isnan(msg.param4) && msg.param4 >= 0.0f && msg.param4 < 360.0f) {
-                    wp.p1 = (int16_t)msg.param4;
-                } else {
-                    wp.p1 = 0;
-                }
-                wp.p2 = 0; // TODO: Alt modes 
-                wp.p3 = 0;
-                wp.flag = 0;
 
-                setWaypoint(255, &wp);
-
-                mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                            msg.command,
-                                            MAV_RESULT_ACCEPTED,
-                                            0,  // progress
-                                            0,  // result_param2
-                                            mavRecvMsg.sysid,
-                                            mavRecvMsg.compid);
-                mavlinkSendMessage();
-            } else {
-                mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                            msg.command,
-                                            MAV_RESULT_DENIED,
-                                            0,
-                                            0,
-                                            mavRecvMsg.sysid,
-                                            mavRecvMsg.compid);
-                mavlinkSendMessage();
-            }
-        } else {
-            mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                        msg.command,
-                                        MAV_RESULT_UNSUPPORTED,
-                                        0,
-                                        0,
-                                        mavRecvMsg.sysid,
-                                        mavRecvMsg.compid);
-            mavlinkSendMessage();
-        }
-        return true;
-    }
-    return false;
 }
 
 
@@ -1292,6 +1242,8 @@ static bool handleIncoming_HEARTBEAT(void) {
     mavlink_heartbeat_t msg;
     mavlink_msg_heartbeat_decode(&mavRecvMsg, &msg);
 
+    LOG_DEBUG(SYSTEM, "Rx: heartbeat from sysid %d compid %d type %d", mavRecvMsg.sysid, mavRecvMsg.compid, msg.type);
+
     switch (msg.type) {
 #ifdef USE_ADSB
         case MAV_TYPE_ADSB:
@@ -1339,6 +1291,9 @@ static bool processMAVLinkIncomingTelemetry(void)
         uint8_t result = mavlink_parse_char(0, c, &mavRecvMsg, &mavRecvStatus);
         if (result == MAVLINK_FRAMING_OK) {
             switch (mavRecvMsg.msgid) {
+
+                LOG_DEBUG(SYSTEM, "Received MAVLink message with ID %d from sysid %d compid %d", mavRecvMsg.msgid, mavRecvMsg.sysid, mavRecvMsg.compid);
+
                 case MAVLINK_MSG_ID_HEARTBEAT:
                    return handleIncoming_HEARTBEAT();
                 case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:

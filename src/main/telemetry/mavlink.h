@@ -17,6 +17,15 @@
 
 #pragma once
 
+typedef struct {
+    float nedPx;
+    float nedPy;
+    float nedPz;
+    float confidence;
+} mavlinkSensorDlz_t;
+
+extern mavlinkSensorDlz_t mavlinkDlzData;
+
 void initMAVLinkTelemetry(void);
 void handleMAVLinkTelemetry(timeUs_t currentTimeUs);
 void checkMAVLinkTelemetryState(void);

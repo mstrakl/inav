@@ -8,6 +8,7 @@
 #include "navigation/navigation_dlz.h"
 #include "sensors/sensors.h"
 #include "common/log.h"
+#include "telemetry/mavlink.h"
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_DIST 250
@@ -55,7 +56,7 @@ void navigationDlzInit(void) {
 
 void navigationDlzUpdate(void) {
 
-
+/*
     if (millis() - lastDataRx > UPDATE_TIMEOUT_MS) {
 
         navDlzData.nedPx = 0;
@@ -73,17 +74,19 @@ void navigationDlzUpdate(void) {
         setSkyvisFlag(10); // No response
         return;
     }
+*/
+    if (true) {
 
-    const bool status = copyMspSensorData(&navDlzData);
-
-    if (status) {
-
-        if (USE_DLZ_COORDS_BODY) {
+            //fpVector3_t pos = {
+            //    .x = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST),
+            //    .y = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST),
+            //    .z = (float)constrainf(navDlzData.nedPz, 0, 10000)
+            //};
 
             fpVector3_t pos = {
-                .x = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST),
-                .y = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST),
-                .z = (float)constrainf(navDlzData.nedPz, 0, 10000)
+                .x = mavlinkDlzData.nedPx,
+                .y = mavlinkDlzData.nedPy,
+                .z = mavlinkDlzData.nedPz
             };
 
             imuTransformVectorBodyToEarth(&pos);
@@ -92,14 +95,9 @@ void navigationDlzUpdate(void) {
             conditionedNavDlzPosY = -pos.y; // So that position regulation works correct
             conditionedNavDlzPosZ = pos.z;
 
-        } else {
-            conditionedNavDlzPosX = (float)constrainf(navDlzData.nedPx, -MAX_DIST, MAX_DIST);
-            conditionedNavDlzPosY = (float)constrainf(navDlzData.nedPy, -MAX_DIST, MAX_DIST);
-            conditionedNavDlzPosZ = (float)constrainf(navDlzData.nedPz, -100000, 10000); // max 100m altitude
+        } 
 
-        }
-
-        conditionedNavDlzConfidence = (float)constrainf(navDlzData.confidence, 0, 1000) / 1000.0f;
+        conditionedNavDlzConfidence = mavlinkDlzData.confidence;
 
         // For telemetry 
         if (conditionedNavDlzConfidence > 0.95f) {
@@ -107,47 +105,10 @@ void navigationDlzUpdate(void) {
         } else {
             setSkyvisFlag(20); // Comms ok, but no tag detected
         }
-    }
 
 }
 
 
-void navigationDlzReceiveNewData(uint8_t *bufferPtr, unsigned int dataSize)
-{
-
-    if(dataSize != sizeof(mspSensorDlz_t)) {
-        return;
-    }
-
-    const mspSensorDlz_t * pkt = (const mspSensorDlz_t *)bufferPtr;
-
-    _mspData.nedPx = pkt->nedPx; 
-    _mspData.nedPy = pkt->nedPy; 
-    _mspData.nedPz = pkt->nedPz;
-    _mspData.confidence = pkt->confidence;
-
-    //LOG_DEBUG(SYSTEM, "Received DLZ data: nedPx=%d, nedPy=%d, nedPz=%d, confidence=%d", 
-    //    _mspData.nedPx, _mspData.nedPy, _mspData.nedPz, _mspData.confidence);
-
-    isNewDataReady = true;
-    lastDataRx = millis();
-
-}
-
-static bool copyMspSensorData(navDlzData_t * data) {
-
-
-
-    if (isNewDataReady) {
-        //LOG_DEBUG(SYSTEM, "Copying DLZ data to output struct");
-        *data = _mspData;
-        isNewDataReady = false;
-        return true;
-    }
-
-    return false;
-
-}
 
 float navigatioDlzGetNedPx(void) {
     return conditionedNavDlzPosX;
