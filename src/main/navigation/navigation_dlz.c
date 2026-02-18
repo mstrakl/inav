@@ -24,6 +24,10 @@ static float conditionedNavDlzConfidence = 0.0f;
 static float conditionedBiasPosX = 0.0f;
 static float conditionedBiasPosY = 0.0f;
 
+static navRateLimiter_t navDlzBiasPosXRateLimiter;
+static navRateLimiter_t navDlzBiasPosYRateLimiter;
+
+
 // Skyvis status flag
 //  UNDEFINED = 0
 //  NO_RESPONSE = 10
@@ -45,6 +49,10 @@ void navigationDlzInit(void) {
 
     conditionedBiasPosX = 0.0f;
     conditionedBiasPosY = 0.0f;
+
+    // Rate limited to 25cm/s initially
+    navRateLimiterInit(&navDlzBiasPosXRateLimiter, 25.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzBiasPosYRateLimiter, 25.0f, 0.0f, millis());
 
     isNewDataReady = false;
     //setSkyvisFlag(0);
@@ -115,9 +123,14 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         conditionedNavDlzPosY = -pos.y; // So that position regulation works correct
         conditionedNavDlzPosZ = pos.z;
 
-        // Calculate bias
-        conditionedBiasPosX = conditionedNavDlzConfidence * (conditionedNavDlzPosX - posErrorX);
-        conditionedBiasPosY = conditionedNavDlzConfidence * (conditionedNavDlzPosY - posErrorY);
+        // Calculate bias, rate limited
+        conditionedBiasPosX = navRateLimiterUpdate(&navDlzBiasPosXRateLimiter,
+                                                   conditionedNavDlzConfidence * (conditionedNavDlzPosX - posErrorX),
+                                                   millis());
+                                                   
+        conditionedBiasPosY = navRateLimiterUpdate(&navDlzBiasPosYRateLimiter,
+                                                   conditionedNavDlzConfidence * (conditionedNavDlzPosY - posErrorY),
+                                                   millis());
 
         // For telemetry 
 
@@ -127,11 +140,6 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
             //setSkyvisFlag(20); // Comms ok, but no tag detected
         }
     }
-
-
-    
-
-
 
 }
 
@@ -151,6 +159,46 @@ void navigationDlzReceiveNewData(const float px,
     isNewDataReady = true;
 
 }
+
+
+// Rate Limiter
+
+
+void navRateLimiterInit(navRateLimiter_t *sl, 
+                        const float rate_per_sec, 
+                        const float initial_value, 
+                        const uint32_t now_ms) {
+
+    sl->rate_per_sec = rate_per_sec;
+    sl->last_output = initial_value;
+    sl->last_time_ms = now_ms;
+}
+
+
+float navRateLimiterUpdate(navRateLimiter_t *sl, 
+                           const float target, 
+                           const uint32_t now_ms) {
+
+    uint32_t dt_ms = now_ms - sl->last_time_ms;
+    sl->last_time_ms = now_ms;
+
+    float dt_sec = dt_ms / 1000.0f;
+    float max_delta = sl->rate_per_sec * dt_sec;
+
+    float delta = target - sl->last_output;
+
+    if (delta > max_delta)
+        delta = max_delta;
+    else if (delta < -max_delta)
+        delta = -max_delta;
+
+    sl->last_output += delta;
+
+    return sl->last_output;
+}
+
+
+// Getters
 
 
 
