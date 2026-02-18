@@ -56,6 +56,7 @@
 
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h"
+#include "navigation/navigation_dlz.h"
 #include "navigation/rth_trackback.h"
 
 #include "rx/rx.h"
@@ -5051,6 +5052,10 @@ void navigationInit(void)
         loadNonVolatileWaypointList(false);
     }
 #endif
+
+
+    // Initialize dlz
+    navigationDlzInit();
 }
 
 /*-----------------------------------------------------------

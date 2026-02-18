@@ -501,6 +501,8 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
     const float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
     const float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
 
+    navigationDlzUpdate(posErrorX, posErrorY);
+
     // Calculate target velocity
     float neuVelX = posErrorX * posControl.pids.pos[X].param.kP;
     float neuVelY = posErrorY * posControl.pids.pos[Y].param.kP;
