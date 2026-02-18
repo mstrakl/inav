@@ -205,6 +205,9 @@ class InavSimulate:
             
             if (tx["swD"] == 2 and self.__TARM >= 9999998.0):
                 self.__TARM = trel
+            elif(tx["enable"] == False and self.__TARM >= 9999998.0):
+                if trel > 7.0:
+                    self.__TARM = trel + 1.0
             
             print("self.__TARM:", self.__TARM)
             
@@ -231,11 +234,13 @@ class InavSimulate:
             if trel > self.__TARM + 12:
                 self.__updateState("ch7",  0.75) # WP Mode
                 
-                self.__updateState("ch10",  tx["potS1"]) 
-                self.__updateState("ch11",  tx["potS2"]) 
-                self.__updateState("ch12",  tx["swA"]) 
+                if (tx["enable"]):
+                    self.__updateState("ch10",  tx["potS1"]) 
+                    self.__updateState("ch11",  tx["potS2"]) 
+                    self.__updateState("ch12",  tx["swA"]) 
 
-                
+                else:
+                    self.__updateState("ch12",  1.0)
 
 #
 #            # Wobble around for testing
