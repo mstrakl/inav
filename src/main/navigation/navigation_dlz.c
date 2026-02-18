@@ -14,7 +14,9 @@
 #define MAX_ALT 10000.0f // max 100 m
 
 static volatile bool isNewDataReady = false;
-static navDlzData_t navDlzData = {0};
+
+static navDlzData_t navDlzData[2];
+static volatile uint8_t activeBuffer = 0;
 
 static float conditionedNavDlzPosX = 0.0f;
 static float conditionedNavDlzPosY = 0.0f;
@@ -27,6 +29,7 @@ static float conditionedBiasPosY = 0.0f;
 static navRateLimiter_t navDlzBiasPosXRateLimiter;
 static navRateLimiter_t navDlzBiasPosYRateLimiter;
 
+const navDlzData_t * navigationDlzGetActiveBuffer(void);
 
 // Skyvis status flag
 //  UNDEFINED = 0
@@ -36,11 +39,18 @@ static navRateLimiter_t navDlzBiasPosYRateLimiter;
 
 void navigationDlzInit(void) {
 
-    navDlzData.px = 0.0f;
-    navDlzData.py = 0.0f;
-    navDlzData.pz = 0.0f;
-    navDlzData.confidence = 0.0f;
-    navDlzData.timestamp_ms = 0;
+    navDlzData[0].px = 0.0f;
+    navDlzData[0].py = 0.0f;
+    navDlzData[0].pz = 0.0f;
+    navDlzData[0].confidence = 0.0f;
+    navDlzData[0].timestamp_ms = 0;
+
+
+    navDlzData[1].px = 0.0f;
+    navDlzData[1].py = 0.0f;
+    navDlzData[1].pz = 0.0f;
+    navDlzData[1].confidence = 0.0f;
+    navDlzData[1].timestamp_ms = 0;
 
     conditionedNavDlzPosX = 0.0f;
     conditionedNavDlzPosY = 0.0f;
@@ -63,16 +73,9 @@ void navigationDlzInit(void) {
 void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
 
-    if (millis() - navDlzData.timestamp_ms > UPDATE_TIMEOUT_MS) {
+    const navDlzData_t* data = navigationDlzGetActiveBuffer();
 
-        navDlzData.px = 0.0f;
-        navDlzData.py = 0.0f;
-        navDlzData.pz = 0.0f;
-        navDlzData.confidence = 0.0f;
-
-        //navDlzData.timestamp_ms = 0; // Don't set timestamp to 0, 
-                                       // so that we can detect when new 
-                                       // data arrives after timeout
+    if (millis() - data->timestamp_ms > UPDATE_TIMEOUT_MS) {
 
         conditionedNavDlzPosX = 0.0f;
         conditionedNavDlzPosY = 0.0f;
@@ -90,30 +93,15 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
     if (isNewDataReady) {
 
-
-        // Read data, and make sure receive time didn't change
-
-        uint32_t dataTimestamp = navDlzData.timestamp_ms;
         fpVector3_t pos;
 
-        pos.x = constrainf(navDlzData.px, -MAX_DIST, MAX_DIST);
-        pos.y = constrainf(navDlzData.py, -MAX_DIST, MAX_DIST);
-        pos.z = constrainf(navDlzData.pz, -MAX_ALT, MAX_ALT);
-        conditionedNavDlzConfidence = constrainf(navDlzData.confidence, 0.0f, 1.0f);
-
-        if (dataTimestamp != navDlzData.timestamp_ms) {
-
-            // Data was updated, let's read it again
-            pos.x = constrainf(navDlzData.px, -MAX_DIST, MAX_DIST);
-            pos.y = constrainf(navDlzData.py, -MAX_DIST, MAX_DIST);
-            pos.z = constrainf(navDlzData.pz, -MAX_ALT, MAX_ALT);
-            conditionedNavDlzConfidence = constrainf(navDlzData.confidence, 0.0f, 1.0f);
-
-        }
+        pos.x = constrainf(data->px, -MAX_DIST, MAX_DIST);
+        pos.y = constrainf(data->py, -MAX_DIST, MAX_DIST);
+        pos.z = constrainf(data->pz, -MAX_ALT, MAX_ALT);
+        conditionedNavDlzConfidence = constrainf(data->confidence, 0.0f, 1.0f);
 
         isNewDataReady = false; // Mark data as consumed, so that we don't 
                                 // use it again until new data arrives
-
 
         // Transform to body
 
@@ -127,7 +115,7 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         conditionedBiasPosX = navRateLimiterUpdate(&navDlzBiasPosXRateLimiter,
                                                    conditionedNavDlzConfidence * (conditionedNavDlzPosX - posErrorX),
                                                    millis());
-                                                   
+
         conditionedBiasPosY = navRateLimiterUpdate(&navDlzBiasPosYRateLimiter,
                                                    conditionedNavDlzConfidence * (conditionedNavDlzPosY - posErrorY),
                                                    millis());
@@ -151,13 +139,21 @@ void navigationDlzReceiveNewData(const float px,
                                  const float pz,
                                  const float confidence) {
 
-    navDlzData.timestamp_ms = millis();
-    navDlzData.px = px;
-    navDlzData.py = py;
-    navDlzData.pz = pz;
-    navDlzData.confidence = confidence;
+    uint8_t writeBuffer = 1 - activeBuffer;  // Write to inactive buffer
+    
+    navDlzData[writeBuffer].timestamp_ms = millis();
+    navDlzData[writeBuffer].px = px;
+    navDlzData[writeBuffer].py = py;
+    navDlzData[writeBuffer].pz = pz;
+    navDlzData[writeBuffer].confidence = confidence;
+    
+    activeBuffer = writeBuffer;  // Atomic pointer swap (8-bit write is atomic)
     isNewDataReady = true;
+}
 
+
+const navDlzData_t * navigationDlzGetActiveBuffer(void) {
+    return &navDlzData[activeBuffer];
 }
 
 
@@ -168,6 +164,11 @@ void navRateLimiterInit(navRateLimiter_t *sl,
                         const float rate_per_sec, 
                         const float initial_value, 
                         const uint32_t now_ms) {
+    
+    if(!sl) {
+        LOG_ERROR(SYSTEM, "navRateLimiterInit: null pointer");
+        return;
+    }
 
     sl->rate_per_sec = rate_per_sec;
     sl->last_output = initial_value;
@@ -178,6 +179,13 @@ void navRateLimiterInit(navRateLimiter_t *sl,
 float navRateLimiterUpdate(navRateLimiter_t *sl, 
                            const float target, 
                            const uint32_t now_ms) {
+
+
+    if(!sl) {
+        LOG_ERROR(SYSTEM, "navRateLimiterUpdate: null pointer");
+        return 0.0f;
+    }
+
 
     uint32_t dt_ms = now_ms - sl->last_time_ms;
     sl->last_time_ms = now_ms;

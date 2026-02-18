@@ -30,7 +30,6 @@ void navigationDlzReceiveNewData(const float px,
 
 // Rate limiter
 
-
 void navRateLimiterInit(navRateLimiter_t *sl, const float rate_per_sec, const float initial_value, const uint32_t now_ms);
 
 float navRateLimiterUpdate(navRateLimiter_t *sl, const float target, const uint32_t now_ms);
