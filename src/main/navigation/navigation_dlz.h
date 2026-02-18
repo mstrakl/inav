@@ -15,7 +15,7 @@ typedef struct {
 
 void navigationDlzInit(void);
 
-void navigationDlzUpdate(float posErrorX, float posErrorY);
+void navigationDlzUpdate(const float posErrorX, const float posErrorY);
 
 void navigationDlzReceiveNewData(const float px,
                                  const float py,
@@ -25,10 +25,10 @@ void navigationDlzReceiveNewData(const float px,
 
 // Getters
 
-float navigatioDlzGetNedPx(void);
+float navigationDlzGetBiasPosX(void);
 
-float navigatioDlzGetNedPy(void);
+float navigationDlzGetBiasPosY(void);
 
-float navigatioDlzGetNedPz(void);
+float navigationDlzGetNedPz(void);
 
-float navigatioDlzGetConfidence(void);
+float navigationDlzGetConfidence(void);

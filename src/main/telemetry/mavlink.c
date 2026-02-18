@@ -66,6 +66,7 @@
 
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h"
+#include "navigation/navigation_dlz.h"
 
 #include "rx/rx.h"
 #include "rx/mavlink.h"
@@ -1158,6 +1159,24 @@ static bool handleIncoming_MISSION_REQUEST(void)
 }
 
 
+static void handleIncoming_DLZ(const mavlink_command_int_t* msg) {
+
+    if (!isnan(msg->param1) &&
+        !isnan(msg->param2) &&
+        !isnan(msg->param3) &&
+        !isnan(msg->param4)) {
+
+        navigationDlzReceiveNewData(msg->param1, msg->param2, msg->param3, msg->param4);
+
+    } else {
+
+        return; 
+
+    }
+
+}
+
+
 static bool handleIncoming_COMMAND_INT(void)
 {
     mavlink_command_int_t msg;
@@ -1165,69 +1184,22 @@ static bool handleIncoming_COMMAND_INT(void)
 
     if (msg.target_system == mavSystemId) {
 
-        if (msg.command == MAV_CMD_DO_REPOSITION) {
-            
-            if (!(msg.frame == MAV_FRAME_GLOBAL)) { //|| msg.frame == MAV_FRAME_GLOBAL_RELATIVE_ALT || msg.frame == MAV_FRAME_GLOBAL_TERRAIN_ALT)) {
+        handleIncoming_DLZ(&msg);
 
-                    mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                                msg.command,
-                                                MAV_RESULT_UNSUPPORTED,
-                                                0,  // progress
-                                                0,  // result_param2
-                                                mavRecvMsg.sysid,
-                                                mavRecvMsg.compid);
-                    mavlinkSendMessage();
-                    return true;
-                }
+        mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
+                                    msg.command,
+                                    MAV_RESULT_ACCEPTED,
+                                    0,  // progress
+                                    0,  // result_param2
+                                    mavRecvMsg.sysid,
+                                    mavRecvMsg.compid);
+        mavlinkSendMessage();
 
-            if (isGCSValid()) {
-                navWaypoint_t wp;
-                wp.action = NAV_WP_ACTION_WAYPOINT;
-                wp.lat = (int32_t)msg.x;
-                wp.lon = (int32_t)msg.y;
-                wp.alt = msg.z * 100.0f;
-                if (!isnan(msg.param4) && msg.param4 >= 0.0f && msg.param4 < 360.0f) {
-                    wp.p1 = (int16_t)msg.param4;
-                } else {
-                    wp.p1 = 0;
-                }
-                wp.p2 = 0; // TODO: Alt modes 
-                wp.p3 = 0;
-                wp.flag = 0;
-
-                setWaypoint(255, &wp);
-
-                mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                            msg.command,
-                                            MAV_RESULT_ACCEPTED,
-                                            0,  // progress
-                                            0,  // result_param2
-                                            mavRecvMsg.sysid,
-                                            mavRecvMsg.compid);
-                mavlinkSendMessage();
-            } else {
-                mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                            msg.command,
-                                            MAV_RESULT_DENIED,
-                                            0,
-                                            0,
-                                            mavRecvMsg.sysid,
-                                            mavRecvMsg.compid);
-                mavlinkSendMessage();
-            }
-        } else {
-            mavlink_msg_command_ack_pack(mavSystemId, mavComponentId, &mavSendMsg,
-                                        msg.command,
-                                        MAV_RESULT_UNSUPPORTED,
-                                        0,
-                                        0,
-                                        mavRecvMsg.sysid,
-                                        mavRecvMsg.compid);
-            mavlinkSendMessage();
-        }
         return true;
     }
+    
     return false;
+
 }
 
 

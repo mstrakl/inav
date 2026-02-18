@@ -1,7 +1,11 @@
+
+#include "drivers/time.h"
+
 #include "common/maths.h"
 #include "common/vector.h"
-#include "drivers/time.h"
 #include "common/log.h"
+
+#include "flight/imu.h"
 
 #include "navigation/navigation_dlz.h"
 
@@ -17,6 +21,9 @@ static float conditionedNavDlzPosY = 0.0f;
 static float conditionedNavDlzPosZ = 0.0f;
 static float conditionedNavDlzConfidence = 0.0f;
 
+static float conditionedBiasPosX = 0.0f;
+static float conditionedBiasPosY = 0.0f;
+
 // Skyvis status flag
 //  UNDEFINED = 0
 //  NO_RESPONSE = 10
@@ -31,13 +38,21 @@ void navigationDlzInit(void) {
     navDlzData.confidence = 0.0f;
     navDlzData.timestamp_ms = 0;
 
+    conditionedNavDlzPosX = 0.0f;
+    conditionedNavDlzPosY = 0.0f;
+    conditionedNavDlzPosZ = 0.0f;
+    conditionedNavDlzConfidence = 0.0f;
+
+    conditionedBiasPosX = 0.0f;
+    conditionedBiasPosY = 0.0f;
+
     isNewDataReady = false;
     //setSkyvisFlag(0);
 
 }
 
 
-void navigationDlzUpdate(float posErrorX, float posErrorY) {
+void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
 
     if (millis() - navDlzData.timestamp_ms > UPDATE_TIMEOUT_MS) {
@@ -47,10 +62,17 @@ void navigationDlzUpdate(float posErrorX, float posErrorY) {
         navDlzData.pz = 0.0f;
         navDlzData.confidence = 0.0f;
 
+        //navDlzData.timestamp_ms = 0; // Don't set timestamp to 0, 
+                                       // so that we can detect when new 
+                                       // data arrives after timeout
+
         conditionedNavDlzPosX = 0.0f;
         conditionedNavDlzPosY = 0.0f;
         conditionedNavDlzPosZ = 0.0f;
         conditionedNavDlzConfidence = 0.0f;
+
+        conditionedBiasPosX = 0.0f;
+        conditionedBiasPosY = 0.0f;
 
         isNewDataReady = false;
         //setSkyvisFlag(10); // No response
@@ -60,26 +82,54 @@ void navigationDlzUpdate(float posErrorX, float posErrorY) {
 
     if (isNewDataReady) {
 
-        fpVector3_t pos = {
-            .x = constrainf(navDlzData.px, -MAX_DIST, MAX_DIST),
-            .y = constrainf(navDlzData.py, -MAX_DIST, MAX_DIST),
-            .z = constrainf(navDlzData.pz, -MAX_ALT, MAX_ALT)
-        };
+
+        // Read data, and make sure receive time didn't change
+
+        uint32_t dataTimestamp = navDlzData.timestamp_ms;
+        fpVector3_t pos;
+
+        pos.x = constrainf(navDlzData.px, -MAX_DIST, MAX_DIST);
+        pos.y = constrainf(navDlzData.py, -MAX_DIST, MAX_DIST);
+        pos.z = constrainf(navDlzData.pz, -MAX_ALT, MAX_ALT);
+        conditionedNavDlzConfidence = constrainf(navDlzData.confidence, 0.0f, 1.0f);
+
+        if (dataTimestamp != navDlzData.timestamp_ms) {
+
+            // Data was updated, let's read it again
+            pos.x = constrainf(navDlzData.px, -MAX_DIST, MAX_DIST);
+            pos.y = constrainf(navDlzData.py, -MAX_DIST, MAX_DIST);
+            pos.z = constrainf(navDlzData.pz, -MAX_ALT, MAX_ALT);
+            conditionedNavDlzConfidence = constrainf(navDlzData.confidence, 0.0f, 1.0f);
+
+        }
+
+        isNewDataReady = false; // Mark data as consumed, so that we don't 
+                                // use it again until new data arrives
+
+
+        // Transform to body
 
         imuTransformVectorBodyToEarth(&pos);
 
         conditionedNavDlzPosX = -pos.x; // So that position regulation works correct
         conditionedNavDlzPosY = -pos.y; // So that position regulation works correct
         conditionedNavDlzPosZ = pos.z;
-        conditionedNavDlzConfidence = constrainf(navDlzData.confidence, 0.0f, 1.0f);
+
+        // Calculate bias
+        conditionedBiasPosX = conditionedNavDlzConfidence * (conditionedNavDlzPosX - posErrorX);
+        conditionedBiasPosY = conditionedNavDlzConfidence * (conditionedNavDlzPosY - posErrorY);
 
         // For telemetry 
+
         if (conditionedNavDlzConfidence > 0.95f) {
             //setSkyvisFlag(30); // Tag detected
         } else {
             //setSkyvisFlag(20); // Comms ok, but no tag detected
         }
     }
+
+
+    
 
 
 
@@ -93,29 +143,100 @@ void navigationDlzReceiveNewData(const float px,
                                  const float pz,
                                  const float confidence) {
 
+    navDlzData.timestamp_ms = millis();
     navDlzData.px = px;
     navDlzData.py = py;
     navDlzData.pz = pz;
     navDlzData.confidence = confidence;
-    navDlzData.timestamp_ms = millis();
     isNewDataReady = true;
 
 }
 
 
 
-float navigatioDlzGetNedPx(void) {
-    return conditionedNavDlzPosX;
+float navigationDlzGetBiasPosX(void) {
+    return conditionedBiasPosX;
 }
 
-float navigatioDlzGetNedPy(void) {
-    return conditionedNavDlzPosY;
+float navigationDlzGetBiasPosY(void) {
+    return conditionedBiasPosY;
 }
 
-float navigatioDlzGetNedPz(void) {
+float navigationDlzGetNedPz(void) {
     return conditionedNavDlzPosZ;
 }
 
-float navigatioDlzGetConfidence(void) {
+float navigationDlzGetConfidence(void) {
     return conditionedNavDlzConfidence;
 }
+
+
+
+/*
+
+// Dlz here
+
+    // True when we're on the final LAND waypoint and it has been reached
+
+    bool landingPntReached = false;
+
+    if (FLIGHT_MODE(NAV_WP_MODE) && 
+        (posControl.activeWaypointIndex == posControl.waypointCount - 1) &&
+        (posControl.wpDistance < 500.0f)) {
+            landingPntReached = true;
+        }
+
+
+    bool dlz_allowed = logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
+
+    float biasX = 0.0f;
+    float biasY = 0.0f;
+
+    //dlzPosCtrlFade = constrainf(dlzPosCtrlFade, 0.0f, 1.0f);
+
+    navigationDlzUpdate();
+
+    if (dlz_allowed) {
+
+        const float fade = navigatioDlzGetConfidence();
+
+        biasX = fade * (navigatioDlzGetNedPx() - posErrorX);
+        biasY = fade * (navigatioDlzGetNedPy() - posErrorY);
+
+        if(landingPntReached && navGetCurrentActualPositionAndVelocity()->pos.z < 200.0f && fade < 0.95f) {
+            biasX = dlzOldBiasX;
+            biasY = dlzOldBiasY;
+        } else {
+            if (fade > 0.95f) {
+                dlzOldBiasX = biasX;
+                dlzOldBiasY = biasY;
+            }
+        }
+
+        posErrorX += biasX;
+        posErrorY += biasY;
+        
+        //if (dlzPosCtrlFade < 1.0f) dlzPosCtrlFade += 0.01f;
+
+    } else {
+        dlzOldBiasX = 0.0f;
+        dlzOldBiasY = 0.0f;
+        //dlzPosCtrlFade = 0.0f;
+    }
+
+    if (millis() - lastPrintTime > PRINT_TIME) {
+        LOG_DEBUG(SYSTEM, "DLZ: allowed: %d", dlz_allowed);
+        LOG_DEBUG(SYSTEM, "DLZ: fin wp reached: %d", landingPntReached);
+        LOG_DEBUG(SYSTEM, "DLZ: dist: %f", posControl.wpDistance);
+        LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f, dpz: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy(), navigatioDlzGetNedPz());
+        LOG_DEBUG(SYSTEM, "DLZ: biasX: %f, biasY: %f", biasX, biasY);
+        LOG_DEBUG(SYSTEM, "DLZ: navpos z: %f", navGetCurrentActualPositionAndVelocity()->pos.z);
+        LOG_DEBUG(SYSTEM, "DLZ: conf: %f, fade: %f", navigatioDlzGetConfidence(), dlzPosCtrlFade);
+        LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f", posErrorX, posErrorY);
+    }
+
+    // End Dlz here
+
+
+
+*/

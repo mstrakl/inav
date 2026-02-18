@@ -51,8 +51,13 @@
 #include "navigation/navigation.h"
 #include "navigation/navigation_private.h"
 #include "navigation/sqrt_controller.h"
+#include "navigation/navigation_dlz.h"
+
+#include "programming/logic_condition.h"
 
 #include "sensors/battery.h"
+
+#define DLZ_LOGIC_COND_ID 50
 
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
@@ -498,10 +503,15 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
         }
     }
 
-    const float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
-    const float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
+    float posErrorX = posControl.desiredState.pos.x - navGetCurrentActualPositionAndVelocity()->pos.x;
+    float posErrorY = posControl.desiredState.pos.y - navGetCurrentActualPositionAndVelocity()->pos.y;
 
     navigationDlzUpdate(posErrorX, posErrorY);
+
+    if(logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0) {
+        posErrorX += navigationDlzGetBiasPosX();
+        posErrorY += navigationDlzGetBiasPosY();
+    }
 
     // Calculate target velocity
     float neuVelX = posErrorX * posControl.pids.pos[X].param.kP;
