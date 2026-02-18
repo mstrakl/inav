@@ -30,6 +30,7 @@
 #include "common/maths.h"
 #include "common/filter.h"
 #include "common/utils.h"
+#include "common/log.h"
 
 #include "sensors/sensors.h"
 #include "sensors/acceleration.h"
@@ -513,6 +514,9 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
         posErrorY += navigationDlzGetBiasPosY();
     }
 
+    LOG_DEBUG(SYSTEM, "bx %f, by %f", navigationDlzGetBiasPosX(), navigationDlzGetBiasPosY());
+    LOG_DEBUG(SYSTEM, "px %f, py %f", posErrorX, posErrorY);
+
     // Calculate target velocity
     float neuVelX = posErrorX * posControl.pids.pos[X].param.kP;
     float neuVelY = posErrorY * posControl.pids.pos[Y].param.kP;
@@ -700,6 +704,10 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
 
     posControl.rcAdjustment[ROLL] = constrain(RADIANS_TO_DECIDEGREES(desiredRoll), -maxBankAngle, maxBankAngle);
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);
+
+
+    LOG_DEBUG(SYSTEM, "pitch %f, roll %f", posControl.rcAdjustment[PITCH], posControl.rcAdjustment[ROLL]);
+
 }
 
 static void applyMulticopterPositionController(timeUs_t currentTimeUs)
