@@ -30,6 +30,7 @@
 #include "common/maths.h"
 #include "common/filter.h"
 #include "common/utils.h"
+#include "common/log.h"
 
 #include "sensors/sensors.h"
 #include "sensors/acceleration.h"
@@ -58,6 +59,7 @@
 #include "sensors/battery.h"
 
 #define DLZ_LOGIC_COND_ID 50
+static int i_log = 0;
 
 /*-----------------------------------------------------------
  * Altitude controller for multicopter aircraft
@@ -82,7 +84,40 @@ float getSqrtControllerVelocity(float targetAltitude, timeDelta_t deltaMicros)
 // Position to velocity controller for Z axis
 static void updateAltitudeVelocityController_MC(timeDelta_t deltaMicros)
 {
-    float targetVel = getDesiredClimbRate(posControl.desiredState.pos.z, deltaMicros);
+
+    const float targetPositionZ = posControl.desiredState.pos.z;
+
+    float targetVel = getDesiredClimbRate(targetPositionZ, deltaMicros);
+
+    if(logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0) {
+
+        const bool landingInProgress = NAV_Status.state >= MW_NAV_STATE_LAND_START && 
+            NAV_Status.state <= MW_NAV_STATE_LAND_START_DESCENT;
+
+        navigationDlzUpdateAltCtrl(landingInProgress,
+                                   navGetCurrentActualPositionAndVelocity()->pos.z); 
+
+        if (navigationDlzIsHoldRequired()) {
+            targetVel = 0.0f; 
+        }
+
+//    if(i_log++ == 50) {
+//        LOG_DEBUG(SYSTEM, "DLZ active, targetZ %f, actualZ %f", targetPositionZ, navGetCurrentActualPositionAndVelocity()->pos.z);
+//        LOG_DEBUG(SYSTEM, "DLZ active, targetVel %f, actualVel %f", targetVel, navGetCurrentActualPositionAndVelocity()->vel.z);
+//        LOG_DEBUG(SYSTEM, "DLZ active, hold %d", navigationDlzIsHoldRequired());
+//
+//        if (NAV_Status.state == MW_NAV_STATE_WP_ENROUTE) {
+//            LOG_DEBUG(SYSTEM, "NAV STATUS: WP Enroute");
+//        }
+//   
+//        if (NAV_Status.state == MW_NAV_STATE_LAND_IN_PROGRESS) {
+//            LOG_DEBUG(SYSTEM, "NAV STATUS: Landing in progress");
+//        }
+//
+//        i_log = 0;
+//    }
+
+    }  
 
     posControl.pids.pos[Z].output_constrained = targetVel;      // only used for Blackbox and OSD info
 

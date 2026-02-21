@@ -28,6 +28,10 @@ void navigationDlzReceiveNewData(const float px,
                                  const float pz,
                                  const float confidence);
 
+
+void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actualAlt);
+
+
 // Rate limiter
 
 void navRateLimiterInit(navRateLimiter_t *sl, const float rate_per_sec, const float initial_value, const uint32_t now_ms);
@@ -46,3 +50,5 @@ float navigationDlzGetBiasPosY(void);
 float navigationDlzGetNedPz(void);
 
 float navigationDlzGetConfidence(void);
+
+bool navigationDlzIsHoldRequired(void);

@@ -3,7 +3,6 @@
 
 #include "common/maths.h"
 #include "common/vector.h"
-#include "common/log.h"
 
 #include "flight/imu.h"
 
@@ -25,6 +24,10 @@ static float conditionedNavDlzConfidence = 0.0f;
 
 static float conditionedBiasPosX = 0.0f;
 static float conditionedBiasPosY = 0.0f;
+
+static bool holdOverDlzRequired = false;
+static bool holdAllowed = true;
+static uint32_t holdOverDlzStartTime = 0;
 
 static navRateLimiter_t navDlzBiasPosXRateLimiter;
 static navRateLimiter_t navDlzBiasPosYRateLimiter;
@@ -59,6 +62,10 @@ void navigationDlzInit(void) {
 
     conditionedBiasPosX = 0.0f;
     conditionedBiasPosY = 0.0f;
+
+    holdOverDlzRequired = false;
+    holdAllowed = true;
+    holdOverDlzStartTime = 0;
 
     // Rate limited to 25cm/s initially
     navRateLimiterInit(&navDlzBiasPosXRateLimiter, 25.0f, 0.0f, millis());
@@ -152,21 +159,54 @@ void navigationDlzReceiveNewData(const float px,
 }
 
 
+
+void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actualAlt) {
+
+
+    float targetVel = 0.0;
+
+    bool localRequireHold = false;
+
+    // If close to landing, check position offset
+    if (actualAlt < 350.0f && landingInProgress) {
+
+        //if (conditionedNavDlzConfidence > 0.5f) {
+
+            const float posErrMag = sqrtf(conditionedBiasPosX * conditionedBiasPosX + conditionedBiasPosY * conditionedBiasPosY);
+            //if (posErrMag > 50.0f) {
+
+                localRequireHold = true;
+            //}
+        //} 
+    }
+
+    if (localRequireHold && holdAllowed && !holdOverDlzRequired) {
+        holdOverDlzRequired = true;
+        holdOverDlzStartTime = millis();
+    }
+
+
+    if (holdOverDlzRequired && (millis() - holdOverDlzStartTime) > 10000) {
+        holdOverDlzRequired = false;
+        holdAllowed = false; // Don't allow hold again until reset, to prevent multiple holds in one flight
+    }
+
+}
+
+
 const navDlzData_t * navigationDlzGetActiveBuffer(void) {
     return &navDlzData[activeBuffer];
 }
 
 
 // Rate Limiter
-
-
 void navRateLimiterInit(navRateLimiter_t *sl, 
                         const float rate_per_sec, 
                         const float initial_value, 
                         const uint32_t now_ms) {
     
     if(!sl) {
-        LOG_ERROR(SYSTEM, "navRateLimiterInit: null pointer");
+        //LOG_ERROR(SYSTEM, "navRateLimiterInit: null pointer");
         return;
     }
 
@@ -182,7 +222,7 @@ float navRateLimiterUpdate(navRateLimiter_t *sl,
 
 
     if(!sl) {
-        LOG_ERROR(SYSTEM, "navRateLimiterUpdate: null pointer");
+        //LOG_ERROR(SYSTEM, "navRateLimiterUpdate: null pointer");
         return 0.0f;
     }
 
@@ -230,72 +270,7 @@ float navigationDlzGetConfidence(void) {
 }
 
 
+bool navigationDlzIsHoldRequired(void) {
+    return holdOverDlzRequired;
+}
 
-/*
-
-// Dlz here
-
-    // True when we're on the final LAND waypoint and it has been reached
-
-    bool landingPntReached = false;
-
-    if (FLIGHT_MODE(NAV_WP_MODE) && 
-        (posControl.activeWaypointIndex == posControl.waypointCount - 1) &&
-        (posControl.wpDistance < 500.0f)) {
-            landingPntReached = true;
-        }
-
-
-    bool dlz_allowed = logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0;
-
-    float biasX = 0.0f;
-    float biasY = 0.0f;
-
-    //dlzPosCtrlFade = constrainf(dlzPosCtrlFade, 0.0f, 1.0f);
-
-    navigationDlzUpdate();
-
-    if (dlz_allowed) {
-
-        const float fade = navigatioDlzGetConfidence();
-
-        biasX = fade * (navigatioDlzGetNedPx() - posErrorX);
-        biasY = fade * (navigatioDlzGetNedPy() - posErrorY);
-
-        if(landingPntReached && navGetCurrentActualPositionAndVelocity()->pos.z < 200.0f && fade < 0.95f) {
-            biasX = dlzOldBiasX;
-            biasY = dlzOldBiasY;
-        } else {
-            if (fade > 0.95f) {
-                dlzOldBiasX = biasX;
-                dlzOldBiasY = biasY;
-            }
-        }
-
-        posErrorX += biasX;
-        posErrorY += biasY;
-        
-        //if (dlzPosCtrlFade < 1.0f) dlzPosCtrlFade += 0.01f;
-
-    } else {
-        dlzOldBiasX = 0.0f;
-        dlzOldBiasY = 0.0f;
-        //dlzPosCtrlFade = 0.0f;
-    }
-
-    if (millis() - lastPrintTime > PRINT_TIME) {
-        LOG_DEBUG(SYSTEM, "DLZ: allowed: %d", dlz_allowed);
-        LOG_DEBUG(SYSTEM, "DLZ: fin wp reached: %d", landingPntReached);
-        LOG_DEBUG(SYSTEM, "DLZ: dist: %f", posControl.wpDistance);
-        LOG_DEBUG(SYSTEM, "DLZ: dpx: %f, dpy: %f, dpz: %f", navigatioDlzGetNedPx(), navigatioDlzGetNedPy(), navigatioDlzGetNedPz());
-        LOG_DEBUG(SYSTEM, "DLZ: biasX: %f, biasY: %f", biasX, biasY);
-        LOG_DEBUG(SYSTEM, "DLZ: navpos z: %f", navGetCurrentActualPositionAndVelocity()->pos.z);
-        LOG_DEBUG(SYSTEM, "DLZ: conf: %f, fade: %f", navigatioDlzGetConfidence(), dlzPosCtrlFade);
-        LOG_DEBUG(SYSTEM, "DLZ: px: %f, py: %f", posErrorX, posErrorY);
-    }
-
-    // End Dlz here
-
-
-
-*/
