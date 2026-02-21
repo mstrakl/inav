@@ -50,15 +50,23 @@ run_docker() {
 }
 
 if [ -z "$(docker images -q inav-build)" ]; then
-    echo "*** Building Docker image"
-    docker build -t inav-build \
-                 --build-arg USER_ID="$(id -u)" \
-                 --build-arg GROUP_ID="$(id -g)" .
+  echo "*** Building Docker image"
+  docker build -t inav-build \
+         --build-arg USER_ID="$(id -u)" \
+         --build-arg GROUP_ID="$(id -g)" .
 else
+  # By default, avoid rebuilding the Docker image on each run to prevent
+  # repeated network pulls and long build times. Set REBUILD_DOCKER=1 to
+  # force a rebuild when you explicitly want to update the image.
+  if [[ "${REBUILD_DOCKER:-0}" == "1" ]]; then
+    echo "*** Rebuilding Docker image (REBUILD_DOCKER=1)"
     docker build -q -t inav-build \
-                 --build-arg USER_ID="$(id -u)" \
-                 --build-arg GROUP_ID="$(id -g)" . >/dev/null ||
+           --build-arg USER_ID="$(id -u)" \
+           --build-arg GROUP_ID="$(id -g)" . >/dev/null ||
     { echo "*** Building Docker image: ERROR"; exit 1; }
+  else
+    echo "*** Using existing Docker image: inav-build (set REBUILD_DOCKER=1 to rebuild)"
+  fi
 fi
 
 if [ ! -d ./build ]; then
