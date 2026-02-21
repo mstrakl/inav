@@ -706,7 +706,7 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);
 
 
-    LOG_DEBUG(SYSTEM, "pitch %f, roll %f", posControl.rcAdjustment[PITCH], posControl.rcAdjustment[ROLL]);
+    LOG_DEBUG(SYSTEM, "pitch %d, roll %d", posControl.rcAdjustment[PITCH], posControl.rcAdjustment[ROLL]);
 
 }
 
