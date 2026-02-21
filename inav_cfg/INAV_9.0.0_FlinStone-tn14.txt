@@ -52,8 +52,9 @@ blackbox -SERVOS
 # Ports
 serial 20 32769 115200 115200 0 115200
 serial 1 0 115200 115200 0 115200
-serial 2 64 115200 115200 0 115200
 serial 3 2 115200 115200 0 115200
+serial 4 64 115200 115200 0 115200
+serial 5 256 115200 115200 57600 115200
 
 # LEDs
 
@@ -89,10 +90,9 @@ logic 50 1 -1 2 1 12 0 1800 0
 # OSD: custom elements
 
 # master
-set gyro_zero_x = -11
-set gyro_zero_y = -2
-set gyro_zero_z = -3
-set ins_gravity_cmss =  973.259
+set gyro_zero_y = 1
+set gyro_zero_z = -5
+set ins_gravity_cmss =  981.221
 set acc_hardware = BMI270
 set acczero_x = 3
 set acczero_y = -5
@@ -122,14 +122,14 @@ set gps_ublox_use_galileo = ON
 set fw_autotune_max_rate_deflection = 80
 set nav_wp_load_on_boot = ON
 set nav_fw_wp_tracking_accuracy = 3
-set nav_auto_speed = 250
-set nav_max_auto_speed = 500
-set nav_manual_speed = 500
+set nav_auto_speed = 150
+set nav_max_auto_speed = 250
+set nav_manual_speed = 250
 set nav_land_slowdown_maxalt = 1000
 set nav_emerg_landing_speed = 250
 set nav_max_altitude = 2000
 set nav_mc_bank_angle = 25
-set nav_mc_auto_climb_rate = 250
+set nav_mc_auto_climb_rate = 150
 set nav_mc_manual_climb_rate = 150
 set nav_mc_braking_boost_factor = 50
 set log_level = DEBUG
@@ -144,7 +144,7 @@ control_profile 2
 
 set max_angle_inclination_rll = 300
 set max_angle_inclination_pit = 300
-set nav_mc_pos_xy_p = 32
+set nav_mc_pos_xy_p = 50
 set rc_expo = 51
 
 # control_profile
