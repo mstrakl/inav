@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/ATOMRCF405NAVI 9.0.0 Jan 14 2026 / 10:22:03 (a7932b92) 
+# INAV/ATOMRCF405NAVI 9.0.1 Feb 21 2026 / 12:35:11 (07aaded8) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -75,9 +75,7 @@ aux 4 3 2 1350 2100
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 2 valid
-wp 0 1 465619090 161397661 500 0 0 0 0
-wp 1 8 465618759 161396273 500 0 0 0 165
+#wp 0 invalid
 
 # OSD [osd_layout]
 
@@ -91,9 +89,10 @@ logic 50 1 -1 2 1 12 0 1800 0
 # OSD: custom elements
 
 # master
-set gyro_zero_y = 1
-set gyro_zero_z = -6
-set ins_gravity_cmss =  983.803
+set gyro_zero_x = -11
+set gyro_zero_y = -2
+set gyro_zero_z = -3
+set ins_gravity_cmss =  973.259
 set acc_hardware = BMI270
 set acczero_x = 3
 set acczero_y = -5
@@ -101,8 +100,14 @@ set acczero_z = -15
 set accgain_x = 4058
 set accgain_y = 4073
 set accgain_z = 4056
-set align_mag = CW270FLIP
-set mag_hardware = NONE
+set align_mag = CW270
+set mag_hardware = IST8310
+set magzero_x = -92
+set magzero_y = 122
+set magzero_z = 85
+set maggain_x = 490
+set maggain_y = 490
+set maggain_z = 482
 set baro_hardware = SPL06
 set pitot_lpf_milli_hz = 350
 set serialrx_provider = CRSF
