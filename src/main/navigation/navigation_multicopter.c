@@ -117,7 +117,10 @@ static void updateAltitudeVelocityController_MC(timeDelta_t deltaMicros)
 //        i_log = 0;
 //    }
 
-    }  
+    }  else {
+        // If DLZ is not active, make sure hold is not required
+        navigationDlzClearHoldBlocker();
+    }
 
     posControl.pids.pos[Z].output_constrained = targetVel;      // only used for Blackbox and OSD info
 

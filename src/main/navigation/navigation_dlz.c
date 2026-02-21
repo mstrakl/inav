@@ -9,7 +9,7 @@
 #include "navigation/navigation_dlz.h"
 
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
-#define MAX_DIST 250.0f  // max 2.5m
+#define MAX_DIST 1000.0f 
 #define MAX_ALT 10000.0f // max 100 m
 
 static volatile bool isNewDataReady = false;
@@ -68,8 +68,8 @@ void navigationDlzInit(void) {
     holdOverDlzStartTime = 0;
 
     // Rate limited to 25cm/s initially
-    navRateLimiterInit(&navDlzBiasPosXRateLimiter, 25.0f, 0.0f, millis());
-    navRateLimiterInit(&navDlzBiasPosYRateLimiter, 25.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzBiasPosXRateLimiter, 50.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzBiasPosYRateLimiter, 50.0f, 0.0f, millis());
 
     isNewDataReady = false;
     //setSkyvisFlag(0);
@@ -102,9 +102,9 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
         fpVector3_t pos;
 
-        pos.x = constrainf(data->px, -MAX_DIST, MAX_DIST);
-        pos.y = constrainf(data->py, -MAX_DIST, MAX_DIST);
-        pos.z = constrainf(data->pz, -MAX_ALT, MAX_ALT);
+        pos.x = data->px;
+        pos.y = data->py;
+        pos.z = data->pz;
         conditionedNavDlzConfidence = constrainf(data->confidence, 0.0f, 1.0f);
 
         isNewDataReady = false; // Mark data as consumed, so that we don't 
@@ -114,9 +114,14 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
         imuTransformVectorBodyToEarth(&pos);
 
-        conditionedNavDlzPosX = -pos.x; // So that position regulation works correct
-        conditionedNavDlzPosY = -pos.y; // So that position regulation works correct
-        conditionedNavDlzPosZ = pos.z;
+        // Warning: Signs adjusted to match expected coordinate system of position error
+
+        #define GAIN 2.0f
+
+        conditionedNavDlzPosX = constrainf(-GAIN * pos.x, -MAX_DIST, MAX_DIST);
+        conditionedNavDlzPosY = constrainf(-GAIN * pos.y, -MAX_DIST, MAX_DIST);
+        conditionedNavDlzPosZ = constrainf(pos.z, -MAX_ALT, MAX_ALT);
+
 
         // Calculate bias, rate limited
         conditionedBiasPosX = navRateLimiterUpdate(&navDlzBiasPosXRateLimiter,
@@ -167,16 +172,19 @@ void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actual
 
     bool localRequireHold = false;
 
+    const float altDlz = fabs(navigationDlzGetNedPz());
+
+
     // If close to landing, check position offset
-    if (actualAlt < 350.0f && landingInProgress) {
+    if (altDlz > 50.0f && altDlz < 350.0f && landingInProgress) {
 
         //if (conditionedNavDlzConfidence > 0.5f) {
 
             const float posErrMag = sqrtf(conditionedBiasPosX * conditionedBiasPosX + conditionedBiasPosY * conditionedBiasPosY);
-            //if (posErrMag > 50.0f) {
+            if (posErrMag > 50.0f) {
 
                 localRequireHold = true;
-            //}
+            }
         //} 
     }
 
@@ -186,11 +194,16 @@ void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actual
     }
 
 
-    if (holdOverDlzRequired && (millis() - holdOverDlzStartTime) > 10000) {
+    if (holdOverDlzRequired && (millis() - holdOverDlzStartTime) > 6000) {
         holdOverDlzRequired = false;
         holdAllowed = false; // Don't allow hold again until reset, to prevent multiple holds in one flight
     }
 
+}
+
+void navigationDlzClearHoldBlocker(void) {
+    holdAllowed = true;
+    holdOverDlzRequired = false;
 }
 
 

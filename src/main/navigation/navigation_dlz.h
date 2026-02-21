@@ -31,6 +31,8 @@ void navigationDlzReceiveNewData(const float px,
 
 void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actualAlt);
 
+void navigationDlzClearHoldBlocker(void);
+
 
 // Rate limiter
 
