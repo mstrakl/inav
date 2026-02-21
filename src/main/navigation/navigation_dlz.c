@@ -119,6 +119,22 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         conditionedBiasPosY = navRateLimiterUpdate(&navDlzBiasPosYRateLimiter,
                                                    conditionedNavDlzConfidence * (conditionedNavDlzPosY - posErrorY),
                                                    millis());
+        
+
+        // Set rangefinder height
+        #if defined(USE_RANGEFINDER_FAKE)
+
+            const int32_t aglCm = (int32_t)(conditionedNavDlzPosZ);
+
+            if (conditionedNavDlzConfidence > 0.50f && 
+                aglCm > 10.0f && aglCm < 1000.0f) {
+                fakeRangefindersSetData(aglCm);
+            } else {
+                fakeRangefindersSetData(-1); // No valid data
+            }   
+        #endif
+
+
 
         // For telemetry 
 
