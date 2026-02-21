@@ -37,6 +37,8 @@ float navRateLimiterUpdate(navRateLimiter_t *sl, const float target, const uint3
 
 // Getters
 
+uint32_t navigationDlzGetTimestamp(void);
+
 float navigationDlzGetBiasPosX(void);
 
 float navigationDlzGetBiasPosY(void);

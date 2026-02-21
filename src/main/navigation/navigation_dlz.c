@@ -209,6 +209,9 @@ float navRateLimiterUpdate(navRateLimiter_t *sl,
 // Getters
 
 
+uint32_t navigationDlzGetTimestamp(void) {
+    return navigationDlzGetActiveBuffer()->timestamp_ms;
+}
 
 float navigationDlzGetBiasPosX(void) {
     return conditionedBiasPosX;
