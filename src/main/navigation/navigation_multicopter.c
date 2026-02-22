@@ -96,11 +96,11 @@ static void updateAltitudeVelocityController_MC(timeDelta_t deltaMicros)
 
         const float newTargetVel = navigationDlzUpdateAltCtrl(landingInProgress,
                                                               targetVel); 
-        
 
-        // Cannot be more than original target vel
-        targetVel = constrainf(newTargetVel, -targetVel, targetVel); 
-        
+        if (landingInProgress) {
+            // Cannot be more than original target vel
+            targetVel = constrainf(newTargetVel, -targetVel, targetVel); 
+        } 
 
 //    if(i_log++ == 50) {
 //        LOG_DEBUG(SYSTEM, "DLZ active, targetZ %f, actualZ %f", targetPositionZ, navGetCurrentActualPositionAndVelocity()->pos.z);
