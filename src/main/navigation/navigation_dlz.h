@@ -18,6 +18,13 @@ typedef struct {
     uint32_t last_time_ms;
 } navRateLimiter_t;
 
+// Integrator
+typedef struct {
+    float ix;
+    float iy;
+    uint32_t last_time_ms;
+} navPosIntegrator_t;
+
 
 void navigationDlzInit(void);
 
@@ -29,10 +36,25 @@ void navigationDlzReceiveNewData(const float px,
                                  const float confidence);
 
 
-void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actualAlt);
+float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targetVel);
 
 void navigationDlzClearHoldBlocker(void);
 
+void navigationDlzResetIntegrator(void);
+
+
+// Integrator
+
+void navPosIntegratorInit(navPosIntegrator_t *pi, uint32_t now_ms);
+
+void navPosIntegratorUpdate(navPosIntegrator_t *pi,
+                            const float errX,
+                            const float errY,
+                            const uint32_t now_ms,
+                            float *outIx,
+                            float *outIy);
+
+void navPosIntegratorReset(navPosIntegrator_t *pi, uint32_t now_ms);
 
 // Rate limiter
 
@@ -52,5 +74,3 @@ float navigationDlzGetBiasPosY(void);
 float navigationDlzGetNedPz(void);
 
 float navigationDlzGetConfidence(void);
-
-bool navigationDlzIsHoldRequired(void);

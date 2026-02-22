@@ -29,10 +29,14 @@ static bool holdOverDlzRequired = false;
 static bool holdAllowed = true;
 static uint32_t holdOverDlzStartTime = 0;
 
+static navPosIntegrator_t navDlzPosIntegrator;
+
 static navRateLimiter_t navDlzBiasPosXRateLimiter;
 static navRateLimiter_t navDlzBiasPosYRateLimiter;
+static navRateLimiter_t navDlzVspdRateLimiter;
 
 const navDlzData_t * navigationDlzGetActiveBuffer(void);
+
 
 // Skyvis status flag
 //  UNDEFINED = 0
@@ -67,9 +71,13 @@ void navigationDlzInit(void) {
     holdAllowed = true;
     holdOverDlzStartTime = 0;
 
-    // Rate limited to 25cm/s initially
+    // Integrator
+    navPosIntegratorInit(&navDlzPosIntegrator, millis());
+
+    // Rate limited 
     navRateLimiterInit(&navDlzBiasPosXRateLimiter, 50.0f, 0.0f, millis());
     navRateLimiterInit(&navDlzBiasPosYRateLimiter, 50.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzVspdRateLimiter, 50.0f, 0.0f, millis());
 
     isNewDataReady = false;
     //setSkyvisFlag(0);
@@ -93,6 +101,8 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         conditionedBiasPosY = 0.0f;
 
         isNewDataReady = false;
+        navPosIntegratorReset(&navDlzPosIntegrator, millis());
+        
         //setSkyvisFlag(10); // No response
         return;
     }
@@ -116,21 +126,38 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
         // Warning: Signs adjusted to match expected coordinate system of position error
 
-        #define GAIN 2.0f
+        pos.x = -pos.x;
+        pos.y = -pos.y;
+        pos.z = pos.z;
 
-        conditionedNavDlzPosX = constrainf(-GAIN * pos.x, -MAX_DIST, MAX_DIST);
-        conditionedNavDlzPosY = constrainf(-GAIN * pos.y, -MAX_DIST, MAX_DIST);
-        conditionedNavDlzPosZ = constrainf(pos.z, -MAX_ALT, MAX_ALT);
 
+        // Add integrator
+        float ix, iy;
+        navPosIntegratorUpdate(&navDlzPosIntegrator, 
+                               pos.x, 
+                               pos.y, 
+                               millis(), 
+                               &ix, &iy);
+        
+        if (conditionedNavDlzConfidence < 0.01f) {
+            navPosIntegratorReset(&navDlzPosIntegrator, millis());
+            ix = 0.0f;
+            iy = 0.0f;
+        }
+
+        const float rawPosX = constrainf(pos.x + ix, -MAX_DIST, MAX_DIST);
+        const float rawPosY = constrainf(pos.y + iy, -MAX_DIST, MAX_DIST);  
 
         // Calculate bias, rate limited
         conditionedBiasPosX = navRateLimiterUpdate(&navDlzBiasPosXRateLimiter,
-                                                   conditionedNavDlzConfidence * (conditionedNavDlzPosX - posErrorX),
+                                                   conditionedNavDlzConfidence * (rawPosX - posErrorX),
                                                    millis());
 
         conditionedBiasPosY = navRateLimiterUpdate(&navDlzBiasPosYRateLimiter,
-                                                   conditionedNavDlzConfidence * (conditionedNavDlzPosY - posErrorY),
+                                                   conditionedNavDlzConfidence * (rawPosY - posErrorY),
                                                    millis());
+        
+        conditionedNavDlzPosZ = constrainf(pos.z, -MAX_ALT, MAX_ALT);
 
         // For telemetry 
 
@@ -165,15 +192,10 @@ void navigationDlzReceiveNewData(const float px,
 
 
 
-void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actualAlt) {
-
-
-    float targetVel = 0.0;
+float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targetVel) {
 
     bool localRequireHold = false;
-
     const float altDlz = fabs(navigationDlzGetNedPz());
-
 
     // If close to landing, check position offset
     if (altDlz > 50.0f && altDlz < 350.0f && landingInProgress) {
@@ -181,7 +203,9 @@ void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actual
         //if (conditionedNavDlzConfidence > 0.5f) {
 
             const float posErrMag = sqrtf(conditionedBiasPosX * conditionedBiasPosX + conditionedBiasPosY * conditionedBiasPosY);
-            if (posErrMag > 50.0f) {
+
+            // Always required hold for now
+            if (posErrMag > 0.0f) {
 
                 localRequireHold = true;
             }
@@ -199,11 +223,27 @@ void navigationDlzUpdateAltCtrl(const bool landingInProgress, const float actual
         holdAllowed = false; // Don't allow hold again until reset, to prevent multiple holds in one flight
     }
 
+
+    float targetVelOut = targetVel;
+
+
+    if (holdOverDlzRequired) {
+        targetVelOut = navRateLimiterUpdate(&navDlzVspdRateLimiter, 0.0f, millis());
+    } else {
+        targetVelOut = navRateLimiterUpdate(&navDlzVspdRateLimiter, targetVel, millis());
+    }
+
+    return targetVelOut;
+
 }
 
 void navigationDlzClearHoldBlocker(void) {
     holdAllowed = true;
     holdOverDlzRequired = false;
+}
+
+void navigationDlzResetIntegrator(void) {
+    navPosIntegratorReset(&navDlzPosIntegrator, millis());  
 }
 
 
@@ -281,9 +321,3 @@ float navigationDlzGetNedPz(void) {
 float navigationDlzGetConfidence(void) {
     return conditionedNavDlzConfidence;
 }
-
-
-bool navigationDlzIsHoldRequired(void) {
-    return holdOverDlzRequired;
-}
-

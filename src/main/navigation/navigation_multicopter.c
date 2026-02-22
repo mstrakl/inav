@@ -94,12 +94,13 @@ static void updateAltitudeVelocityController_MC(timeDelta_t deltaMicros)
         const bool landingInProgress = NAV_Status.state >= MW_NAV_STATE_LAND_START && 
             NAV_Status.state <= MW_NAV_STATE_LAND_START_DESCENT;
 
-        navigationDlzUpdateAltCtrl(landingInProgress,
-                                   navGetCurrentActualPositionAndVelocity()->pos.z); 
+        const float newTargetVel = navigationDlzUpdateAltCtrl(landingInProgress,
+                                                              targetVel); 
+        
 
-        if (navigationDlzIsHoldRequired()) {
-            targetVel = 0.0f; 
-        }
+        // Cannot be more than original target vel
+        targetVel = constrainf(newTargetVel, -targetVel, targetVel); 
+        
 
 //    if(i_log++ == 50) {
 //        LOG_DEBUG(SYSTEM, "DLZ active, targetZ %f, actualZ %f", targetPositionZ, navGetCurrentActualPositionAndVelocity()->pos.z);
@@ -549,6 +550,8 @@ static void updatePositionVelocityController_MC(const float maxSpeed)
     if(logicConditionGetValue(DLZ_LOGIC_COND_ID) != 0) {
         posErrorX += navigationDlzGetBiasPosX();
         posErrorY += navigationDlzGetBiasPosY();
+    } else {
+        navigationDlzResetIntegrator();
     }
 
     // Calculate target velocity
@@ -1063,8 +1066,11 @@ void applyMulticopterNavigationController(navigationFSMStateFlags_t navStateFlag
         if (navStateFlags & NAV_CTL_ALT)
             applyMulticopterAltitudeController(currentTimeUs);
 
-        if (navStateFlags & NAV_CTL_POS)
+        if (navStateFlags & NAV_CTL_POS) {
             applyMulticopterPositionController(currentTimeUs);
+        } else {
+            navigationDlzInit();
+        }
 
         if (navStateFlags & NAV_CTL_YAW)
             applyMulticopterHeadingController();

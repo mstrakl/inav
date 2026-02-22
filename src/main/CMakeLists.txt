@@ -570,6 +570,7 @@ main_sources(COMMON_SRC
     navigation/navigation.c
     navigation/navigation.h
     navigation/navigation_dlz.c
+    navigation/navigation_dlz_integrator.c
     navigation/navigation_dlz.h
     navigation/navigation_fixedwing.c
     navigation/navigation_fw_launch.c
