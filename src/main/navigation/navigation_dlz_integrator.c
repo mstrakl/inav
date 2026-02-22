@@ -1,6 +1,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>
+
+#include "common/maths.h"
 
 #include "navigation/navigation_dlz.h"
 
