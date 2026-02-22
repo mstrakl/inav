@@ -11,6 +11,7 @@
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_DIST 1000.0f 
 #define MAX_ALT 10000.0f // max 100 m
+#define GAIN 2.0f
 
 static volatile bool isNewDataReady = false;
 
@@ -126,8 +127,8 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
 
         // Warning: Signs adjusted to match expected coordinate system of position error
 
-        pos.x = -pos.x;
-        pos.y = -pos.y;
+        pos.x = -GAIN * pos.x;
+        pos.y = -GAIN * pos.y;
         pos.z = pos.z;
 
 

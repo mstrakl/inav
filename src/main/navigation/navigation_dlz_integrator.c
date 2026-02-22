@@ -7,14 +7,14 @@
 
 #include "navigation/navigation_dlz.h"
 
-#define POS_INT_KI            0.05f     // integrator gain
-#define POS_INT_LIMIT         50.0f     // max action in cm
+#define POS_INT_KI            0.03f     // integrator gain
+#define POS_INT_LIMIT         25.0f     // max action in cm
 
-#define POS_INT_FULL_ERR      50.0f     // full integrator below this distance cm
-#define POS_INT_ZERO_ERR      100.0f    // zero integrator above this distance cm
+#define POS_INT_FULL_ERR      25.0f     // full integrator below this distance cm
+#define POS_INT_ZERO_ERR      50.0f    // zero integrator above this distance cm
 
 #define POS_INT_LEAK_ACTIVE   0.999f    // leak when active
-#define POS_INT_RESET_ERR     500.0f
+#define POS_INT_RESET_ERR     100.0f
 
 void navPosIntegratorInit(navPosIntegrator_t *pi, uint32_t now_ms) {
     if (!pi) return;

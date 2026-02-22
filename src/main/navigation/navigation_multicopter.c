@@ -99,7 +99,8 @@ static void updateAltitudeVelocityController_MC(timeDelta_t deltaMicros)
 
         if (landingInProgress) {
             // Cannot be more than original target vel
-            targetVel = constrainf(newTargetVel, -targetVel, targetVel); 
+            const float maxVel = fabsf(targetVel);
+            targetVel = constrainf(newTargetVel, -maxVel, maxVel); 
         } 
 
 //    if(i_log++ == 50) {
