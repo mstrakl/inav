@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/SPEEDYBEEF405WING 9.0.1 Feb 13 2026 / 06:49:52 (d44f2cf6) 
+# INAV/SPEEDYBEEF405WING 9.0.1 Feb 22 2026 / 15:16:35 (6e67a13a) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -31,7 +31,7 @@ servo 7 1300 1850 1600 100
 # safehome
 
 # Fixed Wing Approach
-fwapproach 8 1000 500 0 0 0 0
+fwapproach 8 2000 500 0 0 0 0
 
 # geozone
 
@@ -87,7 +87,6 @@ aux 5 62 3 900 2100
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 0 invalid
 
 # OSD [osd_layout]
 
@@ -109,10 +108,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = -2
+set gyro_zero_x = -3
 set gyro_zero_y = -10
 set gyro_zero_z = 4
-set ins_gravity_cmss =  1000.478
+set ins_gravity_cmss =  999.406
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -142,22 +141,25 @@ set servo_lpf_hz = 25
 set small_angle = 180
 set applied_defaults = 3
 set gps_ublox_use_galileo = ON
+set gps_ublox_use_beidou = ON
+set gps_ublox_use_glonass = ON
 set gps_ublox_nav_hz = 20
 set airmode_type = STICK_CENTER_ONCE
 set inav_allow_dead_reckoning = ON
 set inav_max_surface_altitude = 500
 set inav_default_alt_sensor = BARO
 set nav_wp_load_on_boot = ON
-set nav_wp_radius = 200
+set nav_wp_radius = 150
 set nav_wp_max_safe_distance = 500
 set nav_fw_wp_tracking_accuracy = 3
 set nav_fw_wp_turn_smoothing = ON-CUT
-set nav_auto_speed = 300
-set nav_max_auto_speed = 500
-set nav_manual_speed = 500
+set nav_auto_speed = 200
+set nav_max_auto_speed = 300
+set nav_manual_speed = 300
 set nav_rth_allow_landing = FS_ONLY
 set nav_rth_altitude = 5000
-set nav_mc_auto_climb_rate = 250
+set nav_mc_auto_climb_rate = 150
+set nav_mc_manual_climb_rate = 150
 set nav_mc_braking_boost_factor = 50
 set nav_fw_control_smoothness = 2
 set nav_fw_launch_motor_delay = 100
@@ -201,12 +203,13 @@ set mc_cd_roll = 58
 set mc_p_yaw = 60
 set mc_i_yaw = 10
 set mc_d_yaw = 90
-set mc_p_level = 12
-set mc_i_level = 12
+set mc_p_level = 14
+set mc_i_level = 14
 set mc_d_level = 65
 set max_angle_inclination_rll = 300
 set max_angle_inclination_pit = 300
 set nav_mc_pos_xy_p = 30
+set nav_mc_vel_xy_d = 90
 set rc_expo = 50
 set roll_rate = 12
 set pitch_rate = 12
