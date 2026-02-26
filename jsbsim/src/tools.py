@@ -26,6 +26,50 @@ def set_motor_commands(sim, cmd):
     sim["fcs/sw_motor"] = cmd["s3"]
     sim["fcs/nw_motor"] = cmd["s4"]
     
+    # Motor tilt control: `cmd["stilt"]` expected in degrees (0-90)
+    # Map tilt to unit direction components and write them to JSBSim
+    # external_reactions <force> direction fields at runtime.
+    # When stilt == 0 -> vertical downwards (x=0, z=-1)
+    stilt_deg = float(cmd.get("stilt", 0.0))
+    # clamp to [0,90]
+    if stilt_deg < 0.0:
+        stilt_deg = 0.0
+    if stilt_deg > 90.0:
+        stilt_deg = 90.0
+
+
+    stilt_rad = np.radians(stilt_deg)
+
+    x_ = float(np.sin(stilt_rad))
+    z_ = float(-np.cos(stilt_rad))
+
+    # Motor x sign according to their body x location in quad.xml
+    motor_x_sign = {
+        'ne': -1.0,  # ne: x = -4.87
+        #'se':  1.0,  # se: x =  4.87
+        #'sw':  1.0,  # sw: x =  4.87
+        'nw': -1.0   # nw: x = -4.87
+    }
+
+    for name, sign in motor_x_sign.items():
+        try:
+            sim[f"external_reactions/{name}_motor/x"] = x_
+            sim[f"external_reactions/{name}_motor/y"] = 0.0
+            sim[f"external_reactions/{name}_motor/z"] = z_
+        except Exception:
+            raise RuntimeError(f"Failed to set motor tilt for {name}. Check if external_reactions/{name}_motor/x exists in JSBSim XML.")
+            # If runtime field doesn't exist, ignore silently (older XMLs)
+            pass
+        
+        
+        #self.sim["external_reactions/ne_motor/x"] = 0.1
+        
+        # Debug
+        #for pp in sim.get_property_catalog():
+        #    if "ne_motor" in pp:
+        #        print(pp, " ", sim.get_property_value(pp.split(" ")[0]))
+
+        
 #    sim["fcs/ne_motor"] = 0.40 #cmd["s3"]
 #    sim["fcs/se_motor"] = 0.40 #cmd["s4"]
 #    sim["fcs/sw_motor"] = 0.40 #cmd["s2"]

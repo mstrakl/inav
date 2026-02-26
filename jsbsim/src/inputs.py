@@ -4,7 +4,7 @@ import numpy as np
 
 
 
-def sim_cmd(t, sim, state):
+def sim_cmd(t, sim, state, cmd):
     
     
     # Acro / Angle mode
@@ -19,7 +19,7 @@ def sim_cmd(t, sim, state):
     
 
     if t > 10.0:
-        sim["propulsion/tilt-angle-rad"] = np.deg2rad(10.0)
+        cmd["stilt"] = 45.0
         
 #    # WP ON
 #    if t > 10.0:
@@ -33,4 +33,4 @@ def sim_cmd(t, sim, state):
 #
         
         
-    return sim, state
+    return sim, state, cmd

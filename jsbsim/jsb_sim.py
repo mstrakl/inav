@@ -50,6 +50,9 @@ class JsbSimulation:
         # Initialize simulation
         self.sim.run_ic()
         
+        
+        self.sim["external_reactions/ne_motor/x"] = 0.1
+        
         # Debug
         if False:
             for obj in dir(self.sim):
@@ -79,6 +82,7 @@ class JsbSimulation:
             "s6": 0.0,
             "s7": 0.0,
             "s8": 0.0,
+            "stilt": 0.0,
         }
         
         
@@ -139,7 +143,7 @@ class JsbSimulation:
         
         # Apply motor commands
         # --------------------------------- #
-        self.sim, self.state = sim_cmd(t, self.sim, self.state)
+        self.sim, self.state, self.cmd = sim_cmd(t, self.sim, self.state, self.cmd)
         if t > 3.0:
             set_motor_commands(self.sim, self.cmd)
 
