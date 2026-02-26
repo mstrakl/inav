@@ -115,21 +115,12 @@
     </contact>
   </ground_reactions>
 
-
-
-
-
-
-
-
   <external_reactions>
 
     <property>fcs/ne_motor</property>
     <property>fcs/se_motor</property>
     <property>fcs/sw_motor</property>
     <property>fcs/nw_motor</property>
-
-    <!-- First the lift forces produced by each propeller -->
 
     <force name="ne_motor" frame="BODY" unit="LBS">
       <function>
@@ -331,7 +322,6 @@
     </force>
 
 
-
     <force name="nw_couple1" frame="BODY" unit="LBS">
       <function>
         <product>
@@ -371,8 +361,6 @@
     </force>
 
   </external_reactions>
-
-  <propulsion/>
 
   <flight_control name="FGFCS"/>
 

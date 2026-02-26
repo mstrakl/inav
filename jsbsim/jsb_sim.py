@@ -40,14 +40,25 @@ class JsbSimulation:
         self.sim["ic/q-rad_sec"] = 0.0
         self.sim["ic/r-rad_sec"] = 0.0
 
-        # Initialize simulation
-        self.sim.run_ic()
 
         # Initialize motors to zero BEFORE first run
         self.sim["fcs/ne_motor"] = 0.0
         self.sim["fcs/se_motor"] = 0.0
         self.sim["fcs/sw_motor"] = 0.0
         self.sim["fcs/nw_motor"] = 0.0
+
+        # Initialize simulation
+        self.sim.run_ic()
+        
+        # Debug
+        if False:
+            for obj in dir(self.sim):
+                print(obj)
+            
+            for pp in self.sim.get_property_catalog():
+                if "external" in pp:
+                    print(pp, " ", self.sim.get_property_value(pp.split(" ")[0]))
+            sys.exit(1)
 
         # ================================ #
         # State
@@ -128,7 +139,7 @@ class JsbSimulation:
         
         # Apply motor commands
         # --------------------------------- #
-        self.state = sim_cmd(t, self.state)
+        self.sim, self.state = sim_cmd(t, self.sim, self.state)
         if t > 3.0:
             set_motor_commands(self.sim, self.cmd)
 
@@ -155,10 +166,12 @@ class JsbSimulation:
             print(f"  Motors:")
             
             print(f"    NE: cmd={motor_info['ne']['command']:.3f}, thrust={motor_info['ne']['thrust_N']:.2f}N, rpm≈{motor_info['ne']['rpm_est']:.0f}")
+            #print(f"    NE: vector={self.sim['fcs/ne_motor/direction/x']:.0f}")
             print(f"    SE: cmd={motor_info['se']['command']:.3f}, thrust={motor_info['se']['thrust_N']:.2f}N, rpm≈{motor_info['se']['rpm_est']:.0f}")
             print(f"    SW: cmd={motor_info['sw']['command']:.3f}, thrust={motor_info['sw']['thrust_N']:.2f}N, rpm≈{motor_info['sw']['rpm_est']:.0f}")
             print(f"    NW: cmd={motor_info['nw']['command']:.3f}, thrust={motor_info['nw']['thrust_N']:.2f}N, rpm≈{motor_info['nw']['rpm_est']:.0f}")
             print(f"    Total thrust: {motor_info['total']['thrust_N']:.2f}N ({motor_info['total']['thrust_lbs']:.2f}lbs)")
+            
         
 #        
 #        # Log data every 0.1 seconds
