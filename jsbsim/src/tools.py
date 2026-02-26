@@ -6,12 +6,12 @@ def set_motor_commands(sim, cmd):
     Set motor commands in X configuration.
     
     Motor layout (looking from above):
-    (1)NW(CCW)    NE(CW)(3)
+    (4)NW(CCW)    NE(CW)(2)
              \    /
                \/
                /\
              /    \
-    (2)SW(CW)     SE(CCW)(4)
+    (3)SW(CW)     SE(CCW)(1)
         
     #     Roll   Pitch   Yaw
     1      -1      1      -1   
@@ -21,10 +21,10 @@ def set_motor_commands(sim, cmd):
     
     """
     
-    sim["fcs/ne_motor"] = cmd["s3"]
-    sim["fcs/se_motor"] = cmd["s4"]
-    sim["fcs/sw_motor"] = cmd["s2"]
-    sim["fcs/nw_motor"] = cmd["s1"]
+    sim["fcs/ne_motor"] = cmd["s2"]
+    sim["fcs/se_motor"] = cmd["s1"]
+    sim["fcs/sw_motor"] = cmd["s3"]
+    sim["fcs/nw_motor"] = cmd["s4"]
     
 #    sim["fcs/ne_motor"] = 0.40 #cmd["s3"]
 #    sim["fcs/se_motor"] = 0.40 #cmd["s4"]
@@ -70,29 +70,29 @@ def get_jsbsim_state(sim, state, init=False):
     state["trk"] = sim["attitude/psi-deg"]  # track angle
     state["hdg"] = sim["attitude/psi-deg"]  # heading
     
-    # Position - Local NED coordinates (meters)
-    # JSBSim doesn't directly provide NED, but we can use velocities integrated or ECEF conversion
-    # For simplicity, using displacement from initial position
-    state["posx"] = 0.0  # Will need to track this externally if needed
-    state["posy"] = 0.0  # Will need to track this externally if needed
+    # Position 
+    state["posx"] = 0.0  # Not used in adumsim
+    state["posy"] = 0.0  # Not used in adumsim
     state["posz"] = sim["position/h-agl-ft"] * FT_TO_M  # altitude AGL in meters
     
     # Ground velocity (m/s)
-    vn = sim["velocities/v-north-fps"] * FT_TO_M
-    ve = sim["velocities/v-east-fps"] * FT_TO_M
-    state["gvel"] = np.sqrt(vn**2 + ve**2)
+    state["veln"] = sim["velocities/v-north-fps"] * FT_TO_M
+    state["vele"] = sim["velocities/v-east-fps"] * FT_TO_M
+    state["veld"] = sim["velocities/v-down-fps"] * FT_TO_M
+    
+    state["gvel"] = np.sqrt(state["veln"]**2 + state["vele"]**2)
     
     # Attitude angles (degrees)
     state["roll"] = sim["attitude/phi-deg"]
-    state["pitch"] = -sim["attitude/theta-deg"]
+    state["pitch"] = sim["attitude/theta-deg"]
     state["yaw"] = sim["attitude/psi-deg"]
     
     # Accelerations in body frame (in 'g' units)
     # Use pilot accelerations which represent what an IMU would measure (specific force)
     # These are the accelerations felt in the body frame, excluding gravity
     state["ax"] = sim["accelerations/a-pilot-x-ft_sec2"] * FT_TO_M / G
-    state["ay"] = - sim["accelerations/a-pilot-y-ft_sec2"] * FT_TO_M / G
-    state["az"] = - sim["accelerations/a-pilot-z-ft_sec2"] * FT_TO_M / G
+    state["ay"] = sim["accelerations/a-pilot-y-ft_sec2"] * FT_TO_M / G
+    state["az"] = -sim["accelerations/a-pilot-z-ft_sec2"] * FT_TO_M / G
     
     # Angular rates in body frame (deg/s)
     state["p"] = np.degrees(sim["velocities/p-rad_sec"])  # roll rate
@@ -130,7 +130,7 @@ def get_motor_info(sim):
     """
     # Conversion constants
     LBS_TO_N = 4.44822  # pounds-force to Newtons
-    MAX_THRUST_LBS = 0.30  # from quad.xml
+    MAX_THRUST_LBS = 0.84  # from quad.xml
     MAX_THRUST_N = MAX_THRUST_LBS * LBS_TO_N
     
     # Estimate RPM range (typical small quad 5000-12000 RPM)
@@ -172,21 +172,3 @@ def get_motor_info(sim):
     return motors
 
 
-def sim_cmd(t, state):
-    
-    
-    # Acro mode
-    state["ch6"] = -0.8
-    
-    if t > 8.0:
-        state["ch5"] = 1.0
-    
-    
-    if t > 8.5:
-        state["ch3"] = 0.5
-        
-    
-    if t > 9.0:
-        state["ch2"] = 0.05
-        
-    return state

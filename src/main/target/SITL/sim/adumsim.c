@@ -86,7 +86,7 @@ static pthread_t listenThread;
 static bool initalized = false;
 static bool useImu = false;
 static timeUs_t s_lastNoiseTimeUs = 0;
-static float s_lastNoiseDt = 0.02f;
+static float s_lastNoiseDt = 0.005f;
 
 
 static int32_t lat_1e7 = 0;
@@ -113,6 +113,13 @@ static bool  hasJoystick = false;
 static float joystickRaw[ADUM_JOYSTICK_AXIS_COUNT];
 
 
+static float convertAzimuth(float azimuth)
+{
+    if (azimuth < 0) {
+        azimuth += 360;
+    }
+    return 360 - fmodf(azimuth + 90, 360.0f);
+}
 
 int init_fgear_socket(char* ip, int port) {
 
@@ -478,7 +485,7 @@ static void* listenWorker(void* arg)
                 lon_1e7,
                 (int32_t)roundf(elevation * 100),
                 (int16_t)roundf(groundspeed * 100),
-                (int16_t)roundf(hpath * 10),
+                (int16_t)roundf(hpath*10.0f + 0.0f),
                 0, //(int16_t)roundf(-local_vz * 100),
                 0, //(int16_t)roundf(local_vx * 100),
                 0, //(int16_t)roundf(-local_vy * 100),
@@ -495,7 +502,8 @@ static void* listenWorker(void* arg)
 
             const int16_t roll_inav = roll * 10;
             const int16_t pitch_inav = -pitch * 10;
-            const int16_t yaw_inav = yaw * 10;
+            //const int16_t yaw_inav = yaw * 10;
+            const int16_t yaw_inav = (int16_t)roundf(yaw*10.0f + 0.0f);
 
             if (!useImu) {
                 imuSetAttitudeRPY(roll_inav, pitch_inav, yaw_inav);

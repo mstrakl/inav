@@ -5,6 +5,7 @@ import jsbsim
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from src.tools import *
+from src.inputs import *
 
 
 class JsbSimulation:
@@ -27,7 +28,7 @@ class JsbSimulation:
         self.sim["ic/long-gc-deg"] = 16.1769
         self.sim["ic/h-agl-ft"] = 0.25  
         self.sim["ic/vt-kts"] = 0.0    # No initial velocity
-        self.sim["ic/psi-true-deg"] = 0.0  # Initial heading (North)
+        self.sim["ic/psi-true-deg"] = 90.0  # Initial heading (North)
         self.sim["ic/theta-deg"] = 0.0  # Level pitch
         self.sim["ic/phi-deg"] = 0.0    # Level roll
 
@@ -145,11 +146,14 @@ class JsbSimulation:
         if t > 0 and abs(t - round(t / self.print_dt) * self.print_dt) < 0.01:
             print(f"\n--- State at t={t:.2f}s ---")
             print(f"  Position: lat={self.state['lat']:.6f}°, lon={self.state['lon']:.6f}°, alt={self.state['alt']:.2f}m")
-            print(f"  Attitude: roll={self.state['roll']:.2f}°, pitch={self.state['pitch']:.2f}°, yaw={self.state['yaw']:.2f}°")
-            print(f"  Velocity: gvel={self.state['gvel']:.2f}m/s")
+
+            print(f"  Velocity (m/s): vn={self.state['veln']:.3f}, ve={self.state['vele']:.3f}, vd={self.state['veld']:.3f}")
             print(f"  Accel (g): ax={self.state['ax']:.3f}, ay={self.state['ay']:.3f}, az={self.state['az']:.3f}")
+            print(f"  Attitude: roll={self.state['roll']:.2f}°, pitch={self.state['pitch']:.2f}°, yaw={self.state['yaw']:.2f}°")
             print(f"  Rates (°/s): p={self.state['p']:.2f}, q={self.state['q']:.2f}, r={self.state['r']:.2f}")
+            
             print(f"  Motors:")
+            
             print(f"    NE: cmd={motor_info['ne']['command']:.3f}, thrust={motor_info['ne']['thrust_N']:.2f}N, rpm≈{motor_info['ne']['rpm_est']:.0f}")
             print(f"    SE: cmd={motor_info['se']['command']:.3f}, thrust={motor_info['se']['thrust_N']:.2f}N, rpm≈{motor_info['se']['rpm_est']:.0f}")
             print(f"    SW: cmd={motor_info['sw']['command']:.3f}, thrust={motor_info['sw']['thrust_N']:.2f}N, rpm≈{motor_info['sw']['rpm_est']:.0f}")

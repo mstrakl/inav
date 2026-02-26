@@ -7,7 +7,7 @@ import threading
 
 HOST = "127.0.0.1"
 PORT = 2323
-RATE_HZ = 60.0
+RATE_HZ = 200.0
 
 _tx_state = {
     "enable": False,
@@ -56,7 +56,7 @@ def main(args):
     start_time = time.time()
     t = 0
     try:
-        while t < 15.0:
+        while t < 600.0:
             
             t = time.time() - start_time  # relative time
 

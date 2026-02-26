@@ -35,13 +35,13 @@
   </metrics>
 
   <mass_balance>
-    <ixx unit="SLUG*FT2"> 1.005 </ixx>
-    <iyy unit="SLUG*FT2"> 1.005 </iyy>
-    <izz unit="SLUG*FT2"> 1.010 </izz>
-    <ixy unit="SLUG*FT2"> 1. </ixy>
-    <ixz unit="SLUG*FT2"> 1. </ixz>
-    <iyz unit="SLUG*FT2"> 1. </iyz>
-        <emptywt unit="LBS"> 0.84 </emptywt>
+    <ixx unit="SLUG*FT2"> 0.005 </ixx>
+    <iyy unit="SLUG*FT2"> 0.005 </iyy>
+    <izz unit="SLUG*FT2"> 0.010 </izz>
+    <ixy unit="SLUG*FT2"> 0.0 </ixy>
+    <ixz unit="SLUG*FT2"> 0.0 </ixz>
+    <iyz unit="SLUG*FT2"> 0.0 </iyz>
+        <emptywt unit="LBS"> 1.50 </emptywt>
     <location name="CG" unit="M">
       <x> 0 </x>
       <y> 0 </y>
@@ -59,8 +59,8 @@
       <static_friction>  0.8 </static_friction>
       <dynamic_friction> 0.5 </dynamic_friction>
       <spring_coeff unit="N/M"> 50 </spring_coeff>
-      <damping_coeff unit="N/M/SEC"> 5 </damping_coeff>
-      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 100 </damping_coeff_rebound>
+      <damping_coeff unit="N/M/SEC"> 10 </damping_coeff>
+      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 50 </damping_coeff_rebound>
       <max_steer unit="DEG"> 0.0 </max_steer>
       <brake_group> NONE </brake_group>
       <retractable>0</retractable>
@@ -75,8 +75,8 @@
       <static_friction>  0.8 </static_friction>
       <dynamic_friction> 0.5 </dynamic_friction>
       <spring_coeff unit="N/M"> 50 </spring_coeff>
-      <damping_coeff unit="N/M/SEC"> 5 </damping_coeff>
-      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 100 </damping_coeff_rebound>
+      <damping_coeff unit="N/M/SEC"> 10 </damping_coeff>
+      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 50 </damping_coeff_rebound>
       <max_steer unit="DEG"> 0.0 </max_steer>
       <brake_group> NONE </brake_group>
       <retractable>0</retractable>
@@ -91,8 +91,8 @@
       <static_friction>  0.8 </static_friction>
       <dynamic_friction> 0.5 </dynamic_friction>
       <spring_coeff unit="N/M"> 50 </spring_coeff>
-      <damping_coeff unit="N/M/SEC"> 5 </damping_coeff>
-      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 100 </damping_coeff_rebound>
+      <damping_coeff unit="N/M/SEC"> 10 </damping_coeff>
+      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 50 </damping_coeff_rebound>
       <max_steer unit="DEG"> 0.0 </max_steer>
       <brake_group> NONE </brake_group>
       <retractable>0</retractable>
@@ -107,8 +107,8 @@
       <static_friction>  0.8 </static_friction>
       <dynamic_friction> 0.5 </dynamic_friction>
       <spring_coeff unit="N/M"> 50 </spring_coeff>
-      <damping_coeff unit="N/M/SEC"> 5 </damping_coeff>
-      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 100 </damping_coeff_rebound>
+      <damping_coeff unit="N/M/SEC"> 10 </damping_coeff>
+      <damping_coeff_rebound type="SQUARE" unit="N/M2/SEC2"> 50 </damping_coeff_rebound>
       <max_steer unit="DEG"> 0.0 </max_steer>
       <brake_group> NONE </brake_group>
       <retractable>0</retractable>
@@ -135,11 +135,11 @@
       <function>
         <product>
           <property>fcs/ne_motor</property>
-          <value> 0.60 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
-        <x>4.87</x>
+        <x>-4.87</x>
         <y>4.87</y>
         <z>0</z>
       </location>
@@ -154,11 +154,11 @@
       <function>
         <product>
           <property>fcs/sw_motor</property>
-          <value> 0.60 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
-        <x>-4.87</x>
+        <x>4.87</x>
         <y>-4.87</y>
         <z>0</z>
       </location>
@@ -173,11 +173,11 @@
       <function>
         <product>
           <property>fcs/se_motor</property>
-          <value> 0.60 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
-        <x>-4.87</x>
+        <x>4.87</x>
         <y>4.87</y>
         <z>0</z>
       </location>
@@ -192,11 +192,11 @@
       <function>
         <product>
           <property>fcs/nw_motor</property>
-          <value> 0.60 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
-        <x>4.87</x>
+        <x>-4.87</x>
         <y>-4.87</y>
         <z>0</z>
       </location>
@@ -214,7 +214,7 @@
       <function>
         <product>
           <property>fcs/ne_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -235,7 +235,7 @@
       <function>
         <product>
           <property>fcs/ne_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -256,7 +256,7 @@
       <function>
         <product>
           <property>fcs/se_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -275,7 +275,7 @@
       <function>
         <product>
           <property>fcs/se_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -296,7 +296,7 @@
       <function>
         <product>
           <property>fcs/sw_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -315,7 +315,7 @@
       <function>
         <product>
           <property>fcs/sw_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -336,7 +336,7 @@
       <function>
         <product>
           <property>fcs/nw_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -355,7 +355,7 @@
       <function>
         <product>
           <property>fcs/nw_motor</property>
-          <value> 0.0 </value>
+          <value> 0.84 </value>
         </product>
       </function>
       <location unit="IN">
@@ -383,7 +383,7 @@
         <product>
           <property>aero/qbar-psf</property>
           <value>47.9</value> <!-- Conversion to pascals -->
-          <value>0.0151</value> <!-- CD x Area (m^2) -->
+          <value>0.30</value> <!-- CD x Area (m^2) -->
           <value>0.224808943</value> <!-- N to LBS -->
         </product>
       </function>
