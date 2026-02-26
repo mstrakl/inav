@@ -1,0 +1,208 @@
+diff all
+
+# version
+# INAV/SITL 9.0.1 Feb 25 2026 / 13:05:13 (2b191170) 
+# GCC-11.4.0
+
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults noreboot
+
+# resources
+
+# Timer overrides
+
+# Outputs [servo]
+
+# safehome
+
+# Fixed Wing Approach
+fwapproach 8 6000 500 0 0 0 0
+
+# geozone
+
+# geozone vertices
+
+# features
+feature TELEMETRY
+feature PWM_OUTPUT_ENABLE
+
+# blackbox
+blackbox -NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 1 0 115200 115200 0 115200
+serial 5 1 230400 115200 0 115200
+serial 6 0 115200 115200 115200 115200
+serial 7 32768 115200 115200 0 115200
+
+# Modes [aux]
+aux 0 0 0 1800 2100
+aux 1 1 1 1400 2100
+aux 2 11 3 1600 2100
+aux 3 28 2 1600 2100
+aux 4 3 1 1600 2100
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 3 valid
+wp 0 1 466313153 161789631 2000 0 0 0 0
+wp 1 7 0 0 0 180 0 0 0
+wp 2 8 466313153 161789631 2000 0 0 0 165
+
+# OSD [osd_layout]
+
+# Programming: logic
+logic 0 1 -1 0 0 0 0 0 0
+logic 1 1 -1 1 3 6 4 0 0
+logic 2 1 -1 12 4 1 0 0 0
+logic 3 1 1 18 0 1 0 10 0
+logic 4 1 2 18 0 1 0 0 0
+logic 50 1 -1 2 1 12 0 1800 0
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set gyro_main_lpf_hz = 90
+set acc_hardware = FAKE
+set align_mag = CW270FLIP
+set mag_hardware = FAKE
+set baro_hardware = FAKE
+set receiver_type = SIM (SITL)
+set serialrx_provider = CRSF
+set blackbox_rate_denom = 2
+set motor_pwm_protocol = STANDARD
+set failsafe_procedure = RTH
+set vbat_meter_type = FAKE
+set current_meter_type = FAKE
+set servo_pwm_rate = 100
+set applied_defaults = 6
+set gps_provider = FAKE
+set airmode_type = THROTTLE_THRESHOLD
+set nav_wp_load_on_boot = ON
+set nav_wp_max_safe_distance = 250
+set nav_fw_wp_tracking_accuracy = 2
+set nav_fw_wp_turn_smoothing = ON-CUT
+set log_level = DEBUG
+set log_topics = 4294967295
+
+# control_profile
+control_profile 1
+
+set mc_p_yaw = 55
+set mc_i_yaw = 30
+set mc_p_level = 3
+set mc_d_level = 15
+set dterm_lpf_hz = 60
+set heading_hold_rate_limit = 60
+set nav_mc_pos_z_p = 10
+set nav_mc_vel_z_p = 20
+set nav_mc_vel_z_i = 5
+set nav_mc_vel_z_d = 1
+set nav_mc_pos_xy_p = 20
+set nav_mc_vel_xy_p = 20
+set nav_mc_vel_xy_i = 10
+set nav_mc_vel_xy_d = 10
+set nav_mc_vel_xy_ff = 10
+set nav_mc_heading_p = 15
+set tpa_rate = 20
+set tpa_breakpoint = 1200
+set rc_expo = 42
+set rc_yaw_expo = 42
+set roll_rate = 30
+set pitch_rate = 30
+set yaw_rate = 15
+set ez_filter_hz = 90
+set ez_response = 26
+set ez_damping = 42
+set ez_stability = 28
+set ez_aggressiveness = 20
+set ez_rate = 8
+set ez_expo = 118
+
+# control_profile
+control_profile 2
+
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set antigravity_gain =  2.000
+set antigravity_accelerator =  5.000
+set tpa_rate = 20
+set tpa_breakpoint = 1200
+
+# control_profile
+control_profile 3
+
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set antigravity_gain =  2.000
+set antigravity_accelerator =  5.000
+set tpa_rate = 20
+set tpa_breakpoint = 1200
+
+# mixer_profile
+mixer_profile 1
+
+set model_preview_type = 3
+set motorstop_on_low = OFF
+
+# Mixer: motor mixer
+
+# Mixer: servo mixer
+
+# mixer_profile
+mixer_profile 2
+
+
+# Mixer: motor mixer
+
+# Mixer: servo mixer
+
+# battery_profile
+battery_profile 1
+
+set nav_mc_hover_thr = 1600
+
+# battery_profile
+battery_profile 2
+
+
+# battery_profile
+battery_profile 3
+
+
+# restore original profile selection
+control_profile 1
+mixer_profile 1
+battery_profile 1
+
+# save configuration
+save
+
+# 

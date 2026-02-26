@@ -1,83 +1,177 @@
-import os, sys
-import numpy as np
-import jsbsim
-from src.simtools import trim, debug_out
-from run.src.data import Data as _Data
-
-jsbsim.FGJSBBase().debug_lvl = 0
-PATH_TO_JSBSIM_FILES = "./run"
-sim = jsbsim.FGFDMExec(PATH_TO_JSBSIM_FILES)  
+import socket
+import time
+import math
+import argparse
+import threading
 
 
-Data = _Data()
+HOST = "127.0.0.1"
+PORT = 2323
+RATE_HZ = 60.0
+
+_tx_state = {
+    "enable": False,
+    "swA": 0,
+    "swB": 0,
+    "swC": 0,
+    "swD": 0,
+    "potS1": 0.0,
+    "potS2": 0.0,
+}
+_tx_lock = threading.Lock()
 
 
-def main():  
+def main(args):
 
-    # ================================ #
-    # Mini Fox glider
-    # ================================ #
-    sim.load_model("./fox")          
-    sim.set_dt(0.02)
-    # ================================ #
-
-    # Set initial conditions for level flight
-    # LJMS, sredina modelarske piste
-    sim["ic/lat-gc-deg"] = 46.16
-    sim["ic/long-gc-deg"] = 15.65
-    sim["ic/h-sl-ft"] = 200.0 # 200 ft agl
-    sim["ic/vt-kts"] =  23        # Initial speed in knots
-    sim["ic/psi-true-rad"] = np.deg2rad(200.0)       # Initial hdg
+    inav_connect = False
     
-    # Trim the aircraft for steady flight at this initial condition
-    sim["fcs/aileron-cmd-norm"] = 0.0    # Neutral aileron
-    sim["fcs/elevator-cmd-norm"] = 0.0   # Neutral elevator
-    sim["fcs/rudder-cmd-norm"] = 0.0     # Neutral rudder
+    if args.sim == "inav":
+        inav_connect = True
+        
+    if args.joy:
+
+        t = threading.Thread(
+            target=read_tx_thread,
+            daemon=True
+        )
+        t.start()
+
+
+    if inav_connect:
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
+        server.bind((HOST, PORT))
+        server.listen(1)
+        print(f"Listening on {HOST}:{PORT}")
+
+        conn, addr = server.accept()
+        print(f"Client connected from {addr}")
     
-    sim.run_ic()  # Run initialize
+        
+
+    from jsb_sim import JsbSimulation
+    Inav = JsbSimulation(1.0/RATE_HZ)
     
-    trim(sim, debug=False)
+    start_time = time.time()
+    t = 0
+    try:
+        while t < 15.0:
+            
+            t = time.time() - start_time  # relative time
 
-    #sim["atmosphere/turb-type"] = 4
-    #sim["atmosphere/turbulence/milspec/windspeed_at_20ft_AGL-fps"] = 10
-    #sim["atmosphere/turbulence/milspec/severity"] = 1.0
+            if args.joy:
+                tx = get_tx_state()
+                
+                if (t < 2.0 and tx["swD"] != 0):
+                    while tx["swD"] != 0:
+                        print("Waiting for disarm...")
+                        time.sleep(0.5)
+                        tx = get_tx_state()
+                
+                #print(
+                #    f"swA={tx['swA']} "
+                #    f"swB={tx['swB']} "
+                #    f"swC={tx['swC']} "
+                #    f"swD={tx['swD']} "
+                #    f"potS1={tx['potS1']:.2f} "
+                #    f"potS2={tx['potS2']:.2f}"
+                #)
+            else:
+                tx = _tx_state
+
+
+            if inav_connect:
+                Inav.rx(conn)
+            
+            Inav.update(tx)
+            
+            if inav_connect:
+                Inav.tx(conn)
+            
+            time.sleep(Inav.getDt())
+            
+    except KeyboardInterrupt:
+        print("\nCtrl+C pressed! Exiting gracefully...")
     
-    i=0
-    while sim.get_sim_time() <= 10.0:
-
-        sim.run()  # Advance the simulation by one time step
-        
-        #if i == 10:
-        #for p in sim.get_property_catalog():
-        #    if p.startswith("aero") or p.startswith("moment") \
-        #        or p.startswith("force") or p.startswith("ic"):
-        #        try:
-        #            xv = sim[p.split(" ")[0].strip()]
-        #            print(f"{p:>30} := {xv:>16.4f}")
-        #        except:
-        #            print(f"{p} := no val")
-        #print("#-------------------------------------------#")
-        #sys.exit(1)
-
-        Data.Out.read(sim)
-        
-        trel = sim.get_sim_time(),
-
-        sim["fcs/aileron-cmd-norm"] = 0.0
-        sim["fcs/elevator-cmd-norm"] = 0.0
-        sim["fcs/speedbrake-cmd-norm"] = 0.0
-        
-        
-        
-        if (i+1) % 50 == 0:
-            debug_out(sim, i)
+    if inav_connect:
+        server.close()
 
 
 
-        # End
-        i += 1
 
+def read_tx_thread(device="/dev/input/js0"):
+    import struct
 
+    JS_EVENT_FORMAT = "IhBB"
+    JS_EVENT_SIZE = struct.calcsize(JS_EVENT_FORMAT)
     
+    try:
+        js = open(device, "rb")
+        _tx_state["enable"] = True
+    except FileNotFoundError:
+        print(f"Joystick device {device} not found. Joystick input will be disabled.")
+        return
+
+    with open(device, "rb") as js:
+        while True:
+            event = js.read(JS_EVENT_SIZE)
+            if not event:
+                break
+
+            _, value, event_type, number = struct.unpack(
+                JS_EVENT_FORMAT, event
+            )
+
+            with _tx_lock:
+                if event_type & 0x01:  # button
+                    if number == 3:
+                        _tx_state["swA"] = value
+
+                elif event_type & 0x02:  # axis
+                    if number == 1:
+                        _tx_state["potS1"] = value / 32767.0
+                    elif number == 3:
+                        _tx_state["potS2"] = value / 32767.0
+                    elif number == 4:
+                        _tx_state["swD"] = read_sw(value)
+                    elif number == 5:
+                        _tx_state["swC"] = read_sw(value)
+                    elif number == 6:
+                        _tx_state["swB"] = read_sw(value)
+
+def get_tx_state():
+    with _tx_lock:
+        return _tx_state.copy()
+    
+def read_sw(value):
+    
+    if value < -10000:
+        return 0
+    elif value < 10000:
+        return 1
+    else:
+        return 2
+
+
 if __name__ == "__main__":
-    main()
+    
+    parser = argparse.ArgumentParser(description="Simulator entry point")
+    parser.add_argument(
+        "--sim",
+        type=str,
+        default=None,
+        choices=["inav"],
+        help="Select simulator backend (e.g. inav)"
+    )
+    
+
+    parser.add_argument(
+        "--joy",
+        action="store_true",
+        help="Use joystick"
+    )
+    
+    args = parser.parse_args()
+    
+    main(args)
