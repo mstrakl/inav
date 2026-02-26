@@ -255,33 +255,39 @@ static void* listenWorker(void* arg)
 
         // Read all outputs from inav
         // ----------------------------------------------------- //
-
         float motorValue[4] = { 0.0f };
-        float yokeValues[3] = { 0 };
-        int y = 0;
-        int k = 0;
-        for (int i = 0; i < mappingCount; i++) {
-            if (y > 2) {
-                break;
-            }
-            if (pwmMapping[i] & 0x80) { // Motor
-                if (k < 4) motorValue[k] = PWM_TO_FLOAT_0_1(motor[pwmMapping[i] & 0x7f]);
-                k++;
-                //printf("Motor %d value: %f\n", i, motorValue);
-                //printf("Motor %d value: %d\n", i, motor[pwmMapping[i] & 0x7f]);
-            } else {
-                yokeValues[y] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[i]]);
-                y++;
-            }
+        float servoValue[6] = { 0.0f };
+        motorValue[0] = PWM_TO_FLOAT_0_1(motor[pwmMapping[0] & 0x7f]);
+        motorValue[1] = PWM_TO_FLOAT_0_1(motor[pwmMapping[1] & 0x7f]);
+        motorValue[2] = PWM_TO_FLOAT_0_1(motor[pwmMapping[2] & 0x7f]);
+        motorValue[3] = PWM_TO_FLOAT_0_1(motor[pwmMapping[3] & 0x7f]);
 
-        }
-        
+        servoValue[0] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[4]]);
+        servoValue[1] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[5]]);
+        servoValue[2] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[6]]);
+        servoValue[3] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[7]]);
+        servoValue[4] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[8]]);
+        servoValue[5] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[9]]);
+
+        //printf("Motor 1 value: %d\n", motorValue[0]);
+        //printf("Motor 2 value: %d\n", motorValue[1]);
+        //printf("Motor 3 value: %d\n", motorValue[2]);
+        //printf("Motor 4 value: %d\n", motorValue[3]);
+        //printf("Servo 1 value: %f\n", servoValue[0]);
+        //printf("Servo 2 value: %f\n", servoValue[1]);
+        //printf("Servo 3 value: %f\n", servoValue[2]);
+        //printf("Servo 4 value: %f\n", servoValue[3]);
+        //printf("Servo 5 value: %f\n", servoValue[4]);
+        //printf("Servo 6 value: %f\n", servoValue[5]);
 
         // Send motor data to simulation
-        char msg[256];  
+        char msg[512];  
         int len = snprintf(msg, sizeof(msg),
-                        "%.6f;%.6f;%.6f;%.6f;\n",
-                        motorValue[0], motorValue[1], motorValue[2], motorValue[3]);
+                        "%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;\n",
+                        motorValue[0], motorValue[1], motorValue[2], motorValue[3], 
+                        servoValue[0], servoValue[1], servoValue[2], 
+                        servoValue[3], servoValue[4], servoValue[5]);
+
         if (len > 0) {
             ssize_t sent = send(sockfd, msg, len, 0);
         }

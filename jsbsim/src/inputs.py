@@ -8,22 +8,22 @@ def sim_cmd(t, sim, state, cmd):
     
     
     # Acro / Angle mode
-    state["ch6"] = 1.0
+    state["ch6"] = 0.0
     
-    if t > 7.5:
+    if t > 10:
         state["ch5"] = 1.0
         
         
-    if t > 8.0:
-        state["ch3"] = 0.75       
+    #if t > 8.0:
+    #    state["ch3"] = 0.75       
     
 
-    if t > 10.0:
-        cmd["stilt"] = 45.0
+    #if t > 10.0:
+    #    cmd["stilt"] = 45.0
         
-#    # WP ON
-#    if t > 10.0:
-#        state["ch7"] = 1.0
+    # WP ON
+    if t > 12.0:
+        state["ch7"] = 1.0
 
    
 #    

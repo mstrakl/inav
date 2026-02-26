@@ -394,7 +394,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/bw-ft</property>
                     <property>fcs/left-aileron-pos-rad</property>
-                    <value>0.0500</value>
+                    <value>0.02500</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cldr">
@@ -417,7 +417,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
                     <property>aero/alpha-rad</property>
-                    <value>-1.2000</value>
+                    <value>-1.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmq">
@@ -428,7 +428,7 @@
                     <property>metrics/cbarw-ft</property>
                     <property>aero/ci2vel</property>
                     <property>velocities/q-aero-rad_sec</property>
-                    <value>-10.0000</value>
+                    <value>-20.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmadot">
@@ -439,7 +439,7 @@
                     <property>metrics/cbarw-ft</property>
                     <property>aero/ci2vel</property>
                     <property>aero/alphadot-rad_sec</property>
-                    <value>-15.0000</value>
+                    <value>-10.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmo">
@@ -458,7 +458,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
                     <property>fcs/elevator-pos-rad</property>
-                    <value>-0.300</value>
+                    <value>-0.200</value>
                 </product>
             </function>
         </axis>

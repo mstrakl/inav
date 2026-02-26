@@ -1,88 +1,65 @@
 
 import numpy as np
 
-def set_motor_commands(sim, cmd):
-    """
-    Set motor commands in X configuration.
+def set_commands(sim, cmd):
     
-    Motor layout (looking from above):
-    (4)NW(CCW)    NE(CW)(2)
-             \    /
-               \/
-               /\
-             /    \
-    (3)SW(CW)     SE(CCW)(1)
-        
-    #     Roll   Pitch   Yaw
-    1      -1      1      -1   
-    2      -1     -1       1
-    3       1      1       1
-    4       1     -1      -1
+    SERVOS_ON = True
+    MOTORS_ON = False
+    MOTOR_TILT_ON = False
     
-    """
+    # Set control surfaces
+    # --------------------------------------- #
+    if SERVOS_ON:
+        sim["fcs/aileron-cmd-norm"] = cmd.get("s1", 0.0)
+        sim["fcs/elevator-cmd-norm"] = cmd.get("s2", 0.0)
+        sim["fcs/rudder-cmd-norm"] = -cmd.get("s4", 0.0)
+        
+
+
+    # Set motor commands in X configuration.
+    # --------------------------------------- #
     
-    sim["fcs/ne_motor"] = cmd["s2"]
-    sim["fcs/se_motor"] = cmd["s1"]
-    sim["fcs/sw_motor"] = cmd["s3"]
-    sim["fcs/nw_motor"] = cmd["s4"]
+    if MOTORS_ON:
+        
+        #    Motor layout (looking from above):
+        #    (4)NW(CCW)    NE(CW)(2)
+        #             \    /
+        #               \/
+        #               /\
+        #             /    \
+        #    (3)SW(CW)     SE(CCW)(1)
+        #        
+
+        sim["fcs/ne_motor"] = cmd["m2"]
+        sim["fcs/se_motor"] = cmd["m1"]
+        sim["fcs/sw_motor"] = cmd["m3"]
+        sim["fcs/nw_motor"] = cmd["m4"]
     
-    # Motor tilt control: `cmd["stilt"]` expected in degrees (0-90)
-    # Map tilt to unit direction components and write them to JSBSim
-    # external_reactions <force> direction fields at runtime.
-    # When stilt == 0 -> vertical downwards (x=0, z=-1)
-    stilt_deg = float(cmd.get("stilt", 0.0))
-    # clamp to [0,90]
-    if stilt_deg < 0.0:
-        stilt_deg = 0.0
-    if stilt_deg > 90.0:
-        stilt_deg = 90.0
+    # Set motor tilt
+    # --------------------------------------- #
+    
+    if MOTOR_TILT_ON:
 
+        stilt_rad = np.radians(cmd.get("stilt", 0.0))
+        x_ = np.sin(stilt_rad)
+        z_ = -np.cos(stilt_rad)
 
-    stilt_rad = np.radians(stilt_deg)
+        # Motor x sign according to their body x location in quad.xml
+        motor_positions = [
+            "ne",
+            "nw"
+        ]
 
-    x_ = float(np.sin(stilt_rad))
-    z_ = float(-np.cos(stilt_rad))
+        for name in motor_positions:
+            try:
+                sim[f"external_reactions/{name}_motor/x"] = x_
+                sim[f"external_reactions/{name}_motor/y"] = 0.0
+                sim[f"external_reactions/{name}_motor/z"] = z_
+            except Exception:
+                raise RuntimeError(f"Failed to set motor tilt for {name}. Check if external_reactions/{name}_motor/x exists in JSBSim XML.")
 
-    # Motor x sign according to their body x location in quad.xml
-    motor_x_sign = {
-        'ne': -1.0,  # ne: x = -4.87
-        #'se':  1.0,  # se: x =  4.87
-        #'sw':  1.0,  # sw: x =  4.87
-        'nw': -1.0   # nw: x = -4.87
-    }
-
-    for name, sign in motor_x_sign.items():
-        try:
-            sim[f"external_reactions/{name}_motor/x"] = x_
-            sim[f"external_reactions/{name}_motor/y"] = 0.0
-            sim[f"external_reactions/{name}_motor/z"] = z_
-        except Exception:
-            raise RuntimeError(f"Failed to set motor tilt for {name}. Check if external_reactions/{name}_motor/x exists in JSBSim XML.")
-            # If runtime field doesn't exist, ignore silently (older XMLs)
-            pass
+            
         
-        
-        #self.sim["external_reactions/ne_motor/x"] = 0.1
-        
-        # Debug
-        #for pp in sim.get_property_catalog():
-        #    if "ne_motor" in pp:
-        #        print(pp, " ", sim.get_property_value(pp.split(" ")[0]))
-
-        
-#    sim["fcs/ne_motor"] = 0.40 #cmd["s3"]
-#    sim["fcs/se_motor"] = 0.40 #cmd["s4"]
-#    sim["fcs/sw_motor"] = 0.40 #cmd["s2"]
-#    sim["fcs/nw_motor"] = 0.40 #cmd["s1"]
-#    
-#    if sim.get_sim_time() > 1.8:
-#
-#        sim["fcs/ne_motor"] = 0.40 * 1.00 #cmd["s3"]
-#        sim["fcs/se_motor"] = 0.40 * 1.00 #cmd["s4"]
-#        sim["fcs/sw_motor"] = 0.40 * 1.10 #cmd["s2"]
-#        sim["fcs/nw_motor"] = 0.40 * 1.10 #cmd["s1"]
-#
-
 def get_jsbsim_state(sim, state, init=False):
     """
     Extract state data from JSBSim and pack into dictionary.
@@ -216,3 +193,13 @@ def get_motor_info(sim):
     return motors
 
 
+def jsb_print_properties(sim, keyword=""):
+
+    import sys
+    
+    for pp in sim.get_property_catalog():
+        if keyword in pp or not keyword:
+            print(pp, " ", sim.get_property_value(
+                pp.split(" ")[0]))
+    
+    sys.exit(1)

@@ -12,7 +12,7 @@ from src.inputs import *
 def main():
     
 
-    dt = 0.02
+    dt = 0.005
     
 
     PATH_TO_JSBSIM_FILES = "../run"
@@ -28,8 +28,8 @@ def main():
     # Set initial conditions - start in the air to avoid ground contact bounce
     sim["ic/lat-gc-deg"] = 46.6312
     sim["ic/long-gc-deg"] = 16.1769
-    sim["ic/h-agl-ft"] = 100 
-    sim["ic/vt-kts"] = 30.0 
+    sim["ic/h-agl-ft"] = 200
+    sim["ic/vt-kts"] = 0.0 
     sim["ic/psi-true-deg"] = 0.0  # Initial heading (North)
     sim["ic/theta-deg"] = 0.0  # Level pitch
     sim["ic/phi-deg"] = 0.0    # Level roll
@@ -44,21 +44,19 @@ def main():
 
     # Initialize simulation
     sim.run_ic()
-    
-    
-    
-    while sim.get_sim_time() < 10.0:
+
+    i = 0
+    while sim.get_sim_time() < 5.0:
         
         sim.run()  # Advance simulation by one time step
 
-        if sim.get_sim_time() > 2.0:
+        if sim.get_sim_time() > 5.0:
 
             sim["fcs/aileron-cmd-norm"] = 0.0
             sim["fcs/elevator-cmd-norm"] = 0.0
             sim["fcs/rudder-cmd-norm"] = 0.0
-        
-        # Print every 0.5 seconds
-        if sim.get_sim_time() < 0.025 or sim.get_sim_time() % 0.1 < 0.01:
+
+        if (i+1) * dt % 0.5 == 0:
         
             # Add basic state printing for debugging
             lat = sim["position/lat-gc-deg"]
@@ -87,7 +85,7 @@ def main():
             
             
                         
-            print(f"Time: {sim.get_sim_time():.2f} s")
+            print(f"Time: {sim.get_sim_time():.6f} s")
             print(f"Lat: {lat:.4f} deg, Lon: {lon:.4f} deg, Alt: {alt:.2f} ft")
             print(f"Alpha: {alpha:.2f} deg, Beta: {beta:.2f} deg")
             print(f"Roll: {roll:.2f} deg, Pitch: {pitch:.2f} deg, Yaw: {yaw:.2f} deg")
@@ -96,6 +94,9 @@ def main():
             print(f"p: {p:.2f} rad/s, q: {q:.2f} rad/s, r: {r:.2f} rad/s")  
         
             print("-" * 50)
+            
+            
+        i += 1
             
 if __name__ == "__main__":
     main()

@@ -25,7 +25,7 @@
 #pragma once
 #include <stdint.h>
 
-#define XP_MAX_PWM_OUTS 4
+#define XP_MAX_PWM_OUTS 10
 
 //int init_fgear_socket(char* ip, int port);
 

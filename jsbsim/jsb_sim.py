@@ -20,90 +20,50 @@ class JsbSimulation:
         # ================================ #
         # Quadcopter Setup
         # ================================ #
-        self.sim.load_model("./quad")          
+        self.sim.load_model("./evis")          
         self.sim.set_dt(self.dt)
 
         # Set initial conditions - start in the air to avoid ground contact bounce
         self.sim["ic/lat-gc-deg"] = 46.6312
         self.sim["ic/long-gc-deg"] = 16.1769
-        self.sim["ic/h-agl-ft"] = 0.25  
-        self.sim["ic/vt-kts"] = 0.0    # No initial velocity
-        self.sim["ic/psi-true-deg"] = 90.0  # Initial heading (North)
-        self.sim["ic/theta-deg"] = 0.0  # Level pitch
-        self.sim["ic/phi-deg"] = 0.0    # Level roll
-
-        # Important: Zero out all velocities to start in stable hover
-        self.sim["ic/u-fps"] = 0.0
-        self.sim["ic/v-fps"] = 0.0
-        self.sim["ic/w-fps"] = 0.0
-        self.sim["ic/p-rad_sec"] = 0.0
-        self.sim["ic/q-rad_sec"] = 0.0
-        self.sim["ic/r-rad_sec"] = 0.0
-
-
-        # Initialize motors to zero BEFORE first run
-        self.sim["fcs/ne_motor"] = 0.0
-        self.sim["fcs/se_motor"] = 0.0
-        self.sim["fcs/sw_motor"] = 0.0
-        self.sim["fcs/nw_motor"] = 0.0
+        self.sim["ic/h-agl-ft"] = 1000
+        self.sim["ic/vt-kts"] = 30
+        self.sim["ic/psi-true-deg"] = 0
+        self.sim["ic/theta-deg"] = 0
+        self.sim["ic/phi-deg"] = 0
 
         # Initialize simulation
         self.sim.run_ic()
-        
-        
-        self.sim["external_reactions/ne_motor/x"] = 0.1
-        
+              
         # Debug
-        if False:
-            for obj in dir(self.sim):
-                print(obj)
-            
-            for pp in self.sim.get_property_catalog():
-                if "external" in pp:
-                    print(pp, " ", self.sim.get_property_value(pp.split(" ")[0]))
-            sys.exit(1)
+        #jsb_print_properties(self.sim, keyword="")
 
         # ================================ #
         # State
         # ================================ #
         self.state = get_jsbsim_state(self.sim, {}, init=True)
-        
-        
+
         
         # ================================ #
         # Inav command channels
         # ================================ #
         self.cmd = {
+            
+            "m1": 0.0,
+            "m2": 0.0,
+            "m3": 0.0,
+            "m4": 0.0,
+            
             "s1": 0.0,
             "s2": 0.0,
             "s3": 0.0,
             "s4": 0.0,
             "s5": 0.0,
             "s6": 0.0,
-            "s7": 0.0,
-            "s8": 0.0,
+            
             "stilt": 0.0,
         }
-        
-        
-        # Data logging
-        time_log = []
-        alt_log = []
-        roll_log = []
-        pitch_log = []
-        yaw_log = []
-        vn_log = []
-        ve_log = []
-        vd_log = []
-        motor_ne_log = []
-        motor_se_log = []
-        motor_sw_log = []
-        motor_nw_log = []
-        
-        print("=" * 60)
-        print("FLIGHT DEMONSTRATION")
-        print("=" * 60)
-        
+
         self.print_dt = 0.10
         self.throttle = 0.0
         
@@ -111,43 +71,13 @@ class JsbSimulation:
     def update(self, joystick_input):
         
         t = self.sim.get_sim_time()
-        
-        # Get current state
-        alt_agl =self.sim["position/h-agl-ft"]
-        roll =self.sim["attitude/phi-deg"]
-        pitch =self.sim["attitude/theta-deg"]
-        yaw =self.sim["attitude/psi-deg"]
-        
-        # Control logic for different phases
-        roll_cmd = 0.0
-        pitch_cmd = 0.0
-        yaw_cmd = 0.0
-        
-        
-#        # Wait on ground with motors off
-#        if t < 1.0:
-#            self.throttle = 0.0
-#        
-#        # Phase 0: Takeoff (1-3s) - Spin up motors and lift off
-#        elif t < 5.0:
-#            self.throttle += 0.01
-#            if self.throttle > 0.3:
-#                self.throttle = 0.3
-#        
-#        # End of demo
-#        else:
-#            throttle = 0.0
-#            pass
 
-
-        
-        # Apply motor commands
+        # Apply commands
         # --------------------------------- #
         self.sim, self.state, self.cmd = sim_cmd(t, self.sim, self.state, self.cmd)
         if t > 3.0:
-            set_motor_commands(self.sim, self.cmd)
+            set_commands(self.sim, self.cmd)
 
-                
         # Run simulation step
         self.sim.run()
         
@@ -155,7 +85,7 @@ class JsbSimulation:
         self.state = get_jsbsim_state(self.sim, self.state)
                 
         # Get motor information
-        motor_info = get_motor_info(self.sim)
+        #motor_info = get_motor_info(self.sim)
         
         # Print state data every 0.5 seconds for demonstration
         if t > 0 and abs(t - round(t / self.print_dt) * self.print_dt) < 0.01:
@@ -169,12 +99,12 @@ class JsbSimulation:
             
             print(f"  Motors:")
             
-            print(f"    NE: cmd={motor_info['ne']['command']:.3f}, thrust={motor_info['ne']['thrust_N']:.2f}N, rpm≈{motor_info['ne']['rpm_est']:.0f}")
-            #print(f"    NE: vector={self.sim['fcs/ne_motor/direction/x']:.0f}")
-            print(f"    SE: cmd={motor_info['se']['command']:.3f}, thrust={motor_info['se']['thrust_N']:.2f}N, rpm≈{motor_info['se']['rpm_est']:.0f}")
-            print(f"    SW: cmd={motor_info['sw']['command']:.3f}, thrust={motor_info['sw']['thrust_N']:.2f}N, rpm≈{motor_info['sw']['rpm_est']:.0f}")
-            print(f"    NW: cmd={motor_info['nw']['command']:.3f}, thrust={motor_info['nw']['thrust_N']:.2f}N, rpm≈{motor_info['nw']['rpm_est']:.0f}")
-            print(f"    Total thrust: {motor_info['total']['thrust_N']:.2f}N ({motor_info['total']['thrust_lbs']:.2f}lbs)")
+            #print(f"    NE: cmd={motor_info['ne']['command']:.3f}, thrust={motor_info['ne']['thrust_N']:.2f}N, rpm≈{motor_info['ne']['rpm_est']:.0f}")
+            ##print(f"    NE: vector={self.sim['fcs/ne_motor/direction/x']:.0f}")
+            #print(f"    SE: cmd={motor_info['se']['command']:.3f}, thrust={motor_info['se']['thrust_N']:.2f}N, rpm≈{motor_info['se']['rpm_est']:.0f}")
+            #print(f"    SW: cmd={motor_info['sw']['command']:.3f}, thrust={motor_info['sw']['thrust_N']:.2f}N, rpm≈{motor_info['sw']['rpm_est']:.0f}")
+            #print(f"    NW: cmd={motor_info['nw']['command']:.3f}, thrust={motor_info['nw']['thrust_N']:.2f}N, rpm≈{motor_info['nw']['rpm_est']:.0f}")
+            #print(f"    Total thrust: {motor_info['total']['thrust_N']:.2f}N ({motor_info['total']['thrust_lbs']:.2f}lbs)")
             
         
 #        
@@ -237,20 +167,25 @@ class JsbSimulation:
             
             vals = line.split(";")
             
-            if len(vals) >= 4:
+            if len(vals) >= 8:
                 try:
-                    self.cmd["s1"] = float(vals[0])
-                    self.cmd["s2"] = float(vals[1])
-                    self.cmd["s3"] = float(vals[2])
-                    self.cmd["s4"] = float(vals[3])
+                    
+                    self.cmd["m1"] = float(vals[0])
+                    self.cmd["m2"] = float(vals[1])
+                    self.cmd["m3"] = float(vals[2])
+                    self.cmd["m4"] = float(vals[3])
+                    
+                    self.cmd["s1"] = float(vals[4])
+                    self.cmd["s2"] = float(vals[5])
+                    self.cmd["s3"] = float(vals[6])
+                    self.cmd["s4"] = float(vals[7])
+                    self.cmd["s5"] = float(vals[8])
+                    self.cmd["s6"] = float(vals[9])
 
-                    #self.cmd_motor_targets[0] = GAIN * float(vals[3])   # Motor FL
-                    #self.cmd_motor_targets[1] = GAIN * float(vals[1])   # Motor FR
-                    #self.cmd_motor_targets[2] = GAIN * float(vals[0])   # Motor RR
-                    #self.cmd_motor_targets[3] = GAIN * float(vals[2])   # Motor RL
+                    #print("Received command:", self.cmd)
 
                 except (ValueError, IndexError) as e:
-                    print(f"Error parsing motor speeds: {e}, line: {line}")   
+                    print(f"Error parsing cmd: {e}, line: {line}")   
 
 
     def tx(self, conn:socket.socket):
