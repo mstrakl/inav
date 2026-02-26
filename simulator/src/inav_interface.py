@@ -368,6 +368,22 @@ class InavSimulate:
             GAIN = 1200.0
             vals = line.split(";")
             
+            
+            
+            # Increase gains when close to ground, to simulate landing
+            # for inav
+            
+            if self.state["trel"] > self.__TARM + 12:
+
+                if self.state["posz"] < 5.0:
+                    GAIN = np.interp(self.state["posz"], 
+                                    [0.0, 5.0], 
+                                    [GAIN * 2.0, GAIN])
+                
+                if GAIN > 1300.0:
+                    print("Increasing gains:", GAIN)
+
+
             if len(vals) >= 4:
                 try:
                     # set targets; actual speeds will lag via filter
