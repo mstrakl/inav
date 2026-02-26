@@ -26,17 +26,22 @@ class JsbSimulation:
         # Set initial conditions - start in the air to avoid ground contact bounce
         self.sim["ic/lat-gc-deg"] = 46.6312
         self.sim["ic/long-gc-deg"] = 16.1769
-        self.sim["ic/h-agl-ft"] = 1000
-        self.sim["ic/vt-kts"] = 30
+        self.sim["ic/h-agl-m"] = 0.0
+        self.sim["ic/vt-kts"] = 0
         self.sim["ic/psi-true-deg"] = 0
         self.sim["ic/theta-deg"] = 0
         self.sim["ic/phi-deg"] = 0
+        
+        
+        self.sim["fcs/motor1"] = 0.0
+        self.sim["fcs/motor2"] = 0.0
+        self.sim["fcs/motor3"] = 0.0
 
         # Initialize simulation
         self.sim.run_ic()
               
         # Debug
-        #jsb_print_properties(self.sim, keyword="")
+        #jsb_print_properties(self.sim, keyword="forces")
 
         # ================================ #
         # State
@@ -52,16 +57,14 @@ class JsbSimulation:
             "m1": 0.0,
             "m2": 0.0,
             "m3": 0.0,
-            "m4": 0.0,
-            
+
             "s1": 0.0,
             "s2": 0.0,
             "s3": 0.0,
             "s4": 0.0,
             "s5": 0.0,
             "s6": 0.0,
-            
-            "stilt": 0.0,
+
         }
 
         self.print_dt = 0.10
@@ -75,8 +78,7 @@ class JsbSimulation:
         # Apply commands
         # --------------------------------- #
         self.sim, self.state, self.cmd = sim_cmd(t, self.sim, self.state, self.cmd)
-        if t > 3.0:
-            set_commands(self.sim, self.cmd)
+        set_commands(self.sim, self.cmd)
 
         # Run simulation step
         self.sim.run()
@@ -87,8 +89,11 @@ class JsbSimulation:
         # Get motor information
         #motor_info = get_motor_info(self.sim)
         
+        #debug_log(self.sim, keyword="external-lbs")
+        #debug_log(self.sim, keyword="external-lbsft")
+        
         # Print state data every 0.5 seconds for demonstration
-        if t > 0 and abs(t - round(t / self.print_dt) * self.print_dt) < 0.01:
+        if t >= 0 and abs(t - round(t / self.print_dt) * self.print_dt) < 0.01:
             print(f"\n--- State at t={t:.2f}s ---")
             print(f"  Position: lat={self.state['lat']:.6f}°, lon={self.state['lon']:.6f}°, alt={self.state['alt']:.2f}m")
 
@@ -97,8 +102,7 @@ class JsbSimulation:
             print(f"  Attitude: roll={self.state['roll']:.2f}°, pitch={self.state['pitch']:.2f}°, yaw={self.state['yaw']:.2f}°")
             print(f"  Rates (°/s): p={self.state['p']:.2f}, q={self.state['q']:.2f}, r={self.state['r']:.2f}")
             
-            print(f"  Motors:")
-            
+            #print(f"  Motors:")
             #print(f"    NE: cmd={motor_info['ne']['command']:.3f}, thrust={motor_info['ne']['thrust_N']:.2f}N, rpm≈{motor_info['ne']['rpm_est']:.0f}")
             ##print(f"    NE: vector={self.sim['fcs/ne_motor/direction/x']:.0f}")
             #print(f"    SE: cmd={motor_info['se']['command']:.3f}, thrust={motor_info['se']['thrust_N']:.2f}N, rpm≈{motor_info['se']['rpm_est']:.0f}")

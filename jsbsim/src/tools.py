@@ -4,7 +4,7 @@ import numpy as np
 def set_commands(sim, cmd):
     
     SERVOS_ON = True
-    MOTORS_ON = False
+    MOTORS_ON = True
     MOTOR_TILT_ON = False
     
     # Set control surfaces
@@ -30,36 +30,46 @@ def set_commands(sim, cmd):
         #    (3)SW(CW)     SE(CCW)(1)
         #        
 
-        sim["fcs/ne_motor"] = cmd["m2"]
-        sim["fcs/se_motor"] = cmd["m1"]
-        sim["fcs/sw_motor"] = cmd["m3"]
-        sim["fcs/nw_motor"] = cmd["m4"]
+        if sim.get_sim_time() < 2.0:
+            sim["fcs/motor1"] = 0.0
+            sim["fcs/motor2"] = 0.0
+            sim["fcs/motor3"] = 0.0
+    
+            
+        else:
+            sim["fcs/motor1"] = cmd["m1"]
+            sim["fcs/motor2"] = cmd["m2"]
+            sim["fcs/motor3"] = cmd["m3"]
     
     # Set motor tilt
     # --------------------------------------- #
     
     if MOTOR_TILT_ON:
-
-        stilt_rad = np.radians(cmd.get("stilt", 0.0))
-        x_ = np.sin(stilt_rad)
-        z_ = -np.cos(stilt_rad)
-
-        # Motor x sign according to their body x location in quad.xml
-        motor_positions = [
-            "ne",
-            "nw"
-        ]
-
-        for name in motor_positions:
-            try:
-                sim[f"external_reactions/{name}_motor/x"] = x_
-                sim[f"external_reactions/{name}_motor/y"] = 0.0
-                sim[f"external_reactions/{name}_motor/z"] = z_
-            except Exception:
-                raise RuntimeError(f"Failed to set motor tilt for {name}. Check if external_reactions/{name}_motor/x exists in JSBSim XML.")
-
-            
         
+        
+        angle1 = cmd.get("s5", 0.0)*60.0 + 45.0
+        angle2 = -cmd.get("s6", 0.0)*60.0 + 45.0
+        
+        #print("Angles:", angle1, angle2)
+
+        x = np.cos(np.deg2rad(angle1))
+        z = np.sin(np.deg2rad(angle1))
+        
+        #print("m1.x, z=", x, z)
+        
+        sim[f"external_reactions/motor1/x"] = x
+        sim[f"external_reactions/motor1/z"] = z
+
+        x = np.cos(np.deg2rad(angle2))
+        z = np.sin(np.deg2rad(angle2))
+        
+        #print("m2.x, z=", x, z)
+        
+        sim[f"external_reactions/motor2/x"] = x
+        sim[f"external_reactions/motor2/z"] = z
+        
+
+
 def get_jsbsim_state(sim, state, init=False):
     """
     Extract state data from JSBSim and pack into dictionary.
@@ -203,3 +213,15 @@ def jsb_print_properties(sim, keyword=""):
                 pp.split(" ")[0]))
     
     sys.exit(1)
+
+
+
+def debug_log(sim, keyword=""):
+    
+    
+    for pp in sim.get_property_catalog():
+        if keyword in pp or not keyword:
+            print(pp, ": ", sim.get_property_value(
+                pp.split(" ")[0]))
+    
+    
