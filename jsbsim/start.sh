@@ -16,17 +16,7 @@ trap cleanup INT TERM EXIT
 # ---------------------------------------------------------- #
 
 ENV_DIR="env"
-
-# Determine OS and set Python executable path
-OS="$(uname -s)"
-if [[ "$OS" == "Linux" ]]; then
-    PYTHON_BIN="$ENV_DIR/bin/python3"
-elif [[ "$OS" == "Darwin" ]]; then
-    PYTHON_BIN="/Users/mitjastrakl/miniconda3/envs/inavsim-py312/bin/python3"
-else
-    echo "Unsupported OS: $OS"
-    exit 1
-fi
+PYTHON_BIN="$ENV_DIR/bin/python3"
 
 # Start Python simulator
 echo "Starting Python simulator..."
@@ -45,11 +35,25 @@ if [ ! -f "$BINARY" ]; then
     exit 1
 fi
 
-stdbuf -oL -eL $BINARY \
-    --path=./eeprom.bin \
-    --sim=adum \
-    --chanmap=M01-01,M02-02,M03-03,M04-04,S01-05,S02-06,S03-07,S04-08,S05-09,S06-10 > sitl.log 2>&1 &
-INAV_PID=$!
+
+OS="$(uname -s)"
+if [[ "$OS" == "Linux" ]]; then
+    stdbuf -oL -eL $BINARY \
+        --path=./eeprom.bin \
+        --sim=adum \
+        --chanmap=M01-01,M02-02,M03-03,M04-04,S01-05,S02-06,S03-07,S04-08,S05-09,S06-10 > sitl.log 2>&1 &
+    INAV_PID=$!
+elif [[ "$OS" == "Darwin" ]]; then
+    $BINARY \
+        --path=./eeprom.bin \
+        --sim=adum \
+        --chanmap=M01-01,M02-02,M03-03,M04-04,S01-05,S02-06,S03-07,S04-08,S05-09,S06-10 > sitl.log 2>&1 &
+    INAV_PID=$!
+else
+    echo "Unsupported OS: $OS"
+    exit 1
+fi
+
 
 
 #sleep 2
