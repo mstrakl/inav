@@ -252,6 +252,14 @@ static void* listenWorker(void* arg)
 
     while (1) {
 
+        // Hardcode for now
+        pwmMapping[4] = 1;
+        pwmMapping[5] = 2;
+        pwmMapping[6] = 3;
+        pwmMapping[7] = 4;
+        pwmMapping[8] = 5;
+        pwmMapping[9] = 6;
+
 
         // Read all outputs from inav
         // ----------------------------------------------------- //
@@ -269,16 +277,22 @@ static void* listenWorker(void* arg)
         servoValue[4] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[8]]);
         servoValue[5] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[9]]);
 
-        //printf("Motor 1 value: %d\n", motorValue[0]);
-        //printf("Motor 2 value: %d\n", motorValue[1]);
-        //printf("Motor 3 value: %d\n", motorValue[2]);
-        //printf("Motor 4 value: %d\n", motorValue[3]);
-        //printf("Servo 1 value: %f\n", servoValue[0]);
-        //printf("Servo 2 value: %f\n", servoValue[1]);
-        //printf("Servo 3 value: %f\n", servoValue[2]);
-        //printf("Servo 4 value: %f\n", servoValue[3]);
-        //printf("Servo 5 value: %f\n", servoValue[4]);
-        //printf("Servo 6 value: %f\n", servoValue[5]);
+//        for (int i =0; i < 20; i++) {
+//            printf("Mapping %d: %d\n", i, pwmMapping[i]);
+//        }
+//
+//        printf("Motor 1 value: %d\n", motorValue[0]);
+//        printf("Motor 2 value: %d\n", motorValue[1]);
+//        printf("Motor 3 value: %d\n", motorValue[2]);
+//        printf("Motor 4 value: %d\n", motorValue[3]);
+//        printf("Servo 1 value: %f, s=%d \n", servoValue[0], pwmMapping[4]);
+//        printf("Servo 2 value: %f, s=%d \n", servoValue[1], pwmMapping[5]);
+//        printf("Servo 3 value: %f, s=%d \n", servoValue[2], pwmMapping[6]);
+//        printf("Servo 4 value: %f, s=%d \n", servoValue[3], pwmMapping[7]);
+//        printf("Servo 5 value: %f, s=%d \n", servoValue[4], pwmMapping[8]);
+//        printf("Servo 6 value: %f, s=%d \n", servoValue[5], pwmMapping[9]);
+//
+//        exit(1);
 
         // Send motor data to simulation
         char msg[512];  
