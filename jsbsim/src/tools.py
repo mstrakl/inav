@@ -12,7 +12,7 @@ def set_commands(sim, cmd):
     if SERVOS_ON:
         sim["fcs/aileron-cmd-norm"] = cmd.get("s1", 0.0)
         sim["fcs/elevator-cmd-norm"] = cmd.get("s2", 0.0)
-        sim["fcs/rudder-cmd-norm"] = -cmd.get("s4", 0.0)
+        sim["fcs/rudder-cmd-norm"] = cmd.get("s4", 0.0)
         
 
 

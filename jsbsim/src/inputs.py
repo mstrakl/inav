@@ -10,7 +10,9 @@ def sim_cmd(t, sim, state, cmd):
     state["ch5"] = -1.0
     state["ch6"] = -1.0
     state["ch7"] = -1.0
-    state["ch8"] =  1.0
+
+    # VTOL
+    state["ch8"] = 1.0
 
     # Acro / Angle mode
     state["ch6"] = 1.0
@@ -28,7 +30,6 @@ def sim_cmd(t, sim, state, cmd):
 
     # Fixed wing
     if t > 15:
-        state["ch5"] = -1.0 
         state["ch8"] = -1.0
 
 

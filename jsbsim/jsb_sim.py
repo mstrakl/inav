@@ -97,7 +97,7 @@ class JsbSimulation:
             alpha = self.sim["aero/alpha-deg"]
             beta = self.sim["aero/beta-deg"]
 
-            print(f"\n--- State at t={t:.2f}s ---")
+            print(f"Time {t:.2f}s")
             print(f"  Position: lat={self.state['lat']:.6f}°, lon={self.state['lon']:.6f}°, alt={self.state['alt']:.2f}m")
             print(f"  Alpha (deg)={alpha:.2f}, Beta (deg)={beta:.2f}")
             print(f"  Velocity (m/s): vn={self.state['veln']:.3f}, ve={self.state['vele']:.3f}, vd={self.state['veld']:.3f}")
@@ -105,7 +105,7 @@ class JsbSimulation:
             print(f"  Attitude: roll={self.state['roll']:.2f}°, pitch={self.state['pitch']:.2f}°, yaw={self.state['yaw']:.2f}°")
             print(f"  Rates (°/s): p={self.state['p']:.2f}, q={self.state['q']:.2f}, r={self.state['r']:.2f}")
             
-            print(f"  Motors:")
+            print(f"Motors:")
 
 
             m1x = self.sim[f"external_reactions/motor1/x"]
@@ -115,6 +115,12 @@ class JsbSimulation:
 
             print(f"  M1 (-): x={m1x:.3f}, z={m1z:.3f}")
             print(f"  M2 (-): x={m2x:.3f}, z={m2z:.3f}")
+
+
+            print("Servos:")
+            print(f"   ail={self.sim['fcs/aileron-cmd-norm']:.2f}")
+            print(f"  elev={self.sim['fcs/elevator-cmd-norm']:.2f}")
+            print(f"   rud={self.sim['fcs/rudder-cmd-norm']:.2f}")
 
 
             #print(f"    NE: cmd={motor_info['ne']['command']:.3f}, thrust={motor_info['ne']['thrust_N']:.2f}N, rpm≈{motor_info['ne']['rpm_est']:.0f}")

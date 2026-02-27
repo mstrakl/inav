@@ -133,7 +133,7 @@
             <location unit="M">
                 <x>0.225</x>
                 <y>-0.25</y>
-                <z>-0.05</z>
+                <z>-0.0</z>
             </location>
             <direction>
                 <x>0</x>
@@ -152,7 +152,7 @@
             <location unit="M">
                 <x>0.225</x>
                 <y>0.25</y>
-                <z>-0.05</z>
+                <z>-0.0</z>
             </location>
             <direction>
                 <x>0</x>
@@ -480,11 +480,10 @@
                     <property>aero/qbar-psf</property>
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
-                    <property>aero/alpha-rad</property>
                     <table>
                           <independentVar lookup="row">aero/alpha-rad</independentVar>
                           <tableData>
-                               -10    0.1
+                              -0.2    0.2
                                  0    0.0
                                1.0   -1.0
                           </tableData>
@@ -499,7 +498,7 @@
                     <property>metrics/cbarw-ft</property>
                     <property>aero/ci2vel</property>
                     <property>velocities/q-aero-rad_sec</property>
-                    <value>-10.0000</value>
+                    <value>-20.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmadot">
@@ -510,7 +509,7 @@
                     <property>metrics/cbarw-ft</property>
                     <property>aero/ci2vel</property>
                     <property>aero/alphadot-rad_sec</property>
-                    <value>-5.0000</value>
+                    <value>-10.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmo">
@@ -529,7 +528,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
                     <property>fcs/elevator-pos-rad</property>
-                    <value>-0.00</value>
+                    <value>-0.20</value>
                 </product>
             </function>
         </axis>
