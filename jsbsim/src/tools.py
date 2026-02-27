@@ -5,7 +5,7 @@ def set_commands(sim, cmd):
     
     SERVOS_ON = True
     MOTORS_ON = True
-    MOTOR_TILT_ON = False
+    MOTOR_TILT_ON = True
     
     # Set control surfaces
     # --------------------------------------- #
@@ -51,17 +51,17 @@ def set_commands(sim, cmd):
         angle2 = -cmd.get("s6", 0.0)*60.0 + 45.0
         
         #print("Angles:", angle1, angle2)
+        
+        x = np.sin(np.deg2rad(angle1))
+        z = -np.cos(np.deg2rad(angle1))
 
-        x = np.cos(np.deg2rad(angle1))
-        z = np.sin(np.deg2rad(angle1))
-        
         #print("m1.x, z=", x, z)
-        
+
         sim[f"external_reactions/motor1/x"] = x
         sim[f"external_reactions/motor1/z"] = z
 
-        x = np.cos(np.deg2rad(angle2))
-        z = np.sin(np.deg2rad(angle2))
+        x = np.sin(np.deg2rad(angle2))
+        z = -np.cos(np.deg2rad(angle2))
         
         #print("m2.x, z=", x, z)
         
