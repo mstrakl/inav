@@ -212,7 +212,7 @@ void outputProfileUpdateTask(timeUs_t currentTimeUs)
         }
         isMixerTransitionMixing_requested = IS_RC_MODE_ACTIVE(BOXMIXERTRANSITION);
     }
-    isMixerTransitionMixing = isMixerTransitionMixing_requested && ((posControl.navState == NAV_STATE_IDLE) || mixerAT_inuse ||(posControl.navState == NAV_STATE_ALTHOLD_IN_PROGRESS));
+    isMixerTransitionMixing = isMixerTransitionMixing_requested;
 }
 
 // switch mixerprofile without reboot
@@ -242,11 +242,11 @@ bool outputProfileHotSwitch(int profile_index)
         // LOG_INFO(PWM, "mixer switch failed, checkMixerProfileHotSwitchAvalibility");
         return false;
     }
-    if  ((posControl.navState != NAV_STATE_IDLE) && (posControl.navState != NAV_STATE_MIXERAT_IN_PROGRESS))
-    {
-        // LOG_INFO(PWM, "mixer switch failed, navState != NAV_STATE_IDLE");
-        return false;
-    }
+    //if  ((posControl.navState != NAV_STATE_IDLE) && (posControl.navState != NAV_STATE_MIXERAT_IN_PROGRESS))
+    //{
+    //    // LOG_INFO(PWM, "mixer switch failed, navState != NAV_STATE_IDLE");
+    //    return false;
+    //}
     if (!setConfigMixerProfile(profile_index))
     {
         // LOG_INFO(PWM, "mixer switch failed to set config");
