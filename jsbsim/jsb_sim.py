@@ -107,15 +107,14 @@ class JsbSimulation:
             
             print(f"Motors:")
 
-
             m1x = self.sim[f"external_reactions/motor1/x"]
             m1z = self.sim[f"external_reactions/motor1/z"]
             m2x = self.sim[f"external_reactions/motor2/x"]
             m2z = self.sim[f"external_reactions/motor2/z"]
 
-            print(f"  M1 (-): x={m1x:.3f}, z={m1z:.3f}")
-            print(f"  M2 (-): x={m2x:.3f}, z={m2z:.3f}")
-
+            print(f"  M1 (-): x={m1x:.3f}, z={m1z:.3f}, thrust={self.sim['fcs/motor1']:.2f}")
+            print(f"  M2 (-): x={m2x:.3f}, z={m2z:.3f}, thrust={self.sim['fcs/motor2']:.2f}")
+            print(f"  M3 (-): x=0.000, z=-1.000, thrust={self.sim['fcs/motor3']:.2f}")
 
             print("Servos:")
             print(f"   ail={self.sim['fcs/aileron-cmd-norm']:.2f}")
@@ -130,7 +129,7 @@ class JsbSimulation:
             #print(f"    NW: cmd={motor_info['nw']['command']:.3f}, thrust={motor_info['nw']['thrust_N']:.2f}N, rpm≈{motor_info['nw']['rpm_est']:.0f}")
             #print(f"    Total thrust: {motor_info['total']['thrust_N']:.2f}N ({motor_info['total']['thrust_lbs']:.2f}lbs)")
 
-            debug_log(self.sim, keyword="external-lbs")
+            #debug_log(self.sim, keyword="motor")
 
                 
         
@@ -211,7 +210,7 @@ class JsbSimulation:
                     self.cmd["s5"] = float(vals[8])
                     self.cmd["s6"] = float(vals[9])
 
-                    #print("Received command:", self.cmd)
+                    #received command:", self.cmd)
 
                 except (ValueError, IndexError) as e:
                     print(f"Error parsing cmd: {e}, line: {line}")   

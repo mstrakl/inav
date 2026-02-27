@@ -127,7 +127,7 @@
             <function>
                 <product>
                 <property>fcs/motor1</property>
-                <value> 2.2 </value>
+                <value> 2.7 </value>
                 </product>
             </function>
             <location unit="M">
@@ -146,7 +146,7 @@
             <function>
                 <product>
                 <property>fcs/motor2</property>
-                <value> 2.2 </value>
+                <value> 2.7 </value>
                 </product>
             </function>
             <location unit="M">
@@ -165,7 +165,7 @@
             <function>
                 <product>
                 <property>fcs/motor3</property>
-                <value> 1.0 </value>
+                <value> 1.2 </value>
                 </product>
             </function>
             <location unit="M">
@@ -291,12 +291,24 @@
                     <value>0.2500</value>
                 </product>
             </function>
+
+            <function name="aero/coefficient/CDL">
+                <description>Drag_due_to_CL</description>
+                <product>
+                    <property>aero/qbar-psf</property>
+                    <property>metrics/Sw-sqft</property>
+                    <value>0.00</value>
+                    <value>5.0</value>
+                </product>
+            </function>
+
+            
             <function name="aero/coefficient/CDwbh">
                 <description>Drag_due_to_alpha</description>
                 <product>
                     <property>aero/qbar-psf</property>
                     <property>metrics/Sw-sqft</property>
-                    <value>10.0</value>
+                    <value>5.0</value>
                       <table>
                           <independentVar lookup="row">aero/alpha-deg</independentVar>
                           <!-- <independentVar lookup="column">fcs/flap-pos-deg</independentVar> -->
@@ -528,7 +540,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
                     <property>fcs/elevator-pos-rad</property>
-                    <value>-0.20</value>
+                    <value>-0.40</value>
                 </product>
             </function>
         </axis>

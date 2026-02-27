@@ -56,7 +56,7 @@ def main(args):
     start_time = time.time()
     t = 0
     try:
-        while t < 100:
+        while t < 500:
             
             t = time.time() - start_time  # relative time
 
