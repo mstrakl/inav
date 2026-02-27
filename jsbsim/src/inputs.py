@@ -7,6 +7,7 @@ import numpy as np
 def sim_cmd(t, sim, state, cmd):
     
     state["ch8"] = 1.0
+    state["ch7"] = -1.0
 
     # Acro / Angle mode
     state["ch6"] = 1.0
@@ -16,7 +17,12 @@ def sim_cmd(t, sim, state, cmd):
         
         
     if t > 9.0:
-        state["ch3"] = 0.35       
+        state["ch3"] = 0.75   
+
+
+    if t > 12.0:
+        state["ch7"] = 0.25
+
 #    
 #    #if t > 10.0:
 #    #    cmd["stilt"] = 45.0

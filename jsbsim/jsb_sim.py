@@ -69,6 +69,8 @@ class JsbSimulation:
 
         self.print_dt = 0.10
         self.throttle = 0.0
+
+        self.__i = 0
         
 
     def update(self, joystick_input):
@@ -89,11 +91,8 @@ class JsbSimulation:
         # Get motor information
         #motor_info = get_motor_info(self.sim)
         
-        #debug_log(self.sim, keyword="external-lbs")
-        #debug_log(self.sim, keyword="external-lbsft")
-        
-        # Print state data every 0.5 seconds for demonstration
-        if t >= 0 and abs(t - round(t / self.print_dt) * self.print_dt) < 0.01:
+        # Print state 
+        if self.__i % 100 == 0:
             print(f"\n--- State at t={t:.2f}s ---")
             print(f"  Position: lat={self.state['lat']:.6f}°, lon={self.state['lon']:.6f}°, alt={self.state['alt']:.2f}m")
 
@@ -109,7 +108,10 @@ class JsbSimulation:
             #print(f"    SW: cmd={motor_info['sw']['command']:.3f}, thrust={motor_info['sw']['thrust_N']:.2f}N, rpm≈{motor_info['sw']['rpm_est']:.0f}")
             #print(f"    NW: cmd={motor_info['nw']['command']:.3f}, thrust={motor_info['nw']['thrust_N']:.2f}N, rpm≈{motor_info['nw']['rpm_est']:.0f}")
             #print(f"    Total thrust: {motor_info['total']['thrust_N']:.2f}N ({motor_info['total']['thrust_lbs']:.2f}lbs)")
-            
+
+            debug_log(self.sim, keyword="external-lbs")
+
+                
         
 #        
 #        # Log data every 0.1 seconds
@@ -135,7 +137,9 @@ class JsbSimulation:
 #                    vn_log, ve_log, vd_log, 
 #                    motor_ne_log, motor_se_log, motor_sw_log, motor_nw_log)
 
-    
+
+
+        self.__i += 1
     
     def getDt(self):
         return self.dt

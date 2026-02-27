@@ -52,8 +52,8 @@
     <mass_balance>
 
         <!-- Inertia scaled roughly from fox model to target mass (~1.5 kg) -->
-        <ixx unit="SLUG*FT2"> 0.018 </ixx>
-        <iyy unit="SLUG*FT2"> 0.036 </iyy>
+        <ixx unit="SLUG*FT2"> 0.027 </ixx>
+        <iyy unit="SLUG*FT2"> 0.055 </iyy>
         <izz unit="SLUG*FT2"> 0.042 </izz>
         <ixz unit="SLUG*FT2"> 0.001 </ixz>
 
@@ -127,11 +127,11 @@
             <function>
                 <product>
                 <property>fcs/motor1</property>
-                <value> 3.0 </value>
+                <value> 2.2 </value>
                 </product>
             </function>
             <location unit="M">
-                <x>-0.105</x>
+                <x>0.225</x>
                 <y>-0.25</y>
                 <z>-0.05</z>
             </location>
@@ -146,11 +146,11 @@
             <function>
                 <product>
                 <property>fcs/motor2</property>
-                <value> 3.0 </value>
+                <value> 2.2 </value>
                 </product>
             </function>
             <location unit="M">
-                <x>-0.105</x>
+                <x>0.225</x>
                 <y>0.25</y>
                 <z>-0.05</z>
             </location>
@@ -165,11 +165,11 @@
             <function>
                 <product>
                 <property>fcs/motor3</property>
-                <value> 1.35 </value>
+                <value> 1.0 </value>
                 </product>
             </function>
             <location unit="M">
-                <x>0.495</x>
+                <x>0.825</x>
                 <y>0.0</y>
                 <z>0.0</z>
             </location>
@@ -288,7 +288,7 @@
                 <product>
                     <property>aero/qbar-psf</property>
                     <property>metrics/Sw-sqft</property>
-                    <value>0.0200</value>
+                    <value>0.0500</value>
                 </product>
             </function>
             <function name="aero/coefficient/CDwbh">
@@ -296,6 +296,7 @@
                 <product>
                     <property>aero/qbar-psf</property>
                     <property>metrics/Sw-sqft</property>
+                    <value>2.0</value>
                       <table>
                           <independentVar lookup="row">aero/alpha-deg</independentVar>
                           <!-- <independentVar lookup="column">fcs/flap-pos-deg</independentVar> -->
@@ -480,7 +481,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
                     <property>aero/alpha-rad</property>
-                    <value>-1.0000</value>
+                    <value>-1.000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmq">
@@ -491,7 +492,7 @@
                     <property>metrics/cbarw-ft</property>
                     <property>aero/ci2vel</property>
                     <property>velocities/q-aero-rad_sec</property>
-                    <value>-20.0000</value>
+                    <value>-10.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmadot">
@@ -502,7 +503,7 @@
                     <property>metrics/cbarw-ft</property>
                     <property>aero/ci2vel</property>
                     <property>aero/alphadot-rad_sec</property>
-                    <value>-10.0000</value>
+                    <value>-5.0000</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmo">
@@ -511,7 +512,7 @@
                     <property>aero/qbar-psf</property>
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
-                    <value>0.035</value>
+                    <value>0.0</value>
                 </product>
             </function>
             <function name="aero/coefficient/Cmde">
@@ -521,7 +522,7 @@
                     <property>metrics/Sw-sqft</property>
                     <property>metrics/cbarw-ft</property>
                     <property>fcs/elevator-pos-rad</property>
-                    <value>-0.200</value>
+                    <value>-0.00</value>
                 </product>
             </function>
         </axis>
