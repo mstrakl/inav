@@ -256,6 +256,8 @@ static bool landingDetectorIsActive;
 
 EXTENDED_FASTRAM multicopterPosXyCoefficients_t multicopterPosXyCoefficients;
 
+static int dlzLastWpIndex;
+
 // Blackbox states
 int16_t navCurrentState;
 int16_t navActualVelocity[3];
@@ -4315,7 +4317,7 @@ void applyWaypointNavigationAndAltitudeHold(void)
         posControl.flags.forcedEmergLandingActivated = false;
         posControl.flags.manualEmergLandActive = false;
         //  ensure WP missions always restart from first waypoint after disarm
-        posControl.activeWaypointIndex = posControl.startWpIndex;
+        //posControl.activeWaypointIndex = posControl.startWpIndex;
         // Reset RTH trackback
         resetRthTrackBack();
 

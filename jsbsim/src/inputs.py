@@ -38,7 +38,7 @@ def sim_cmd(t, sim, state, cmd):
 
     # Start as fixed wing in angle mode
     state["ch8"] = -1.0
-    state["ch6"] = 1.0
+    state["ch6"] = 0.9
 
     # Takeoff
     if t > 6:
@@ -51,8 +51,17 @@ def sim_cmd(t, sim, state, cmd):
     if t > 12:
         state["ch7"] = 1.0
 
-    if t > 40:
-        state["ch8"] = 1.0
+    if t > 88:
+        state["ch5"] = -1.0
+        state["ch3"] = 0.0
+        state["ch6"] = 1.0
+        state["ch7"] = -1.0
+
+    if t > 91:
+        state["ch5"] = 1.0
+    
+    if t > 92:
+        state["ch7"] = 1.0
 
 
     return sim, state, cmd
