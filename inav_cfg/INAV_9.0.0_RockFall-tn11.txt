@@ -20,10 +20,10 @@ timer_output_mode 2 SERVOS
 # Outputs [servo]
 servo 1 1000 2150 1500 100
 servo 2 1000 2100 1500 -100
-servo 3 1300 1900 1600 100
-servo 4 1200 1800 1500 100
-servo 5 1000 2000 1500 -100
-servo 6 1000 1850 1500 -100
+servo 3 1420 1780 1600 -100
+servo 4 1400 1700 1550 -100
+servo 5 1000 2000 1650 -100
+servo 6 1000 1850 1430 -100
 
 # safehome
 
@@ -55,8 +55,6 @@ blackbox SERVOS
 # Receiver: Channel map
 
 # Ports
-serial 1 0 115200 115200 0 115200
-serial 2 64 115200 115200 0 115200
 
 # LEDs
 
@@ -66,8 +64,10 @@ serial 2 64 115200 115200 0 115200
 
 # Modes [aux]
 aux 0 0 0 1750 2100
-aux 1 1 1 1750 2100
-aux 2 62 3 1850 2100
+aux 1 1 1 1775 2100
+aux 2 12 1 900 1250
+aux 3 62 3 1275 2100
+aux 4 63 3 1275 1725
 
 # Adjustments [adjrange]
 
@@ -92,15 +92,15 @@ logic 2 1 -1 51 1 5 0 1500 0
 # OSD: custom elements
 
 # master
-set gyro_main_lpf_hz = 110
+set gyro_main_lpf_hz = 75
 set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = -43
+set gyro_zero_x = -40
 set gyro_zero_y = -7
-set gyro_zero_z = -15
-set ins_gravity_cmss =  994.846
+set gyro_zero_z = -16
+set ins_gravity_cmss =  994.345
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = MPU6000
 set acczero_x = 45
@@ -116,8 +116,7 @@ set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = DSHOT300
 set failsafe_delay = 10
-set align_board_roll = -20
-set align_board_pitch = -20
+set align_board_yaw = 1800
 set current_meter_scale = 250
 set servo_lpf_hz = 25
 set small_angle = 180
@@ -165,24 +164,10 @@ set rate_dynamics_end_weight = 10
 # control_profile
 control_profile 2
 
-set mc_p_pitch = 43
-set mc_i_pitch = 31
-set mc_d_pitch = 40
-set mc_cd_pitch = 54
-set mc_p_roll = 36
-set mc_i_roll = 23
-set mc_d_roll = 45
-set mc_cd_roll = 58
-set mc_p_yaw = 60
-set mc_i_yaw = 10
-set mc_d_yaw = 90
-set mc_p_level = 14
-set mc_i_level = 14
-set mc_d_level = 65
-set max_angle_inclination_rll = 300
-set max_angle_inclination_pit = 300
-set nav_mc_pos_xy_p = 30
-set nav_mc_vel_xy_d = 90
+set mc_d_yaw = 10
+set mc_p_level = 10
+set mc_i_level = 6
+set dterm_lpf_hz = 75
 set rc_expo = 50
 set roll_rate = 12
 set pitch_rate = 12
@@ -191,7 +176,6 @@ set yaw_rate = 7
 # control_profile
 control_profile 3
 
-set fw_ff_pitch = 80
 set fw_p_roll = 15
 set fw_i_roll = 3
 set fw_d_roll = 7
@@ -256,16 +240,16 @@ mmix 2  1.000  0.000  1.330  0.000
 # Mixer: servo mixer
 smix reset
 
-smix 0 1 2 -30 0 -1
-smix 1 2 2 -30 0 -1
-smix 2 1 29 -77 100 -1
-smix 3 2 29 81 100 -1
+smix 0 1 2 -45 0 -1
+smix 1 2 2 -45 0 -1
+smix 2 1 29 -74 100 -1
+smix 3 2 29 78 100 -1
 smix 4 5 1 20 0 -1
 smix 5 5 2 20 0 -1
 smix 6 6 1 -20 0 -1
 smix 7 6 2 20 0 -1
-smix 8 1 38 77 100 -1
-smix 9 2 38 -81 100 -1
+smix 8 1 38 74 100 -1
+smix 9 2 38 -78 100 -1
 
 # battery_profile
 battery_profile 1
