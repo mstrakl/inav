@@ -99,8 +99,8 @@ set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
 set gyro_zero_x = -40
 set gyro_zero_y = -7
-set gyro_zero_z = -16
-set ins_gravity_cmss =  994.345
+set gyro_zero_z = -17
+set ins_gravity_cmss =  993.722
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = MPU6000
 set acczero_x = 45
@@ -242,14 +242,14 @@ smix reset
 
 smix 0 1 2 -45 0 -1
 smix 1 2 2 -45 0 -1
-smix 2 1 29 -74 100 -1
-smix 3 2 29 78 100 -1
+smix 2 1 29 -71 100 -1
+smix 3 2 29 75 100 -1
 smix 4 5 1 20 0 -1
 smix 5 5 2 20 0 -1
 smix 6 6 1 -20 0 -1
 smix 7 6 2 20 0 -1
-smix 8 1 38 74 100 -1
-smix 9 2 38 -78 100 -1
+smix 8 1 38 71 100 -1
+smix 9 2 38 -75 100 -1
 
 # battery_profile
 battery_profile 1
