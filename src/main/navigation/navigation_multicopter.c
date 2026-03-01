@@ -58,7 +58,11 @@
 
 #include "sensors/battery.h"
 
+#define TAKEOFF_LOGIC_COND_ID 40
 #define DLZ_LOGIC_COND_ID 50
+static uint32_t timeTOStarted = 0;
+static bool modeTOIsAllowed = true;
+
 static int i_log = 0;
 
 /*-----------------------------------------------------------
@@ -733,8 +737,40 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
     lastAccelTargetY = newAccelY;
 
     // Rotate acceleration target into forward-right frame (aircraft)
-    const float accelForward = newAccelX * posControl.actualState.cosYaw + newAccelY * posControl.actualState.sinYaw;
-    const float accelRight = -newAccelX * posControl.actualState.sinYaw + newAccelY * posControl.actualState.cosYaw;
+    float accelForward = newAccelX * posControl.actualState.cosYaw + newAccelY * posControl.actualState.sinYaw;
+    float accelRight = -newAccelX * posControl.actualState.sinYaw + newAccelY * posControl.actualState.cosYaw;
+
+    // For TO override errors to 0
+    // ------------------------------------------- //
+
+    if(logicConditionGetValue(TAKEOFF_LOGIC_COND_ID) != 0 && modeTOIsAllowed) {
+
+        if (timeTOStarted == 0) {
+            timeTOStarted = millis();
+            LOG_DEBUG(SYSTEM, "Millis set");
+        } else {
+
+            accelForward = 0.0;
+            accelRight = 0.0;
+
+            LOG_DEBUG(SYSTEM, "Overriding pos coordinates");
+
+            if (millis() - timeTOStarted > 10000) {
+                modeTOIsAllowed = false;
+            }
+
+            if (! modeTOIsAllowed) {
+                LOG_DEBUG(SYSTEM, "TO timeout");
+            }
+        }
+
+    }
+
+    if (! modeTOIsAllowed) {
+        LOG_DEBUG(SYSTEM, "TO timeout");
+    }
+    // ------------------------------------------- //
+
 
     // Calculate banking angles
     const float desiredPitch = atan2_approx(accelForward, GRAVITY_CMSS);

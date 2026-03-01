@@ -3,6 +3,27 @@ import os, sys
 import numpy as np
 
 
+def sim_cmd(t, sim, state, cmd):
+
+    # Init
+    state["ch5"] = -1.0
+    state["ch6"] = -1.0
+    state["ch7"] = -1.0
+
+    # Start as MC in angle mode
+    state["ch8"] = 1.0
+    state["ch6"] = 1.0
+
+    # Takeoff
+    if t > 6:
+        state["ch5"] = 1.0 
+
+    if t > 7:
+        state["ch7"] = 1.0
+
+
+    return sim, state, cmd
+
 def sim_cmd1(t, sim, state, cmd):
 
     # Init
@@ -29,7 +50,7 @@ def sim_cmd1(t, sim, state, cmd):
 
     return sim, state, cmd
 
-def sim_cmd(t, sim, state, cmd):
+def sim_cmd2(t, sim, state, cmd):
     
     # Init
     state["ch5"] = -1.0
@@ -68,7 +89,7 @@ def sim_cmd(t, sim, state, cmd):
 
 
 
-def sim_cmd2(t, sim, state, cmd):
+def sim_cmd3(t, sim, state, cmd):
     
     # Init
     state["ch5"] = -1.0
