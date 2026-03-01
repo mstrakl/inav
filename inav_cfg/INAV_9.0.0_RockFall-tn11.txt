@@ -292,7 +292,7 @@ set nav_mc_hover_thr = 1650
 set nav_fw_cruise_thr = 1500
 set nav_fw_min_thr = 1300
 set nav_fw_pitch2thr = 20
-set nav_fw_launch_idle_thr = 0
+set nav_fw_launch_idle_thr = 1000
 
 # restore original profile selection
 control_profile 1
