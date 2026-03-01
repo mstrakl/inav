@@ -4317,7 +4317,7 @@ void applyWaypointNavigationAndAltitudeHold(void)
         posControl.flags.forcedEmergLandingActivated = false;
         posControl.flags.manualEmergLandActive = false;
         //  ensure WP missions always restart from first waypoint after disarm
-        //posControl.activeWaypointIndex = posControl.startWpIndex;
+        posControl.activeWaypointIndex = posControl.startWpIndex;
         // Reset RTH trackback
         resetRthTrackBack();
 
