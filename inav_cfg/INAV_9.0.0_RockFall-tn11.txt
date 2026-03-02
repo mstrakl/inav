@@ -286,12 +286,20 @@ smix 9 2 38 -75 100 -1
 # battery_profile
 battery_profile 1
 
-set throttle_idle =  10.000
-set nav_mc_hover_thr = 1600
+set nav_mc_hover_thr = 1750
+set nav_fw_cruise_thr = 1500
+set nav_fw_min_thr = 1300
+set nav_fw_pitch2thr = 20
+set nav_fw_launch_idle_thr = 1000
 
 # battery_profile
 battery_profile 2
 
+set nav_mc_hover_thr = 1750
+set nav_fw_cruise_thr = 1500
+set nav_fw_min_thr = 1300
+set nav_fw_pitch2thr = 20
+set nav_fw_launch_idle_thr = 1000
 
 # battery_profile
 battery_profile 3
@@ -305,7 +313,7 @@ set nav_fw_launch_idle_thr = 1000
 # restore original profile selection
 control_profile 2
 mixer_profile 2
-battery_profile 2
+battery_profile 1
 
 # save configuration
 save
