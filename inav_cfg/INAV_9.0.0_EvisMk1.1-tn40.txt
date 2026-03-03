@@ -162,9 +162,6 @@ set nav_fw_control_smoothness = 2
 set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
 set nav_fw_launch_climb_angle = 25
-set debug_mode = FLOW_RAW
-set log_level = DEBUG
-set log_topics = 4294967295
 
 # control_profile
 control_profile 1
