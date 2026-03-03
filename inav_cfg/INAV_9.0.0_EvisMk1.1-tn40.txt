@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/MATEKF405SE 9.0.0 Jan 14 2026 / 12:44:11 (a7932b92) 
+# INAV/MATEKF405SE 9.0.1 Mar  3 2026 / 17:14:42 (29100733) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -145,9 +145,9 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 5
+set gyro_zero_x = 4
 set gyro_zero_z = 5
-set ins_gravity_cmss =  979.488
+set ins_gravity_cmss =  978.014
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
@@ -176,7 +176,10 @@ set servo_pwm_rate = 100
 set servo_lpf_hz = 25
 set small_angle = 180
 set applied_defaults = 3
+set gps_sbas_mode = WAAS
 set gps_ublox_use_galileo = ON
+set gps_ublox_use_beidou = ON
+set gps_ublox_use_glonass = ON
 set airmode_type = STICK_CENTER_ONCE
 set inav_allow_dead_reckoning = ON
 set inav_max_surface_altitude = 500
