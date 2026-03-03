@@ -55,6 +55,7 @@
 #include "navigation/navigation_dlz.h"
 
 #include "programming/logic_condition.h"
+#include "programming/global_variables.h"
 
 #include "sensors/battery.h"
 
@@ -1051,11 +1052,15 @@ void resetMulticopterHeadingController(void)
 
 static void applyMulticopterHeadingController(void)
 {
-    if (FLIGHT_MODE(NAV_COURSE_HOLD_MODE)) {    // heading set by Nav during Course Hold so disable yaw stick input
+    if (FLIGHT_MODE(NAV_COURSE_HOLD_MODE)) {
+        // Course Hold: heading driven by Nav, disable yaw stick
         rcCommand[YAW] = 0;
+        updateHeadingHoldTarget(CENTIDEGREES_TO_DEGREES(posControl.desiredState.yaw));
+    } else {
+        // Heading Hold (nav-active): override target from GV4 (0..360 deg) every cycle
+        const int16_t target_hdg = (int16_t)constrain(gvGet(4), 0, 360);
+        updateHeadingHoldTarget(target_hdg);
     }
-
-    updateHeadingHoldTarget(CENTIDEGREES_TO_DEGREES(posControl.desiredState.yaw));
 }
 
 void applyMulticopterNavigationController(navigationFSMStateFlags_t navStateFlags, timeUs_t currentTimeUs)
@@ -1073,7 +1078,13 @@ void applyMulticopterNavigationController(navigationFSMStateFlags_t navStateFlag
             navigationDlzInit();
         }
 
-        if (navStateFlags & NAV_CTL_YAW)
+        if (navStateFlags & NAV_CTL_YAW) {
             applyMulticopterHeadingController();
+        } else if (FLIGHT_MODE(HEADING_MODE) && !FLIGHT_MODE(NAV_COURSE_HOLD_MODE)) {
+            // Pure HEADING_MODE (no nav yaw control active, e.g. idle nav state):
+            // override the maghold target from GV4 so the craft tracks it continuously.
+            const int16_t target_hdg = (int16_t)constrain(gvGet(4), 0, 360);
+            updateHeadingHoldTarget(target_hdg);
+        }
     }
 }

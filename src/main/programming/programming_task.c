@@ -25,11 +25,71 @@
 #include "platform.h"
 
 #include "programming/logic_condition.h"
+#include "programming/global_variables.h"
 #include "programming/pid.h"
 #include "flight/mixer_profile.h"
 
-void programmingFrameworkUpdateTask(timeUs_t currentTimeUs) {
+
+#include "drivers/time.h"
+
+
+#define MIXER_LC_ID 60
+
+static bool old_state = false;
+static uint32_t t_change = 0;
+
+static void updateTransitionAdum(void);
+
+void programmingFrameworkUpdateTask(timeUs_t currentTimeUs)
+{
     programmingPidUpdateTask(currentTimeUs);
     outputProfileUpdateTask(currentTimeUs);
     logicConditionUpdateTask(currentTimeUs);
+
+    updateTransitionAdum();
+}
+
+static void updateTransitionAdum(void)
+{
+
+    const bool newState = logicConditionGetValue(MIXER_LC_ID) != 0;
+
+
+    unsigned int t_fw_to_mc = gvGet(1);
+    unsigned int t_mc_to_fw = gvGet(2);
+
+
+    // Overload with default if stupid values
+    if (t_fw_to_mc < 1000 || t_fw_to_mc > 10000) {
+        t_fw_to_mc = 1000;
+    }
+
+    if (t_mc_to_fw < 1000 || t_mc_to_fw > 10000) {
+        t_mc_to_fw = 5000;
+    }
+
+    if (newState != old_state) {
+        t_change = millis();
+    }
+
+    if (newState) {
+            
+        if (millis() - t_change < t_fw_to_mc) {
+            gvSet(0, 20);
+        } else {
+            gvSet(0, 30);
+        }
+
+    } else {
+
+        if (millis() - t_change < t_mc_to_fw) {
+            gvSet(0, 20);
+        } else {
+            gvSet(0, 10);
+        }
+
+    }
+    
+    old_state = newState;
+
 }
