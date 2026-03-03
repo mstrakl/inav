@@ -79,7 +79,7 @@ class JsbSimulation:
 
         # Apply commands
         # --------------------------------- #
-        self.sim, self.state, self.cmd = sim_cmd(t, self.sim, self.state, self.cmd)
+        self.sim, self.state, self.cmd = sim_cmd(t, self.sim, self.state, self.cmd, joystick=joystick_input)
         set_commands(self.sim, self.cmd)
 
         # Run simulation step

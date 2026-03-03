@@ -20,7 +20,7 @@ PYTHON_BIN="$ENV_DIR/bin/python3"
 
 # Start Python simulator
 echo "Starting Python simulator..."
-$PYTHON_BIN main.py --sim=inav & #--joy & #> rotsim.log 2>&1 &
+$PYTHON_BIN main.py --sim=inav --joy & #> rotsim.log 2>&1 &
 PYTHON_PID=$!
 
 sleep 1

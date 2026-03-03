@@ -101,13 +101,21 @@ def main(args):
 
 
 def read_tx_thread(device="/dev/input/js0"):
+    import sys
+    if sys.platform == "darwin":
+        _read_tx_thread_pygame()
+    else:
+        _read_tx_thread_linux(device)
+
+
+def _read_tx_thread_linux(device="/dev/input/js0"):
     import struct
 
     JS_EVENT_FORMAT = "IhBB"
     JS_EVENT_SIZE = struct.calcsize(JS_EVENT_FORMAT)
-    
+
     try:
-        js = open(device, "rb")
+        open(device, "rb").close()
         _tx_state["enable"] = True
     except FileNotFoundError:
         print(f"Joystick device {device} not found. Joystick input will be disabled.")
@@ -119,15 +127,12 @@ def read_tx_thread(device="/dev/input/js0"):
             if not event:
                 break
 
-            _, value, event_type, number = struct.unpack(
-                JS_EVENT_FORMAT, event
-            )
+            _, value, event_type, number = struct.unpack(JS_EVENT_FORMAT, event)
 
             with _tx_lock:
-                if event_type & 0x01:  # button
+                if event_type & 0x01:   # button
                     if number == 3:
                         _tx_state["swA"] = value
-
                 elif event_type & 0x02:  # axis
                     if number == 1:
                         _tx_state["potS1"] = value / 32767.0
@@ -139,6 +144,79 @@ def read_tx_thread(device="/dev/input/js0"):
                         _tx_state["swC"] = read_sw(value)
                     elif number == 6:
                         _tx_state["swB"] = read_sw(value)
+
+
+def _read_tx_thread_pygame(joystick_index=0):
+    import os
+    import pygame
+
+    # Prevent SDL from touching Cocoa/AppKit (creating a window or menu bar).
+    # On macOS those calls must happen on the main thread; we run on a daemon
+    # thread, so using the dummy video/audio driver avoids the crash entirely.
+    # Joystick input does not need a display.
+    os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
+    os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
+
+    pygame.init()
+    pygame.joystick.init()
+
+    if pygame.joystick.get_count() == 0:
+        print("No joystick found by pygame. Joystick input will be disabled.")
+        return
+
+    joy = pygame.joystick.Joystick(joystick_index)
+    joy.init()
+    print(f"pygame joystick: {joy.get_name()}  "
+          f"({joy.get_numaxes()} axes, {joy.get_numbuttons()} buttons)")
+
+    _tx_state["enable"] = True
+
+    # Axis/button indices match the Linux /dev/input mapping for the TX16S:
+    #   axis 1  -> potS1   (right vertical, normalised -1..1)
+    #   axis 3  -> potS2   (right horizontal, normalised -1..1)
+    #   axis 4  -> swD     (3-pos switch, -1 / 0 / +1)
+    #   axis 5  -> swC
+    #   axis 6  -> swB
+    #   button 3 -> swA    (momentary, 0/1)
+    POLL_HZ = 100
+    import time
+    while True:
+        pygame.event.pump()
+        with _tx_lock:
+            _tx_state["swA"]   = joy.get_button(3)
+            _tx_state["potS1"] = joy.get_axis(1)
+            _tx_state["potS2"] = joy.get_axis(3)
+            # get_axis returns -1..1; scale to -32767..32767 for read_sw
+            _tx_state["swD"]  = read_sw(int(joy.get_axis(4) * 32767))
+            _tx_state["swC"]  = read_sw(int(joy.get_axis(5) * 32767))
+            _tx_state["swB"]  = read_sw(int(joy.get_axis(6) * 32767))
+
+            _tx_state["swF"]  = joy.get_button(2)
+            _tx_state["swG"]  = read_sw(int(joy.get_axis(7) * 32767))
+
+
+            _tx_state["axAil"] = joy.get_axis(0)
+            _tx_state["axEle"] = joy.get_axis(1)
+            _tx_state["axThr"] = joy.get_axis(2)
+            _tx_state["axRud"] = joy.get_axis(3)
+
+        if False:
+            # Print all raw axes and buttons, then the mapped TX state
+            axes_str    = "  ".join(f"a{i}={joy.get_axis(i):+.3f}"    for i in range(joy.get_numaxes()))
+            buttons_str = "  ".join(f"b{i}={joy.get_button(i)}"       for i in range(joy.get_numbuttons()))
+            print(f"AXES:    {axes_str}")
+            print(f"BUTTONS: {buttons_str}")
+            with _tx_lock:
+                s = _tx_state
+                print(f"MAPPED:  swA={s['swA']}  swB={s['swB']}  swC={s['swC']}  swD={s['swD']}"
+                    f"  swF={s['swF']}  swG={s['swG']}")
+            print()
+
+
+        time.sleep(1.0 / POLL_HZ)
+
+
+
 
 def get_tx_state():
     with _tx_lock:
