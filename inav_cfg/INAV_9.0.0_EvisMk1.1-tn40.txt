@@ -23,10 +23,10 @@ timer_output_mode 11 SERVOS
 # Outputs [servo]
 servo 1 1130 2030 1580 100
 servo 2 1130 2050 1620 100
-servo 3 1200 1720 1470 100
-servo 4 1280 1770 1490 100
-servo 5 1320 2000 1620 100
-servo 6 1315 2000 1710 100
+servo 3 1200 1720 1445 100
+servo 4 1250 1700 1490 100
+servo 5 1320 1930 1630 100
+servo 6 1410 2000 1700 100
 servo 7 1050 1500 1270 100
 
 # safehome
@@ -115,10 +115,9 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 3
-set gyro_zero_y = 1
-set gyro_zero_z = 4
-set ins_gravity_cmss =  982.783
+set gyro_zero_x = 5
+set gyro_zero_z = 5
+set ins_gravity_cmss =  979.488
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
