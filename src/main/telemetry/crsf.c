@@ -51,6 +51,7 @@
 #include "io/serial.h"
 
 #include "navigation/navigation.h"
+#include "navigation/navigation_dlz.h"
 #include "navigation/navigation_private.h"
 
 #include "rx/crsf.h"
@@ -272,11 +273,15 @@ static void crsfFrameBatterySensor(sbuf_t *dst)
         crsfSerialize16(dst, getBatteryVoltage() / 10); // vbat is in units of 0.01V
     }
     crsfSerialize16(dst, getAmperage() / 10);
-    const uint8_t batteryRemainingPercentage = calculateBatteryPercentage();
+    //const uint8_t batteryRemainingPercentage = calculateBatteryPercentage();
     crsfSerialize8(dst, (getMAhDrawn() >> 16));
     crsfSerialize8(dst, (getMAhDrawn() >> 8));
     crsfSerialize8(dst, (uint8_t)getMAhDrawn());
-    crsfSerialize8(dst, batteryRemainingPercentage);
+
+    //crsfSerialize8(dst, batteryRemainingPercentage);
+
+    crsfSerialize8(dst, getSkyvisFlag());
+
 }
 
 const int32_t ALT_MIN_DM = 10000;

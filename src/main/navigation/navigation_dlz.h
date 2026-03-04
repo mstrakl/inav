@@ -26,6 +26,8 @@ typedef struct {
 } navPosIntegrator_t;
 
 
+extern uint8_t skyvisFlag;
+
 void navigationDlzInit(void);
 
 void navigationDlzUpdate(const float posErrorX, const float posErrorY);
@@ -74,3 +76,8 @@ float navigationDlzGetBiasPosY(void);
 float navigationDlzGetNedPz(void);
 
 float navigationDlzGetConfidence(void);
+
+// Flags
+void setSkyvisFlag(uint8_t flag);
+
+uint8_t getSkyvisFlag(void);

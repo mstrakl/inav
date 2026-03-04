@@ -38,6 +38,7 @@ static navRateLimiter_t navDlzVspdRateLimiter;
 
 const navDlzData_t * navigationDlzGetActiveBuffer(void);
 
+uint8_t skyvisFlag = 0;
 
 // Skyvis status flag
 //  UNDEFINED = 0
@@ -81,7 +82,7 @@ void navigationDlzInit(void) {
     navRateLimiterInit(&navDlzVspdRateLimiter, 50.0f, 0.0f, millis());
 
     isNewDataReady = false;
-    //setSkyvisFlag(0);
+    setSkyvisFlag(5);
 
 }
 
@@ -104,7 +105,7 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         isNewDataReady = false;
         navPosIntegratorReset(&navDlzPosIntegrator, millis());
         
-        //setSkyvisFlag(10); // No response
+        setSkyvisFlag(10); // No response
         return;
     }
 
@@ -163,9 +164,9 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         // For telemetry 
 
         if (conditionedNavDlzConfidence > 0.95f) {
-            //setSkyvisFlag(30); // Tag detected
+            setSkyvisFlag(30); // Tag detected
         } else {
-            //setSkyvisFlag(20); // Comms ok, but no tag detected
+            setSkyvisFlag(20); // Comms ok, but no tag detected
         }
     }
 
@@ -321,4 +322,14 @@ float navigationDlzGetNedPz(void) {
 
 float navigationDlzGetConfidence(void) {
     return conditionedNavDlzConfidence;
+}
+
+// Flags
+
+void setSkyvisFlag(uint8_t flag) {
+    skyvisFlag = flag;
+}
+
+uint8_t getSkyvisFlag(void) {
+    return skyvisFlag;
 }
