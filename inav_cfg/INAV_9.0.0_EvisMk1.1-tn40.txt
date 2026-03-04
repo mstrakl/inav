@@ -27,7 +27,7 @@ servo 3 1200 1720 1445 100
 servo 4 1250 1700 1490 100
 servo 5 1400 1910 1650 100
 servo 6 1410 1930 1700 100
-servo 7 1050 1500 1270 100
+servo 7 1450 1740 1600 100
 
 # safehome
 
@@ -146,9 +146,9 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 4
-set gyro_zero_z = 5
-set ins_gravity_cmss =  979.677
+set gyro_zero_x = 2
+set gyro_zero_z = -1
+set ins_gravity_cmss =  978.066
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
