@@ -1,7 +1,7 @@
 diff all
 
 # version
-# INAV/MATEKF405SE 9.0.1 Mar  3 2026 / 17:14:42 (29100733) 
+# INAV/MATEKF405SE 9.0.1 Mar  4 2026 / 17:53:15 (b4d814c7) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -27,12 +27,12 @@ servo 3 1200 1825 1575 100
 servo 4 1170 2050 1645 100
 servo 5 1100 1920 1540 100
 servo 6 1060 1780 1450 100
-servo 7 1200 1420 1300 100
+servo 7 1470 1720 1600 100
 
 # safehome
 
 # Fixed Wing Approach
-fwapproach 8 6000 500 0 0 0 0
+fwapproach 8 3000 500 0 0 0 0
 
 # geozone
 
@@ -93,7 +93,13 @@ aux 8 63 10 1275 1725
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 0 invalid
+#wp 6 valid
+wp 0 1 287565031 -817407207 3000 0 0 0 0
+wp 1 1 287560644 -817423608 3000 0 0 2 0
+wp 2 1 287555977 -817412259 3000 0 0 2 0
+wp 3 7 0 0 0 100 0 0 0
+wp 4 8 287555566 -817410309 3000 0 0 2 0
+wp 5 7 0 0 0 100 0 0 165
 
 # OSD [osd_layout]
 
@@ -147,9 +153,9 @@ set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
 set gyro_zero_x = 11
-set gyro_zero_y = -3
+set gyro_zero_y = -4
 set gyro_zero_z = -2
-set ins_gravity_cmss =  974.220
+set ins_gravity_cmss =  981.148
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -3
@@ -172,6 +178,7 @@ set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = STANDARD
 set failsafe_delay = 10
+set align_board_roll = -2
 set align_board_pitch = 8
 set align_board_yaw = 1800
 set current_meter_scale = 150
@@ -189,18 +196,17 @@ set inav_max_surface_altitude = 500
 set nav_wp_load_on_boot = ON
 set nav_wp_radius = 500
 set nav_wp_max_safe_distance = 500
-set nav_fw_wp_tracking_accuracy = 3
-set nav_fw_wp_turn_smoothing = ON-CUT
+set nav_fw_wp_tracking_accuracy = 2
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 5000
 set nav_mc_bank_angle = 45
 set nav_mc_auto_climb_rate = 300
 set nav_mc_manual_climb_rate = 300
+set nav_mc_braking_boost_factor = 33
 set nav_fw_bank_angle = 45
 set nav_fw_manual_climb_rate = 200
 set nav_fw_dive_angle = 10
 set nav_fw_loiter_radius = 5000
-set nav_rth_allow_landing = FS_ONLY
-set nav_rth_altitude = 5000
-set nav_mc_braking_boost_factor = 33
 set nav_fw_control_smoothness = 2
 set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
@@ -361,9 +367,10 @@ battery_profile 1
 
 set throttle_idle =  10.000
 set nav_mc_hover_thr = 1700
-set nav_fw_cruise_thr = 1500
-set nav_fw_min_thr = 1300
-set nav_fw_pitch2thr = 20
+set nav_fw_cruise_thr = 1600
+set nav_fw_min_thr = 1500
+set nav_fw_max_thr = 1900
+set nav_fw_pitch2thr = 15
 
 # battery_profile
 battery_profile 2
@@ -384,8 +391,8 @@ set nav_fw_min_thr = 1300
 set nav_fw_pitch2thr = 20
 
 # restore original profile selection
-control_profile 2
-mixer_profile 2
+control_profile 1
+mixer_profile 1
 battery_profile 1
 
 # save configuration
