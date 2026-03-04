@@ -51,6 +51,7 @@
 #include "io/serial.h"
 
 #include "navigation/navigation.h"
+#include "navigation/navigation_private.h"
 
 #include "rx/crsf.h"
 #include "rx/rx.h"
@@ -221,8 +222,17 @@ static void crsfFrameGps(sbuf_t *dst)
     // use sbufWrite since CRC does not include frame length
     sbufWriteU8(dst, CRSF_FRAME_GPS_PAYLOAD_SIZE + CRSF_FRAME_LENGTH_TYPE_CRC);
     crsfSerialize8(dst, CRSF_FRAMETYPE_GPS);
-    crsfSerialize32(dst, gpsSol.llh.lat); // CRSF and betaflight use same units for degrees
-    crsfSerialize32(dst, gpsSol.llh.lon);
+
+    //crsfSerialize32(dst, gpsSol.llh.lat); // CRSF and betaflight use same units for degrees
+    //crsfSerialize32(dst, gpsSol.llh.lon);
+
+    // Change GPS Lat / Lon to wp index and distance to pnt
+    const uint32_t wp_idx = posControl.activeWaypointIndex * 10000000; // wp index, as it appears in edgetx
+    const uint32_t dist_m = lrintf(posControl.wpDistance/10.0f) * 1000000;  // dist in m, as it appears in edgetx
+
+    crsfSerialize32(dst, wp_idx);
+    crsfSerialize32(dst, dist_m);
+
     crsfSerialize16(dst, (gpsSol.groundSpeed * 36 + 50) / 100); // gpsSol.groundSpeed is in cm/s
     crsfSerialize16(dst, DECIDEGREES_TO_CENTIDEGREES(gpsSol.groundCourse)); // gpsSol.groundCourse is 0.1 degrees, need 0.01 deg
     const uint16_t altitude = (getEstimatedActualPosition(Z) / 100) + 1000;
