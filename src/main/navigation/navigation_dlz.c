@@ -42,6 +42,8 @@ static navRateLimiter_t navDlzVspdRateLimiter;
 
 const navDlzData_t * navigationDlzGetActiveBuffer(void);
 
+static bool dlzDetectedFromHigh = false;
+
 uint8_t skyvisFlag = 0;
 
 // Skyvis status flag
@@ -126,7 +128,7 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         // conditionedNavDlzPosZ here is the previous frame's value (Z updated later), which is fine.
         const float newConf = constrainf(data->confidence, 0.0f, 1.0f);
         const float altAbsCm = fabsf(conditionedNavDlzPosZ);
-        if (altAbsCm > 10.0f && altAbsCm < HOLD_ALT_CM) {
+        if (altAbsCm > 10.0f && altAbsCm < HOLD_ALT_CM && dlzDetectedFromHigh) {
             conditionedNavDlzConfidence = fmaxf(newConf, conditionedNavDlzConfidence);
         } else {
             conditionedNavDlzConfidence = newConf;
@@ -177,6 +179,9 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         // For telemetry 
 
         if (conditionedNavDlzConfidence > 0.95f) {
+
+            if (conditionedNavDlzPosZ > HOLD_ALT_CM) dlzDetectedFromHigh = true;
+
             setSkyvisFlag(30); // Tag detected
         } else {
             setSkyvisFlag(20); // Comms ok, but no tag detected
@@ -255,6 +260,7 @@ float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targe
 void navigationDlzClearHoldBlocker(void) {
     holdAllowed = true;
     holdOverDlzRequired = false;
+    dlzDetectedFromHigh = false;
 }
 
 void navigationDlzResetIntegrator(void) {

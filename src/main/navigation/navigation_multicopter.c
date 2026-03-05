@@ -125,6 +125,11 @@ static void updateAltitudeVelocityController_MC(timeDelta_t deltaMicros)
         navigationDlzClearHoldBlocker();
     }
 
+    // Clear hold blocker also if system is disarmed
+    if (!ARMING_FLAG(ARMED)) {
+        navigationDlzClearHoldBlocker();
+    }
+
     posControl.pids.pos[Z].output_constrained = targetVel;      // only used for Blackbox and OSD info
 
     // Limit max up/down acceleration target
