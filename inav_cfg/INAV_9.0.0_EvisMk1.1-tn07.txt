@@ -1,0 +1,388 @@
+diff all
+
+# version
+# INAV/MATEKF405SE 9.0.1 Mar  4 2026 / 03:52:48 (f338ae03) 
+# GCC-13.2.1 20231009
+
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults noreboot
+
+# resources
+
+# Timer overrides
+timer_output_mode 0 SERVOS
+timer_output_mode 1 MOTORS
+timer_output_mode 2 SERVOS
+timer_output_mode 3 MOTORS
+timer_output_mode 7 SERVOS
+timer_output_mode 11 SERVOS
+
+# Outputs [servo]
+servo 3 1325 1825 1400 100
+servo 4 1220 1720 1560 100
+servo 5 1170 1680 1410 -100
+servo 6 1270 1780 1530 -100
+servo 7 1300 1850 1500 100
+
+# safehome
+
+# Fixed Wing Approach
+fwapproach 8 6000 500 0 0 0 0
+
+# geozone
+
+# geozone vertices
+
+# features
+feature -OSD
+feature GPS
+feature BLACKBOX
+feature PWM_OUTPUT_ENABLE
+
+# beeper
+
+# blackbox
+blackbox NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 3 2 115200 115200 0 115200
+serial 5 256 57600 57600 0 57600
+serial 30 0 115200 115200 0 115200
+
+# LEDs
+
+# LED color
+
+# LED mode_color
+
+# Modes [aux]
+aux 0 0 0 1750 2100
+aux 1 1 1 1775 2100
+aux 2 12 1 900 1250
+aux 3 11 9 1900 2100
+aux 4 28 8 1700 2100
+aux 5 3 9 1700 2100
+aux 6 5 9 1700 2100
+aux 7 62 10 1275 2100
+aux 8 63 10 1275 1725
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 0 invalid
+
+# OSD [osd_layout]
+
+# Programming: logic
+logic 0 1 -1 6 1 7 0 0 0
+logic 1 1 -1 4 1 9 0 0 0
+logic 2 1 -1 12 4 1 0 0 0
+logic 3 1 -1 7 4 0 4 1 0
+logic 4 1 -1 7 4 0 4 2 0
+logic 10 1 -1 6 1 11 0 0 0
+logic 11 1 10 18 0 5 1 8 0
+logic 20 1 4 47 4 4 0 19000 0
+logic 21 1 4 47 4 4 0 26000 0
+logic 22 1 21 38 0 14 0 1800 0
+logic 23 1 20 38 0 14 0 2000 0
+logic 24 0 28 0 0 0 0 0 0
+logic 25 1 4 48 4 4 0 20000 0
+logic 26 1 4 47 4 25 0 900000 0
+logic 27 1 26 18 0 5 0 1000 0
+logic 28 1 4 47 4 4 0 26000 0
+logic 29 0 28 38 0 4 0 1100 0
+logic 30 1 4 48 4 4 0 1000 0
+logic 31 1 4 47 4 30 0 900000 0
+logic 32 1 31 38 0 4 0 2000 0
+logic 36 1 -1 6 1 10 0 0 0
+logic 37 1 36 38 0 14 0 2000 0
+logic 39 0 3 0 0 0 0 0 0
+logic 40 1 3 38 0 13 0 2000 0
+logic 41 1 0 1 7 6 0 1 0
+logic 42 1 40 48 4 41 0 7000 0
+logic 43 1 42 18 0 5 0 2000 0
+logic 50 1 -1 7 0 0 0 1 0
+logic 54 1 -1 1 5 0 0 10 0
+logic 55 1 -1 1 5 0 0 20 0
+logic 56 1 -1 1 5 0 0 30 0
+logic 57 1 54 38 0 15 0 1000 0
+logic 58 1 55 38 0 15 0 1500 0
+logic 59 1 56 38 0 15 0 2000 0
+logic 60 1 -1 6 5 5 0 0 0
+logic 61 1 -1 18 0 1 0 1000 0
+logic 62 1 -1 18 0 2 0 3000 0
+logic 63 1 -1 18 0 4 0 100 0
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set gyro_main_lpf_hz = 90
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 73
+set dynamic_gyro_notch_mode = 3D
+set setpoint_kalman_q = 200
+set gyro_zero_x = 14
+set gyro_zero_y = -9
+set gyro_zero_z = -5
+set ins_gravity_cmss =  964.027
+set gyro_adaptive_filter_min_hz = 20
+set acc_hardware = ICM42605
+set acczero_y = 4
+set acczero_z = -22
+set accgain_x = 4085
+set accgain_y = 4089
+set accgain_z = 4083
+set opflow_scale =  4.688
+set align_mag = CW0FLIP
+set mag_hardware = IST8310
+set baro_hardware = SPL06
+set serialrx_provider = CRSF
+set blackbox_rate_denom = 2
+set motor_pwm_protocol = DSHOT300
+set failsafe_delay = 10
+set align_board_yaw = 1800
+set current_meter_scale = 150
+set servo_pwm_rate = 100
+set servo_lpf_hz = 25
+set small_angle = 180
+set applied_defaults = 3
+set gps_sbas_mode = WAAS
+set gps_ublox_use_galileo = ON
+set gps_ublox_use_beidou = ON
+set gps_ublox_use_glonass = ON
+set airmode_type = STICK_CENTER_ONCE
+set inav_allow_dead_reckoning = ON
+set inav_max_surface_altitude = 500
+set nav_mc_althold_throttle = HOVER
+set nav_wp_load_on_boot = ON
+set nav_wp_radius = 500
+set nav_wp_max_safe_distance = 500
+set nav_fw_wp_tracking_accuracy = 2
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 5000
+set nav_mc_bank_angle = 45
+set nav_mc_auto_climb_rate = 300
+set nav_mc_manual_climb_rate = 450
+set nav_mc_braking_boost_factor = 33
+set nav_fw_bank_angle = 45
+set nav_fw_manual_climb_rate = 200
+set nav_fw_dive_angle = 10
+set nav_fw_loiter_radius = 5000
+set nav_fw_control_smoothness = 2
+set nav_fw_launch_motor_delay = 100
+set nav_fw_launch_max_altitude = 5000
+set nav_fw_launch_climb_angle = 25
+
+# control_profile
+control_profile 1
+
+set fw_p_pitch = 21
+set fw_i_pitch = 51
+set fw_d_pitch = 7
+set fw_ff_pitch = 70
+set fw_p_roll = 35
+set fw_i_roll = 50
+set fw_d_roll = 23
+set fw_ff_roll = 86
+set fw_p_yaw = 46
+set fw_i_yaw = 17
+set fw_d_yaw = 7
+set fw_ff_yaw = 79
+set fw_p_level = 23
+set fw_d_level = 50
+set max_angle_inclination_pit = 300
+set fw_level_pitch_trim =  3.000
+set rc_expo = 25
+set rc_yaw_expo = 25
+set roll_rate = 19
+set pitch_rate = 15
+set yaw_rate = 6
+set manual_rc_yaw_expo = 30
+set rate_dynamics_end_sensitivity = 120
+set rate_dynamics_center_correction = 20
+set rate_dynamics_center_weight = 20
+set rate_dynamics_end_weight = 10
+
+# control_profile
+control_profile 2
+
+set mc_i_pitch = 52
+set mc_d_pitch = 21
+set mc_cd_pitch = 54
+set mc_p_roll = 30
+set mc_i_roll = 44
+set mc_d_roll = 18
+set mc_cd_roll = 44
+set mc_p_yaw = 55
+set mc_i_yaw = 29
+set mc_d_yaw = 47
+set mc_cd_yaw = 52
+set mc_p_level = 15
+set mc_d_level = 65
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set fw_level_pitch_trim =  2.000
+set roll_rate = 10
+set pitch_rate = 15
+set yaw_rate = 7
+
+# control_profile
+control_profile 3
+
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set dterm_lpf_hz = 10
+set fw_turn_assist_pitch_gain =  0.400
+set nav_fw_pos_z_p = 25
+set nav_fw_pos_z_d = 8
+set nav_fw_pos_xy_p = 55
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+
+# mixer_profile
+mixer_profile 1
+
+set has_flaps = ON
+set model_preview_type = 28
+set mixer_control_profile_linking = ON
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000  0.000  0.000  0.000
+mmix 1  1.000  0.000  0.000  0.000
+mmix 2 -1.000  0.000  0.000  0.000
+
+# Mixer: servo mixer
+smix reset
+
+smix 0 3 0 100 0 -1
+smix 1 4 0 100 0 -1
+smix 2 5 1 85 0 -1
+smix 3 5 2 50 0 -1
+smix 4 6 1 -85 0 -1
+smix 5 6 2 50 0 -1
+smix 6 7 6 100 0 -1
+smix 7 1 29 90 100 -1
+smix 8 2 29 -90 100 -1
+
+# mixer_profile
+mixer_profile 2
+
+set platform_type = TRICOPTER
+set model_preview_type = 1
+set mixer_control_profile_linking = ON
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000  1.000 -0.667  0.000
+mmix 1  1.000 -1.000 -0.667  0.000
+mmix 2  1.000  0.000  1.330  0.000
+
+# Mixer: servo mixer
+smix reset
+
+smix 0 1 2 -45 0 -1
+smix 1 2 2 -45 0 -1
+smix 2 1 29 -71 100 -1
+smix 3 2 29 75 100 -1
+smix 4 5 1 -50 0 -1
+smix 5 5 2 -40 0 -1
+smix 6 6 1 50 0 -1
+smix 7 6 2 -40 0 -1
+smix 8 1 38 71 100 -1
+smix 9 2 38 -75 100 -1
+smix 10 3 0 50 0 -1
+smix 11 4 0 50 0 -1
+smix 12 1 1 50 50 -1
+smix 13 2 1 -50 50 -1
+
+# battery_profile
+battery_profile 1
+
+set throttle_idle =  10.000
+set nav_mc_hover_thr = 1800
+set nav_fw_cruise_thr = 1600
+set nav_fw_min_thr = 1500
+set nav_fw_max_thr = 1900
+set nav_fw_pitch2thr = 15
+
+# battery_profile
+battery_profile 2
+
+set throttle_idle =  10.000
+set nav_mc_hover_thr = 1700
+set nav_fw_cruise_thr = 1500
+set nav_fw_min_thr = 1300
+set nav_fw_pitch2thr = 20
+
+# battery_profile
+battery_profile 3
+
+set throttle_idle =  10.000
+set nav_mc_hover_thr = 1700
+set nav_fw_cruise_thr = 1500
+set nav_fw_min_thr = 1300
+set nav_fw_pitch2thr = 20
+
+# restore original profile selection
+control_profile 2
+mixer_profile 2
+battery_profile 1
+
+# save configuration
+save
+
+# 
