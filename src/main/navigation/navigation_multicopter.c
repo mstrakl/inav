@@ -55,6 +55,7 @@
 #include "navigation/navigation_dlz.h"
 
 #include "programming/logic_condition.h"
+#include "programming/global_variables.h"
 
 #include "sensors/battery.h"
 
