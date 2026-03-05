@@ -68,8 +68,6 @@
 #include "navigation/navigation_private.h"
 #include "navigation/navigation_dlz.h"
 
-#include "programming/global_variables.h"
-
 #include "rx/rx.h"
 #include "rx/mavlink.h"
 
@@ -823,17 +821,13 @@ void mavlinkSendHUDAndHeartbeat(void)
         mavType = MAV_AUTOPILOT_GENERIC;
     }
 
-
-    uint8_t robotRequest = 0;
-    if (gvGet(6) >= 0 && gvGet(6) <= 10) robotRequest = gvGet(6);
-
     mavlink_msg_heartbeat_pack(mavSystemId, mavComponentId, &mavSendMsg,
         // type Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
         mavSystemType,
         // autopilot Autopilot type / class. defined in MAV_AUTOPILOT ENUM
         mavType,
         // base_mode System mode bitfield, see MAV_MODE_FLAGS ENUM in mavlink/include/mavlink_types.h
-        robotRequest,
+        mavModes,
         // custom_mode A bitfield for use for autopilot-specific flags.
         mavCustomMode,
         // system_status System status flag, see MAV_STATE ENUM
