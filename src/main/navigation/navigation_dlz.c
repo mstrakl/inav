@@ -13,6 +13,10 @@
 #define MAX_ALT 10000.0f // max 100 m
 #define GAIN 2.0f
 
+#define HOLD_ALT_CM 350.0f
+#define HOLD_TIME_MS 6000
+
+
 static volatile bool isNewDataReady = false;
 
 static navDlzData_t navDlzData[2];
@@ -117,7 +121,16 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         pos.x = data->px;
         pos.y = data->py;
         pos.z = data->pz;
-        conditionedNavDlzConfidence = constrainf(data->confidence, 0.0f, 1.0f);
+        // Below 200 cm altitude, confidence is only allowed to increase — prevents sudden
+        // drops near the landing pad from destabilising bias estimation.
+        // conditionedNavDlzPosZ here is the previous frame's value (Z updated later), which is fine.
+        const float newConf = constrainf(data->confidence, 0.0f, 1.0f);
+        const float altAbsCm = fabsf(conditionedNavDlzPosZ);
+        if (altAbsCm > 10.0f && altAbsCm < HOLD_ALT_CM) {
+            conditionedNavDlzConfidence = fmaxf(newConf, conditionedNavDlzConfidence);
+        } else {
+            conditionedNavDlzConfidence = newConf;
+        }
 
         isNewDataReady = false; // Mark data as consumed, so that we don't 
                                 // use it again until new data arrives
@@ -200,7 +213,7 @@ float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targe
     const float altDlz = fabs(navigationDlzGetNedPz());
 
     // If close to landing, check position offset
-    if (altDlz > 50.0f && altDlz < 350.0f && landingInProgress) {
+    if (altDlz > 50.0f && altDlz < HOLD_ALT_CM && landingInProgress) {
 
         //if (conditionedNavDlzConfidence > 0.5f) {
 
@@ -220,7 +233,7 @@ float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targe
     }
 
 
-    if (holdOverDlzRequired && (millis() - holdOverDlzStartTime) > 6000) {
+    if (holdOverDlzRequired && (millis() - holdOverDlzStartTime) > HOLD_TIME_MS) {
         holdOverDlzRequired = false;
         holdAllowed = false; // Don't allow hold again until reset, to prevent multiple holds in one flight
     }
