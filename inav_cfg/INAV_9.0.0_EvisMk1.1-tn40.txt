@@ -105,7 +105,7 @@ logic 3 1 -1 7 4 0 4 1 0
 logic 4 1 -1 7 4 0 4 2 0
 logic 10 1 -1 6 1 11 0 0 0
 logic 11 1 10 18 0 5 1 8 0
-logic 20 1 4 47 4 4 0 19000 0
+logic 20 1 4 47 4 4 0 17000 0
 logic 21 1 4 47 4 4 0 26000 0
 logic 22 1 21 38 0 14 0 1800 0
 logic 23 1 20 38 0 14 0 2000 0
@@ -113,8 +113,8 @@ logic 24 0 28 0 0 0 0 0 0
 logic 25 1 4 48 4 4 0 20000 0
 logic 26 1 4 47 4 25 0 900000 0
 logic 27 1 26 18 0 5 0 1000 0
-logic 28 1 4 47 4 4 0 26000 0
-logic 29 0 28 38 0 4 0 1100 0
+logic 28 0 4 0 0 0 0 0 0
+logic 29 0 28 0 0 0 0 0 0
 logic 30 1 4 48 4 4 0 1000 0
 logic 31 1 4 47 4 30 0 900000 0
 logic 32 1 31 38 0 4 0 2000 0
@@ -135,7 +135,7 @@ logic 59 1 56 38 0 15 0 2000 0
 logic 60 1 -1 6 5 5 0 0 0
 logic 61 1 -1 18 0 1 0 1000 0
 logic 62 1 -1 18 0 2 0 3000 0
-logic 63 1 -1 18 0 4 0 100 0
+logic 63 1 -1 18 0 4 0 80 0
 
 # Programming: global variables
 
@@ -149,10 +149,9 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 4
-set gyro_zero_y = 1
+set gyro_zero_x = 5
 set gyro_zero_z = 5
-set ins_gravity_cmss =  977.007
+set ins_gravity_cmss =  977.338
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
@@ -164,12 +163,12 @@ set accgain_z = 4095
 set opflow_scale =  4.688
 set align_mag = CW270FLIP
 set mag_hardware = IST8310
-set magzero_x = -72
-set magzero_y = -94
-set magzero_z = -69
-set maggain_x = 441
-set maggain_y = 419
-set maggain_z = 468
+set magzero_x = -38
+set magzero_y = -105
+set magzero_z = -203
+set maggain_x = 379
+set maggain_y = 429
+set maggain_z = 439
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
