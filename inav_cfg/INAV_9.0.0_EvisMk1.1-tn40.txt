@@ -32,7 +32,7 @@ servo 7 1500 1800 1650 100
 # safehome
 
 # Fixed Wing Approach
-fwapproach 8 6000 500 0 0 0 0
+fwapproach 8 3000 500 0 0 0 0
 
 # geozone
 
@@ -93,7 +93,13 @@ aux 8 63 10 1275 1725
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 0 invalid
+#wp 6 valid
+wp 0 1 279787203 -820239936 3000 0 0 0 0
+wp 1 1 279790544 -820258833 3000 0 0 2 0
+wp 2 1 279781154 -820248451 3000 0 0 2 0
+wp 3 7 0 0 0 100 0 0 0
+wp 4 8 279780948 -820246154 3000 0 0 2 0
+wp 5 7 0 0 0 100 0 0 165
 
 # OSD [osd_layout]
 
@@ -124,7 +130,7 @@ logic 37 1 36 38 0 14 0 2000 0
 logic 39 0 3 0 0 0 0 0 0
 logic 40 1 3 38 0 13 0 2000 0
 logic 41 1 0 1 7 6 0 1 0
-logic 42 1 40 48 4 41 0 10000 0
+logic 42 1 40 48 4 41 0 12000 0
 logic 43 1 42 18 0 5 0 2000 0
 logic 50 1 -1 1 5 6 0 0 0
 logic 54 1 -1 1 5 0 0 10 0
@@ -150,9 +156,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 4
-set gyro_zero_z = 4
-set ins_gravity_cmss =  980.335
+set gyro_zero_x = 3
+set gyro_zero_y = 1
+set gyro_zero_z = 1
+set ins_gravity_cmss =  978.296
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
@@ -175,6 +182,7 @@ set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = DSHOT300
 set failsafe_delay = 10
+set align_board_pitch = 2
 set align_board_yaw = 1800
 set current_meter_scale = 150
 set servo_pwm_rate = 100
