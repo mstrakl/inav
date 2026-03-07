@@ -13,8 +13,8 @@
 #define MAX_ALT 10000.0f // max 100 m
 #define GAIN 2.0f
 
-#define HOLD_ALT_CM 350.0f
-#define HOLD_TIME_MS 6000
+#define HOLD_ALT_CM 300.0f
+#define HOLD_TIME_MS 3000
 
 
 static volatile bool isNewDataReady = false;
@@ -225,8 +225,7 @@ float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targe
             const float posErrMag = sqrtf(conditionedBiasPosX * conditionedBiasPosX + conditionedBiasPosY * conditionedBiasPosY);
 
             // Always required hold for now
-            if (posErrMag > 0.0f) {
-
+            if (posErrMag > 200.0f) {
                 localRequireHold = true;
             }
         //} 
