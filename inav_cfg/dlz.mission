@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mission>
+	<version value="2.3-pre8"/>
+	<mwp cx="-82.0246155" cy="27.9780973" home-x="0" home-y="0" zoom="24.995112159837465"/>
+	<missionitem no="1" action="WAYPOINT" lat="27.9780948" lon="-82.0246154" alt="50" parameter1="0" parameter2="0" parameter3="0" flag="165"/>
+</mission>
