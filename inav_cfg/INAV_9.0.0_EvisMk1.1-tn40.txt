@@ -93,8 +93,7 @@ aux 8 63 10 1275 1725
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 1 valid
-wp 0 1 281708528 -817918237 5000 0 0 0 165
+#wp 0 invalid
 
 # OSD [osd_layout]
 
@@ -106,6 +105,7 @@ logic 3 1 -1 7 4 0 4 1 0
 logic 4 1 -1 7 4 0 4 2 0
 logic 10 1 -1 6 1 11 0 0 0
 logic 11 1 10 18 0 5 1 8 0
+logic 15 1 -1 7 4 2 4 56 0
 logic 20 1 4 47 4 4 0 17000 0
 logic 21 1 4 47 4 4 0 26000 0
 logic 22 1 21 38 0 14 0 1800 0
@@ -150,10 +150,9 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 2
-set gyro_zero_y = 4
+set gyro_zero_x = 4
 set gyro_zero_z = 4
-set ins_gravity_cmss =  979.142
+set ins_gravity_cmss =  980.335
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_x = -1
@@ -346,18 +345,20 @@ smix reset
 
 smix 0 1 2 -45 0 -1
 smix 1 2 2 -45 0 -1
-smix 2 1 29 -60 100 -1
-smix 3 2 29 60 100 -1
+smix 2 1 29 -70 100 -1
+smix 3 2 29 70 100 -1
 smix 4 5 1 -50 0 -1
 smix 5 5 2 -40 0 -1
 smix 6 6 1 50 0 -1
 smix 7 6 2 -40 0 -1
-smix 8 1 38 60 100 -1
-smix 9 2 38 -60 100 -1
+smix 8 1 38 70 100 -1
+smix 9 2 38 -70 100 -1
 smix 10 3 0 50 0 -1
 smix 11 4 0 50 0 -1
 smix 12 1 1 50 50 -1
 smix 13 2 1 -50 50 -1
+smix 14 1 29 10 100 15
+smix 15 2 29 -10 100 15
 
 # battery_profile
 battery_profile 1
