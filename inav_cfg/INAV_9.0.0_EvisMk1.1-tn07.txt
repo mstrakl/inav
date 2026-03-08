@@ -21,8 +21,8 @@ timer_output_mode 7 SERVOS
 timer_output_mode 11 SERVOS
 
 # Outputs [servo]
-servo 3 1325 1825 1400 100
-servo 4 1220 1720 1560 100
+servo 3 1160 1660 1420 100
+servo 4 1280 1840 1580 100
 servo 5 1170 1680 1410 -100
 servo 6 1270 1780 1530 -100
 servo 7 1300 1850 1500 100
@@ -30,7 +30,6 @@ servo 7 1300 1850 1500 100
 # safehome
 
 # Fixed Wing Approach
-fwapproach 8 6000 500 0 0 0 0
 
 # geozone
 
@@ -81,8 +80,8 @@ aux 3 11 9 1900 2100
 aux 4 28 8 1700 2100
 aux 5 3 9 1700 2100
 aux 6 5 9 1700 2100
-aux 7 62 10 1275 2100
-aux 8 63 10 1275 1725
+aux 7 62 10 1250 2100
+aux 8 63 10 1250 1750
 
 # Adjustments [adjrange]
 
@@ -147,10 +146,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 14
+set gyro_zero_x = 15
 set gyro_zero_y = -9
-set gyro_zero_z = -5
-set ins_gravity_cmss =  964.027
+set gyro_zero_z = -7
+set ins_gravity_cmss =  967.525
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -159,13 +158,21 @@ set accgain_x = 4085
 set accgain_y = 4089
 set accgain_z = 4083
 set opflow_scale =  4.688
-set align_mag = CW0FLIP
+set align_mag = CW270FLIP
 set mag_hardware = IST8310
+set magzero_x = 222
+set magzero_y = 108
+set magzero_z = -178
+set maggain_x = 477
+set maggain_y = 459
+set maggain_z = 449
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = DSHOT300
 set failsafe_delay = 10
+set failsafe_procedure = DROP
+set align_board_roll = 4
 set align_board_yaw = 1800
 set current_meter_scale = 150
 set servo_pwm_rate = 100
@@ -182,7 +189,7 @@ set inav_max_surface_altitude = 500
 set nav_mc_althold_throttle = HOVER
 set nav_wp_load_on_boot = ON
 set nav_wp_radius = 500
-set nav_wp_max_safe_distance = 500
+set nav_wp_max_safe_distance = 1500
 set nav_fw_wp_tracking_accuracy = 2
 set nav_rth_allow_landing = FS_ONLY
 set nav_rth_altitude = 5000
@@ -190,11 +197,11 @@ set nav_mc_bank_angle = 45
 set nav_mc_auto_climb_rate = 300
 set nav_mc_manual_climb_rate = 450
 set nav_mc_braking_boost_factor = 33
-set nav_fw_bank_angle = 45
+set nav_fw_bank_angle = 60
 set nav_fw_manual_climb_rate = 200
 set nav_fw_dive_angle = 10
 set nav_fw_loiter_radius = 5000
-set nav_fw_control_smoothness = 2
+set nav_fw_control_smoothness = 3
 set nav_fw_launch_motor_delay = 100
 set nav_fw_launch_max_altitude = 5000
 set nav_fw_launch_climb_angle = 25
@@ -308,13 +315,13 @@ smix reset
 
 smix 0 3 0 100 0 -1
 smix 1 4 0 100 0 -1
-smix 2 5 1 85 0 -1
+smix 2 5 1 75 0 -1
 smix 3 5 2 50 0 -1
-smix 4 6 1 -85 0 -1
+smix 4 6 1 -75 0 -1
 smix 5 6 2 50 0 -1
 smix 6 7 6 100 0 -1
-smix 7 1 29 90 100 -1
-smix 8 2 29 -90 100 -1
+smix 7 1 29 70 100 -1
+smix 8 2 29 -62 100 -1
 
 # mixer_profile
 mixer_profile 2
@@ -336,18 +343,20 @@ smix reset
 
 smix 0 1 2 -45 0 -1
 smix 1 2 2 -45 0 -1
-smix 2 1 29 -71 100 -1
-smix 3 2 29 75 100 -1
-smix 4 5 1 -50 0 -1
-smix 5 5 2 -40 0 -1
-smix 6 6 1 50 0 -1
-smix 7 6 2 -40 0 -1
-smix 8 1 38 71 100 -1
-smix 9 2 38 -75 100 -1
+smix 2 1 29 -58 100 -1
+smix 3 2 29 64 100 -1
+smix 4 5 1 50 0 -1
+smix 5 5 2 40 0 -1
+smix 6 6 1 -50 0 -1
+smix 7 6 2 40 0 -1
+smix 8 1 38 58 100 -1
+smix 9 2 38 -64 100 -1
 smix 10 3 0 50 0 -1
 smix 11 4 0 50 0 -1
 smix 12 1 1 50 50 -1
 smix 13 2 1 -50 50 -1
+smix 14 1 29 10 100 15
+smix 15 2 29 -10 100 15
 
 # battery_profile
 battery_profile 1
@@ -363,19 +372,21 @@ set nav_fw_pitch2thr = 15
 battery_profile 2
 
 set throttle_idle =  10.000
-set nav_mc_hover_thr = 1700
-set nav_fw_cruise_thr = 1500
-set nav_fw_min_thr = 1300
-set nav_fw_pitch2thr = 20
+set nav_mc_hover_thr = 1800
+set nav_fw_cruise_thr = 1600
+set nav_fw_min_thr = 1500
+set nav_fw_max_thr = 1900
+set nav_fw_pitch2thr = 15
 
 # battery_profile
 battery_profile 3
 
 set throttle_idle =  10.000
-set nav_mc_hover_thr = 1700
-set nav_fw_cruise_thr = 1500
-set nav_fw_min_thr = 1300
-set nav_fw_pitch2thr = 20
+set nav_mc_hover_thr = 1800
+set nav_fw_cruise_thr = 1600
+set nav_fw_min_thr = 1500
+set nav_fw_max_thr = 1900
+set nav_fw_pitch2thr = 15
 
 # restore original profile selection
 control_profile 2
