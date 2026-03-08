@@ -80,8 +80,8 @@ aux 3 11 9 1900 2100
 aux 4 28 8 1700 2100
 aux 5 3 9 1700 2100
 aux 6 5 9 1700 2100
-aux 7 62 10 1250 2100
-aux 8 63 10 1250 1750
+aux 7 62 10 1275 2100
+aux 8 63 10 1275 1725
 
 # Adjustments [adjrange]
 
@@ -148,10 +148,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 14
-set gyro_zero_y = -10
-set gyro_zero_z = -4
-set ins_gravity_cmss =  967.012
+set gyro_zero_x = 15
+set gyro_zero_y = -9
+set gyro_zero_z = -6
+set ins_gravity_cmss =  966.888
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -188,6 +188,7 @@ set gps_ublox_use_glonass = ON
 set airmode_type = STICK_CENTER_ONCE
 set inav_allow_dead_reckoning = ON
 set inav_max_surface_altitude = 500
+set nav_disarm_on_landing = OFF
 set nav_mc_althold_throttle = HOVER
 set nav_wp_load_on_boot = ON
 set nav_wp_radius = 500
@@ -391,8 +392,8 @@ set nav_fw_max_thr = 1900
 set nav_fw_pitch2thr = 15
 
 # restore original profile selection
-control_profile 1
-mixer_profile 1
+control_profile 2
+mixer_profile 2
 battery_profile 1
 
 # save configuration
