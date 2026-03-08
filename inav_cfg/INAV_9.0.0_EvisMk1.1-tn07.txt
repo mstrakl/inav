@@ -25,7 +25,7 @@ servo 3 1160 1660 1420 100
 servo 4 1280 1840 1580 100
 servo 5 1170 1680 1410 -100
 servo 6 1270 1780 1530 -100
-servo 7 1300 1850 1500 100
+servo 7 1500 1800 1650 100
 
 # safehome
 
@@ -90,7 +90,8 @@ aux 8 63 10 1250 1750
 # temp_sensor
 
 # Mission Control Waypoints [wp]
-#wp 0 invalid
+#wp 1 valid
+wp 0 1 283031980 -816513367 5000 0 0 0 165
 
 # OSD [osd_layout]
 
@@ -102,7 +103,8 @@ logic 3 1 -1 7 4 0 4 1 0
 logic 4 1 -1 7 4 0 4 2 0
 logic 10 1 -1 6 1 11 0 0 0
 logic 11 1 10 18 0 5 1 8 0
-logic 20 1 4 47 4 4 0 19000 0
+logic 15 1 -1 7 4 2 4 56 0
+logic 20 1 4 47 4 4 0 17000 0
 logic 21 1 4 47 4 4 0 26000 0
 logic 22 1 21 38 0 14 0 1800 0
 logic 23 1 20 38 0 14 0 2000 0
@@ -110,8 +112,8 @@ logic 24 0 28 0 0 0 0 0 0
 logic 25 1 4 48 4 4 0 20000 0
 logic 26 1 4 47 4 25 0 900000 0
 logic 27 1 26 18 0 5 0 1000 0
-logic 28 1 4 47 4 4 0 26000 0
-logic 29 0 28 38 0 4 0 1100 0
+logic 28 0 4 0 0 0 0 0 0
+logic 29 0 28 0 0 0 0 0 0
 logic 30 1 4 48 4 4 0 1000 0
 logic 31 1 4 47 4 30 0 900000 0
 logic 32 1 31 38 0 4 0 2000 0
@@ -120,9 +122,9 @@ logic 37 1 36 38 0 14 0 2000 0
 logic 39 0 3 0 0 0 0 0 0
 logic 40 1 3 38 0 13 0 2000 0
 logic 41 1 0 1 7 6 0 1 0
-logic 42 1 40 48 4 41 0 7000 0
+logic 42 1 40 48 4 41 0 11000 0
 logic 43 1 42 18 0 5 0 2000 0
-logic 50 1 -1 7 0 0 0 1 0
+logic 50 1 -1 1 5 6 0 0 0
 logic 54 1 -1 1 5 0 0 10 0
 logic 55 1 -1 1 5 0 0 20 0
 logic 56 1 -1 1 5 0 0 30 0
@@ -132,7 +134,7 @@ logic 59 1 56 38 0 15 0 2000 0
 logic 60 1 -1 6 5 5 0 0 0
 logic 61 1 -1 18 0 1 0 1000 0
 logic 62 1 -1 18 0 2 0 3000 0
-logic 63 1 -1 18 0 4 0 100 0
+logic 63 1 -1 18 0 4 0 80 0
 
 # Programming: global variables
 
@@ -146,10 +148,10 @@ set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 73
 set dynamic_gyro_notch_mode = 3D
 set setpoint_kalman_q = 200
-set gyro_zero_x = 15
-set gyro_zero_y = -9
-set gyro_zero_z = -7
-set ins_gravity_cmss =  967.525
+set gyro_zero_x = 14
+set gyro_zero_y = -10
+set gyro_zero_z = -4
+set ins_gravity_cmss =  967.012
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42605
 set acczero_y = 4
@@ -160,12 +162,12 @@ set accgain_z = 4083
 set opflow_scale =  4.688
 set align_mag = CW270FLIP
 set mag_hardware = IST8310
-set magzero_x = 222
-set magzero_y = 108
-set magzero_z = -178
-set maggain_x = 477
-set maggain_y = 459
-set maggain_z = 449
+set magzero_x = 208
+set magzero_y = 107
+set magzero_z = -155
+set maggain_x = 467
+set maggain_y = 466
+set maggain_z = 478
 set baro_hardware = SPL06
 set serialrx_provider = CRSF
 set blackbox_rate_denom = 2
@@ -343,14 +345,14 @@ smix reset
 
 smix 0 1 2 -45 0 -1
 smix 1 2 2 -45 0 -1
-smix 2 1 29 -58 100 -1
-smix 3 2 29 64 100 -1
+smix 2 1 29 -69 100 -1
+smix 3 2 29 75 100 -1
 smix 4 5 1 50 0 -1
 smix 5 5 2 40 0 -1
 smix 6 6 1 -50 0 -1
 smix 7 6 2 40 0 -1
-smix 8 1 38 58 100 -1
-smix 9 2 38 -64 100 -1
+smix 8 1 38 69 100 -1
+smix 9 2 38 -75 100 -1
 smix 10 3 0 50 0 -1
 smix 11 4 0 50 0 -1
 smix 12 1 1 50 50 -1
@@ -389,8 +391,8 @@ set nav_fw_max_thr = 1900
 set nav_fw_pitch2thr = 15
 
 # restore original profile selection
-control_profile 2
-mixer_profile 2
+control_profile 1
+mixer_profile 1
 battery_profile 1
 
 # save configuration
