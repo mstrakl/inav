@@ -194,6 +194,7 @@ set gps_ublox_use_glonass = ON
 set airmode_type = STICK_CENTER_ONCE
 set inav_allow_dead_reckoning = ON
 set inav_max_surface_altitude = 500
+set nav_disarm_on_landing = OFF
 set nav_mc_althold_throttle = HOVER
 set nav_wp_load_on_boot = ON
 set nav_wp_radius = 500
