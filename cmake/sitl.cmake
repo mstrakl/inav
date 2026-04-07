@@ -21,6 +21,8 @@ main_sources(SITL_SRC
     target/SITL/sim/simHelper.h
     target/SITL/sim/simple_soap_client.c
     target/SITL/sim/simple_soap_client.h
+    target/SITL/sim/jsbsim.c
+    target/SITL/sim/jsbsim.h
     target/SITL/sim/xplane.c
     target/SITL/sim/xplane.h
 )
@@ -64,11 +66,7 @@ if(NOT MACOSX)
         -Wno-error=maybe-uninitialized
         -fsingle-precision-constant
     )
-    include(CheckLinkerFlag OPTIONAL)
-    if(COMMAND check_linker_flag)
-        check_linker_flag(C "-Wl,--no-warn-rwx-segments" LINKER_SUPPORTS_NO_RWX_WARNING)
-    endif()
-    if(LINKER_SUPPORTS_NO_RWX_WARNING)
+    if (CMAKE_COMPILER_IS_GNUCC AND NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 12.0)
         set(SITL_LINK_OPTIONS ${SITL_LINK_OPTIONS} "-Wl,--no-warn-rwx-segments")
     endif()
 else()

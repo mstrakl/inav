@@ -195,6 +195,7 @@ typedef enum
     SITL_SIM_NONE,
     SITL_SIM_REALFLIGHT,
     SITL_SIM_XPLANE,
+    SITL_SIM_JSB,
 } SitlSim_e;
 
 
