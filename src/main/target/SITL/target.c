@@ -131,8 +131,8 @@ void systemInit(void) {
             break;
 
         case SITL_SIM_JSB:
-            if (mappingCount > XP_MAX_PWM_OUTS) {
-                fprintf(stderr, "[SIM] Mapping error. Adum supports a maximum of %i PWM outputs.", XP_MAX_PWM_OUTS);
+            if (mappingCount > JSB_MAX_PWM_OUTS) {
+                fprintf(stderr, "[SIM] Mapping error. Jsb supports a maximum of %i PWM outputs, requested was %i.\n", JSB_MAX_PWM_OUTS, mappingCount);
                 sitlSim = SITL_SIM_NONE;
                 break;
             }
