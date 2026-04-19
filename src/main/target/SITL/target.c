@@ -296,6 +296,8 @@ void parseArguments(int argc, char *argv[])
                     sitlSim = SITL_SIM_JSB;
                 } else {
                     fprintf(stderr, "[SIM] Unsupported simulator %s.\n", optarg);
+                    fprintf(stderr, "Supported simulators are: rf (RealFlight), xp (XPlane), jsb (JsbSim).\n");
+                    exit(1);
                 }
                 break;
 

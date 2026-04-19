@@ -83,6 +83,9 @@ static bool useImu = false;
 static timeUs_t s_lastNoiseTimeUs = 0;
 static float s_lastNoiseDt = 0.005f;
 
+static char serverIP[64];
+static int serverPort;
+
 
 static int32_t lat_1e7 = 0;
 static int32_t lon_1e7 = 0;
@@ -233,8 +236,18 @@ static void* listenWorker(void* arg)
     char buf[BUF_SIZE];
     char *token;
 
-
     while (1) {
+        // (Re)connect to server
+        printf("[JSBSIM] Connecting to %s:%d...\n", serverIP, serverPort);
+        if (init_fgear_client(serverIP, serverPort) != 0) {
+            printf("[JSBSIM] Failed to connect, retrying in 5 seconds...\n");
+            sleep(5);
+            continue;
+        }
+        printf("[JSBSIM] Connected successfully\n");
+
+        // Main communication loop
+        while (1) {
 
         // Hardcode for now
         pwmMapping[4] = 1;
@@ -570,7 +583,7 @@ static void* listenWorker(void* arg)
 
         } else if (n == 0) {
             // Connection closed by client
-            printf("Client disconnected\n");
+            printf("[JSBSIM] Connection closed, will reconnect...\n");
             break;
 
         } else {
@@ -580,16 +593,21 @@ static void* listenWorker(void* arg)
                 // No data right now, sleep briefly
                 usleep(1000); // 1 ms
             } else {
-                perror("recv");
+                perror("[JSBSIM] recv error, will reconnect");
                 break;
             }
 
         }
 
+        }
+
+        // Close current connection before reconnecting
+        close(sockfd);
+        printf("[JSBSIM] Connection lost, attempting reconnect in 2 seconds...\n");
+        sleep(2);
     }
 
-    close(connFd);
-    close(listenFd);
+    printf("[JSBSIM] Leaving main loop...\n");
 
     return 0;
 }
@@ -597,7 +615,7 @@ static void* listenWorker(void* arg)
 bool simAdumInit(char* ip, int port, uint8_t* mapping, uint8_t mapCount, bool imu)
 {
 
-    printf("[Juhu SIM] Pozz world\n");
+    printf("[JSBSIM] Hi, starting init...\n");
 
     memcpy(pwmMapping, mapping, mapCount);
     mappingCount = mapCount;
@@ -611,7 +629,10 @@ bool simAdumInit(char* ip, int port, uint8_t* mapping, uint8_t mapCount, bool im
         port = JSB_XP_PORT; // use default port
     }
 
-    init_fgear_client(ip, port); //init_fgear_socket(ip, port);
+    // Store connection details for reconnection
+    strncpy(serverIP, ip, sizeof(serverIP) - 1);
+    serverIP[sizeof(serverIP) - 1] = '\0';
+    serverPort = port;
 
 
     if (pthread_create(&listenThread, NULL, listenWorker, NULL) < 0) {
