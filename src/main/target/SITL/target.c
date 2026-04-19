@@ -166,30 +166,31 @@ void systemInit(void) {
 bool parseMapping(char* mapStr)
 {
     char *split = strtok(mapStr, ",");
-    //char numBuf[2];
     while(split)
     {
         if (strlen(split) != 6) {
             return false;
         }
-        //printf("split: %s\n", split);
+        
         if (split[0] == 'M' || split[0] == 'S') {
-            char numBuf1[2];
+            char numBuf1[3];  // 2 digits + null terminator
             numBuf1[0] = split[1];
             numBuf1[1] = split[2];
-            //memcpy(numBuf, &split[1], 2);
-            //printf("-numb1: %s\n", numBuf1);
+            numBuf1[2] = '\0';  // Null terminate for atoi
+            
             int pwmOut = atoi(numBuf1);
 
-            char numBuf2[2];
+            char numBuf2[3];  // 2 digits + null terminator
             numBuf2[0] = split[4];
             numBuf2[1] = split[5];
-            //memcpy(numBuf2, &split[4], 2);
-            //printf("-numb2: %s\n", numBuf2);
+            numBuf2[2] = '\0';  // Null terminate for atoi
+            
             int rOut = atoi(numBuf2);
-            if (pwmOut < 0 || rOut < 1) {
+            
+            if (pwmOut < 1 || rOut < 1) {  // Both should start at 1
                 return false;
             }
+            
             if (split[0] == 'M') {
                 pwmMapping[rOut - 1] = pwmOut - 1;
                 pwmMapping[rOut - 1] |= 0x80;
@@ -198,16 +199,11 @@ bool parseMapping(char* mapStr)
                 pwmMapping[rOut - 1] = pwmOut;
                 mappingCount++;
             }
-
-            //printf("-pwmout %d, rout %d\n", pwmOut, rOut);
-
         } else {
             return false;
         }
         split = strtok(NULL, ",");
     }
-
-    //exit(1);
 
     return true;
 }

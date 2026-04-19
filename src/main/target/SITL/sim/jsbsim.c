@@ -249,355 +249,340 @@ static void* listenWorker(void* arg)
         // Main communication loop
         while (1) {
 
-        // Hardcode for now
-        pwmMapping[4] = 1;
-        pwmMapping[5] = 2;
-        pwmMapping[6] = 3;
-        pwmMapping[7] = 4;
-        pwmMapping[8] = 5;
-        pwmMapping[9] = 6;
+            // Read all outputs from inav
+            // ----------------------------------------------------- //
+            float motorValue[4] = { 0.0f };
+            float servoValue[6] = { 0.0f };
+            motorValue[0] = PWM_TO_FLOAT_0_1(motor[pwmMapping[0] & 0x7f]);
+            motorValue[1] = PWM_TO_FLOAT_0_1(motor[pwmMapping[1] & 0x7f]);
+            motorValue[2] = PWM_TO_FLOAT_0_1(motor[pwmMapping[2] & 0x7f]);
+            motorValue[3] = PWM_TO_FLOAT_0_1(motor[pwmMapping[3] & 0x7f]);
+
+            servoValue[0] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[4]]);
+            servoValue[1] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[5]]);
+            servoValue[2] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[6]]);
+            servoValue[3] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[7]]);
+            servoValue[4] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[8]]);
+            servoValue[5] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[9]]);
+
+            //printf("Motor 1 value: %d, m=%d, n=%d\n", motor[0], pwmMapping[0], pwmMapping[0] & 0x7f);
+            //printf("Motor 2 value: %d, m=%d, n=%d\n", motor[1], pwmMapping[1], pwmMapping[1] & 0x7f);
+            //printf("Motor 3 value: %d, m=%d, n=%d\n", motor[2], pwmMapping[2], pwmMapping[2] & 0x7f);
+            //printf("Motor 4 value: %d, m=%d, n=%d\n", motor[3], pwmMapping[3], pwmMapping[3] & 0x7f);
+            //printf("Servo 1 value: %f, s=%d \n", servoValue[0], pwmMapping[4]);
+            //printf("Servo 2 value: %f, s=%d \n", servoValue[1], pwmMapping[5]);
+            //printf("Servo 3 value: %f, s=%d \n", servoValue[2], pwmMapping[6]);
+            //printf("Servo 4 value: %f, s=%d \n", servoValue[3], pwmMapping[7]);
+            //printf("Servo 5 value: %f, s=%d \n", servoValue[4], pwmMapping[8]);
+            //printf("Servo 6 value: %f, s=%d \n", servoValue[5], pwmMapping[9]);
+
+            // Send motor data to simulation
+            char msg[512];  
+            int len = snprintf(msg, sizeof(msg),
+                            "%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;\n",
+                            (double)motorValue[0], (double)motorValue[1], (double)motorValue[2], (double)motorValue[3],
+                            (double)servoValue[0], (double)servoValue[1], (double)servoValue[2],
+                            (double)servoValue[3], (double)servoValue[4], (double)servoValue[5]);
+
+            if (len > 0) {
+                (void)send(sockfd, msg, len, 0);
+            }
+
+            // Read all data from socket
+            // ----------------------------------------------------- //
+
+            uint16_t channelValues[JSB_JOYSTICK_AXIS_COUNT];
 
 
-        // Read all outputs from inav
-        // ----------------------------------------------------- //
-        float motorValue[4] = { 0.0f };
-        float servoValue[6] = { 0.0f };
-        motorValue[0] = PWM_TO_FLOAT_0_1(motor[pwmMapping[0] & 0x7f]);
-        motorValue[1] = PWM_TO_FLOAT_0_1(motor[pwmMapping[1] & 0x7f]);
-        motorValue[2] = PWM_TO_FLOAT_0_1(motor[pwmMapping[2] & 0x7f]);
-        motorValue[3] = PWM_TO_FLOAT_0_1(motor[pwmMapping[3] & 0x7f]);
+            ssize_t n = recv(sockfd, buf, sizeof(buf) - 1, 0);
 
-        servoValue[0] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[4]]);
-        servoValue[1] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[5]]);
-        servoValue[2] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[6]]);
-        servoValue[3] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[7]]);
-        servoValue[4] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[8]]);
-        servoValue[5] = PWM_TO_FLOAT_MINUS_1_1(servo[pwmMapping[9]]);
+            if (n > 0) {
+                buf[n] = '\0';  // null terminate
+                //printf("Rx: %s\n", buf);
 
-//        for (int i =0; i < 20; i++) {
-//            printf("Mapping %d: %d\n", i, pwmMapping[i]);
-//        }
-//
-//        printf("Motor 1 value: %d\n", motorValue[0]);
-//        printf("Motor 2 value: %d\n", motorValue[1]);
-//        printf("Motor 3 value: %d\n", motorValue[2]);
-//        printf("Motor 4 value: %d\n", motorValue[3]);
-//        printf("Servo 1 value: %f, s=%d \n", servoValue[0], pwmMapping[4]);
-//        printf("Servo 2 value: %f, s=%d \n", servoValue[1], pwmMapping[5]);
-//        printf("Servo 3 value: %f, s=%d \n", servoValue[2], pwmMapping[6]);
-//        printf("Servo 4 value: %f, s=%d \n", servoValue[3], pwmMapping[7]);
-//        printf("Servo 5 value: %f, s=%d \n", servoValue[4], pwmMapping[8]);
-//        printf("Servo 6 value: %f, s=%d \n", servoValue[5], pwmMapping[9]);
-//
-//        exit(1);
+                int index = 0;
+                token = strtok(buf, ";");
+                while (token != NULL) {
 
-        // Send motor data to simulation
-        char msg[512];  
-        int len = snprintf(msg, sizeof(msg),
-                        "%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;\n",
-                        (double)motorValue[0], (double)motorValue[1], (double)motorValue[2], (double)motorValue[3],
-                        (double)servoValue[0], (double)servoValue[1], (double)servoValue[2],
-                        (double)servoValue[3], (double)servoValue[4], (double)servoValue[5]);
+                    float value = strtof(token, NULL);
 
-        if (len > 0) {
-            (void)send(sockfd, msg, len, 0);
-        }
+                    switch(index) {
+                        case 0:
+                            //trel=value;
+                            break;
 
-        // Read all data from socket
-        // ----------------------------------------------------- //
-
-        uint16_t channelValues[JSB_JOYSTICK_AXIS_COUNT];
-
-
-        ssize_t n = recv(sockfd, buf, sizeof(buf) - 1, 0);
-
-        if (n > 0) {
-            buf[n] = '\0';  // null terminate
-            //printf("Rx: %s\n", buf);
-
-            int index = 0;
-            token = strtok(buf, ";");
-            while (token != NULL) {
-
-                float value = strtof(token, NULL);
-
-                switch(index) {
-                    case 0:
-                        //trel=value;
-                        break;
-
-                    case 1:
-                        lat_1e7 = atoi(token);
-                        break;
-                    
-                    case 2:
-                        lon_1e7 = atoi(token);
-                        break;
-                    
-                    case 3:
-                        elevation = value; // Altitude MSL in meters
-                        break;
-
-                    case 4:
-                        hpath = value; // Track
-                        break;
-                    
-                    case 5:
-                        yaw = value;  // Heading
-                        break;
-                    
-                    case 6:
-                        //posx = value;
-                        break;
-                   
-                    case 7:
-                        //posy = value;
-                        break;
-                    
-                    case 8:
-                        agl = value;  // posz
-                        break;
-
-                    case 9:
-                        groundspeed = value;
-                        break;
-
-                    case 10:
-                        roll = value;
-                        break;
+                        case 1:
+                            lat_1e7 = atoi(token);
+                            break;
                         
-                    case 11:
-                        pitch = value;
-                        break;
-                    
-                    case 12:
-                        //yaw = value;  // Gets this from heading
-                        break;
-                    
-                    case 13:
-                        accel_x = value;
-                        break;
-                    
-                    case 14:
-                        accel_y = value;
-                        break;
-                    
-                    case 15:
-                        accel_z = value;
-                        break;
+                        case 2:
+                            lon_1e7 = atoi(token);
+                            break;
+                        
+                        case 3:
+                            elevation = value; // Altitude MSL in meters
+                            break;
 
-                    case 16:
-                        gyro_x = value;
-                        break;
+                        case 4:
+                            hpath = value; // Track
+                            break;
+                        
+                        case 5:
+                            yaw = value;  // Heading
+                            break;
+                        
+                        case 6:
+                            //posx = value;
+                            break;
                     
-                    case 17:
-                        gyro_y = value;
-                        break;
-                    
-                    case 18:
-                        gyro_z = value;
-                        break;
+                        case 7:
+                            //posy = value;
+                            break;
+                        
+                        case 8:
+                            agl = value;  // posz
+                            break;
 
-                    case 19:
-                        channelValues[0] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 9:
+                            groundspeed = value;
+                            break;
 
-                    case 20:
-                        channelValues[1] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 21:
-                        channelValues[2] = FLOAT_0_1_TO_PWM(value);
-                        break;
-                    
-                    case 22:
-                        channelValues[3] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 23:
-                        channelValues[4] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 24:
-                        channelValues[5] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 10:
+                            roll = value;
+                            break;
+                            
+                        case 11:
+                            pitch = value;
+                            break;
+                        
+                        case 12:
+                            //yaw = value;  // Gets this from heading
+                            break;
+                        
+                        case 13:
+                            accel_x = value;
+                            break;
+                        
+                        case 14:
+                            accel_y = value;
+                            break;
+                        
+                        case 15:
+                            accel_z = value;
+                            break;
 
-                    case 25:
-                        channelValues[6] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 16:
+                            gyro_x = value;
+                            break;
+                        
+                        case 17:
+                            gyro_y = value;
+                            break;
+                        
+                        case 18:
+                            gyro_z = value;
+                            break;
 
-                    case 26:
-                        channelValues[7] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 19:
+                            channelValues[0] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
 
-                    case 27:
-                        channelValues[8] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 20:
+                            channelValues[1] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 21:
+                            channelValues[2] = FLOAT_0_1_TO_PWM(value);
+                            break;
+                        
+                        case 22:
+                            channelValues[3] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 23:
+                            channelValues[4] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 24:
+                            channelValues[5] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
 
-                    case 28:
-                        channelValues[9] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 29:
-                        channelValues[10] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 30:
-                        channelValues[11] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 31:
-                        channelValues[12] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
-                    
-                    case 32:
-                        channelValues[13] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 25:
+                            channelValues[6] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
 
-                    case 33:
-                        channelValues[14] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 26:
+                            channelValues[7] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
 
-                    case 34:
-                        channelValues[15] = FLOAT_MINUS_1_1_TO_PWM(value);
-                        break;
+                        case 27:
+                            channelValues[8] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
 
-                    default:
-                        break;
+                        case 28:
+                            channelValues[9] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 29:
+                            channelValues[10] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 30:
+                            channelValues[11] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 31:
+                            channelValues[12] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+                        
+                        case 32:
+                            channelValues[13] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+
+                        case 33:
+                            channelValues[14] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+
+                        case 34:
+                            channelValues[15] = FLOAT_MINUS_1_1_TO_PWM(value);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    token = strtok(NULL, ";");
+                    index++;
                 }
 
-                token = strtok(NULL, ";");
-                index++;
-            }
+                rxSimSetChannelValue(channelValues, JSB_JOYSTICK_AXIS_COUNT);
 
-            rxSimSetChannelValue(channelValues, JSB_JOYSTICK_AXIS_COUNT);
+                // compute time delta for noise model and apply sensor noise
+                {
+                    timeUs_t nowUs = micros();
+                    float dt = (s_lastNoiseTimeUs == 0) ? 0.001f : ((nowUs - s_lastNoiseTimeUs) * 1e-6f);
+                    s_lastNoiseTimeUs = nowUs;
+                    s_lastNoiseDt = dt;
+    #if SIMULATE_SENSOR_NOISE
+                    // temporary mag vector placeholder (actual mag computed later using attitude)
+                    float magx_temp = 0.0f, magy_temp = 0.0f, magz_temp = 0.0f;
+                    jsbSimApplySensorNoise(
+                        &accel_x, &accel_y, &accel_z,
+                        &gyro_x, &gyro_y, &gyro_z,
+                        &roll, &pitch,
+                        &magx_temp, &magy_temp, &magz_temp,
+                        &lat_1e7, &lon_1e7,
+                        &groundspeed, &hpath,
+                        dt
+                    );
+    #endif
+                }
 
-            // compute time delta for noise model and apply sensor noise
-            {
-                timeUs_t nowUs = micros();
-                float dt = (s_lastNoiseTimeUs == 0) ? 0.001f : ((nowUs - s_lastNoiseTimeUs) * 1e-6f);
-                s_lastNoiseTimeUs = nowUs;
-                s_lastNoiseDt = dt;
-#if SIMULATE_SENSOR_NOISE
-                // temporary mag vector placeholder (actual mag computed later using attitude)
-                float magx_temp = 0.0f, magy_temp = 0.0f, magz_temp = 0.0f;
-                jsbSimApplySensorNoise(
-                    &accel_x, &accel_y, &accel_z,
-                    &gyro_x, &gyro_y, &gyro_z,
-                    &roll, &pitch,
-                    &magx_temp, &magy_temp, &magz_temp,
-                    &lat_1e7, &lon_1e7,
-                    &groundspeed, &hpath,
-                    dt
+                //printf("Rx: lat=%d lon=%d \n",
+                //    lat_1e7, lon_1e7);
+
+                gpsFakeSet(
+                    GPS_FIX_3D,
+                    16,
+                    lat_1e7,
+                    lon_1e7,
+                    (int32_t)roundf(elevation * 100),
+                    (int16_t)roundf(groundspeed * 100),
+                    (int16_t)roundf(hpath*10.0f + 0.0f),
+                    0, //(int16_t)roundf(-local_vz * 100),
+                    0, //(int16_t)roundf(local_vx * 100),
+                    0, //(int16_t)roundf(-local_vy * 100),
+                    0
                 );
-#endif
-            }
-
-            //printf("Rx: lat=%d lon=%d \n",
-            //    lat_1e7, lon_1e7);
-
-            gpsFakeSet(
-                GPS_FIX_3D,
-                16,
-                lat_1e7,
-                lon_1e7,
-                (int32_t)roundf(elevation * 100),
-                (int16_t)roundf(groundspeed * 100),
-                (int16_t)roundf(hpath*10.0f + 0.0f),
-                0, //(int16_t)roundf(-local_vz * 100),
-                0, //(int16_t)roundf(local_vx * 100),
-                0, //(int16_t)roundf(-local_vy * 100),
-                0
-            );
 
 
-            const int32_t altitideOverGround = (int32_t)roundf(agl * 100);
-            if (altitideOverGround > 0 && altitideOverGround <= RANGEFINDER_VIRTUAL_MAX_RANGE_CM) {
-                fakeRangefindersSetData(altitideOverGround);
-            } else {
-                fakeRangefindersSetData(-1);
-            }
+                const int32_t altitideOverGround = (int32_t)roundf(agl * 100);
+                if (altitideOverGround > 0 && altitideOverGround <= RANGEFINDER_VIRTUAL_MAX_RANGE_CM) {
+                    fakeRangefindersSetData(altitideOverGround);
+                } else {
+                    fakeRangefindersSetData(-1);
+                }
 
-            const int16_t roll_inav = roll * 10;
-            const int16_t pitch_inav = -pitch * 10;
-            //const int16_t yaw_inav = yaw * 10;
-            const int16_t yaw_inav = (int16_t)roundf(yaw*10.0f + 0.0f);
+                const int16_t roll_inav = roll * 10;
+                const int16_t pitch_inav = -pitch * 10;
+                //const int16_t yaw_inav = yaw * 10;
+                const int16_t yaw_inav = (int16_t)roundf(yaw*10.0f + 0.0f);
 
-            if (!useImu) {
-                imuSetAttitudeRPY(roll_inav, pitch_inav, yaw_inav);
-                imuUpdateAttitude(micros());
-            }
+                if (!useImu) {
+                    imuSetAttitudeRPY(roll_inav, pitch_inav, yaw_inav);
+                    imuUpdateAttitude(micros());
+                }
 
-            fakeAccSet(
-                constrainToInt16(accel_x * GRAVITY_MSS * 1000.0f),
-                constrainToInt16(accel_y * GRAVITY_MSS * 1000.0f),
-                constrainToInt16(accel_z * GRAVITY_MSS * 1000.0f)
-            );
+                fakeAccSet(
+                    constrainToInt16(accel_x * GRAVITY_MSS * 1000.0f),
+                    constrainToInt16(accel_y * GRAVITY_MSS * 1000.0f),
+                    constrainToInt16(accel_z * GRAVITY_MSS * 1000.0f)
+                );
 
-            fakeGyroSet(
-                constrainToInt16(gyro_x * 16.0f),
-                constrainToInt16(-gyro_y * 16.0f),
-                constrainToInt16(-gyro_z * 16.0f)
-            );
+                fakeGyroSet(
+                    constrainToInt16(gyro_x * 16.0f),
+                    constrainToInt16(-gyro_y * 16.0f),
+                    constrainToInt16(-gyro_z * 16.0f)
+                );
 
-            fakeBaroSet((int32_t)(101325.0f - 12.0f*elevation),DEGREES_TO_CENTIDEGREES(21));
+                fakeBaroSet((int32_t)(101325.0f - 12.0f*elevation),DEGREES_TO_CENTIDEGREES(21));
 
-            fakePitotSetAirspeed(airspeed * 100.0f);
-            fakeBattSensorSetVbat(16.8f * 100);
+                fakePitotSetAirspeed(airspeed * 100.0f);
+                fakeBattSensorSetVbat(16.8f * 100);
 
-            fpQuaternion_t quat;
-            fpVector3_t north;
-            north.x = 1.0f;
-            north.y = 0.0f;
-            north.z = 0.0f;
-            computeQuaternionFromRPY(&quat, roll_inav, pitch_inav, yaw_inav);
-            transformVectorEarthToBody(&north, &quat);
+                fpQuaternion_t quat;
+                fpVector3_t north;
+                north.x = 1.0f;
+                north.y = 0.0f;
+                north.z = 0.0f;
+                computeQuaternionFromRPY(&quat, roll_inav, pitch_inav, yaw_inav);
+                transformVectorEarthToBody(&north, &quat);
 
-            // apply magnetometer noise to the transformed north vector
-#if SIMULATE_SENSOR_NOISE
-            north.x = jsbSimApplySignalNoise(north.x, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[0], &s_magState.lagState[0], s_lastNoiseDt);
-            north.y = jsbSimApplySignalNoise(north.y, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[1], &s_magState.lagState[1], s_lastNoiseDt);
-            north.z = jsbSimApplySignalNoise(north.z, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[2], &s_magState.lagState[2], s_lastNoiseDt);
-#endif
+                // apply magnetometer noise to the transformed north vector
+    #if SIMULATE_SENSOR_NOISE
+                north.x = jsbSimApplySignalNoise(north.x, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[0], &s_magState.lagState[0], s_lastNoiseDt);
+                north.y = jsbSimApplySignalNoise(north.y, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[1], &s_magState.lagState[1], s_lastNoiseDt);
+                north.z = jsbSimApplySignalNoise(north.z, DEFAULT_MAG_NOISE_STD, DEFAULT_MAG_BIAS_WALK_STD, DEFAULT_MAG_LAG_TAU_S, &s_magState.bias[2], &s_magState.lagState[2], s_lastNoiseDt);
+    #endif
 
-            fakeMagSet(
-                constrainToInt16(north.x * 1024.0f),
-                constrainToInt16(north.y * 1024.0f),
-                constrainToInt16(north.z * 1024.0f)
-            );
+                fakeMagSet(
+                    constrainToInt16(north.x * 1024.0f),
+                    constrainToInt16(north.y * 1024.0f),
+                    constrainToInt16(north.z * 1024.0f)
+                );
 
-            if (!initalized) {
-                ENABLE_ARMING_FLAG(SIMULATOR_MODE_SITL);
-                // Aircraft can wobble on the runway and prevents calibration of the accelerometer
-                ENABLE_STATE(ACCELEROMETER_CALIBRATED);
-                initalized = true;
-            }
+                if (!initalized) {
+                    ENABLE_ARMING_FLAG(SIMULATOR_MODE_SITL);
+                    // Aircraft can wobble on the runway and prevents calibration of the accelerometer
+                    ENABLE_STATE(ACCELEROMETER_CALIBRATED);
+                    initalized = true;
+                }
 
-            unlockMainPID();
+                unlockMainPID();
 
 
 
 
-        // Check connection and close if required
-        // ----------------------------------------------------- //
+            // Check connection and close if required
+            // ----------------------------------------------------- //
 
-        } else if (n == 0) {
-            // Connection closed by client
-            printf("[JSBSIM] Connection closed, will reconnect...\n");
-            break;
-
-        } else {
-
-            // No data available or error
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // No data right now, sleep briefly
-                usleep(1000); // 1 ms
-            } else {
-                perror("[JSBSIM] recv error, will reconnect");
+            } else if (n == 0) {
+                // Connection closed by client
+                printf("[JSBSIM] Connection closed, will reconnect...\n");
                 break;
-            }
 
-        }
+            } else {
+
+                // No data available or error
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // No data right now, sleep briefly
+                    usleep(1000); // 1 ms
+                } else {
+                    perror("[JSBSIM] recv error, will reconnect");
+                    break;
+                }
+
+            }
 
         }
 
