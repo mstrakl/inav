@@ -388,6 +388,9 @@ static bool allOrientationsHaveCalibrationDataCollected(void)
 
 bool accIsCalibrationComplete(void)
 {
+#ifdef USE_IMU_FAKE
+    return true;  // Skip calibration for fake accelerometer in SITL
+#endif
     return zeroCalibrationIsCompleteV(&zeroCalibration);
 }
 

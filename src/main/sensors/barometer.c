@@ -301,11 +301,17 @@ float altitudeToPressure(const float altCm)
 
 bool baroIsCalibrationComplete(void)
 {
+#ifdef USE_FAKE_BARO
+    return true;  // Skip calibration for fake baro in SITL
+#endif
     return zeroCalibrationIsCompleteS(&zeroCalibration) && zeroCalibrationIsSuccessfulS(&zeroCalibration);
 }
 
 void baroStartCalibration(void)
 {
+#ifdef USE_FAKE_BARO
+    return;  // Skip calibration for fake baro in SITL
+#endif
     const float acceptedPressureVariance = (101325.0f - altitudeToPressure(barometerConfig()->baro_calibration_tolerance)); // max 30cm deviation during calibration (at sea level)
     zeroCalibrationStartS(&zeroCalibration, CALIBRATING_BARO_TIME_MS, acceptedPressureVariance, false);
 }

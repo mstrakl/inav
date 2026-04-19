@@ -198,11 +198,17 @@ bool pitotInit(void)
 
 bool pitotIsCalibrationComplete(void)
 {
+#ifdef USE_FAKE_PITOT
+    return true;  // Skip calibration for fake pitot in SITL
+#endif
     return zeroCalibrationIsCompleteS(&pitot.zeroCalibration) && zeroCalibrationIsSuccessfulS(&pitot.zeroCalibration);
 }
 
 void pitotStartCalibration(void)
 {
+#ifdef USE_FAKE_PITOT
+    return;  // Skip calibration for fake pitot in SITL
+#endif
     zeroCalibrationStartS(&pitot.zeroCalibration, CALIBRATING_PITOT_TIME_MS, SSL_AIR_PRESSURE * pitot.dev.calibThreshold, false);
 }
 
