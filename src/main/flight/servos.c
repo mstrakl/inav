@@ -28,6 +28,7 @@
 #include "common/axis.h"
 #include "common/filter.h"
 #include "common/maths.h"
+#include "common/log.h"
 #include "programming/global_variables.h"
 
 #include "config/config_reset.h"
@@ -440,6 +441,9 @@ void servoMixer(float dT)
     }
 
     // mix servos according to rules
+
+    bool alreadyUpdatedTransFraction = false;
+
     for (int i = 0; i < servoRuleCount; i++) {
         const uint8_t target = currentServoMixer[i].targetChannel;
         const uint8_t from = currentServoMixer[i].inputSource;
@@ -463,7 +467,13 @@ void servoMixer(float dT)
          */
         int16_t inputLimited = (int16_t) rateLimitFilterApply4(&servoSpeedLimitFilter[i], inputRaw, currentServoMixer[i].speed * 10, dT);
 
+        if (from == INPUT_MIXER_TRANSITION && !alreadyUpdatedTransFraction) {
+            updateTransitionFractionFromServo(inputLimited*2);
+            alreadyUpdatedTransFraction = true;
+        }
+
         servo[target] += ((int32_t)inputLimited * currentServoMixer[i].rate) / 100;
+
     }
 
     for (int i = 0; i < MAX_SUPPORTED_SERVOS; i++) {

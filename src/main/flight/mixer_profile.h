@@ -34,6 +34,7 @@ typedef enum {
     MIXERAT_REQUEST_NONE, //no request, stats checking only
     MIXERAT_REQUEST_RTH,
     MIXERAT_REQUEST_LAND,
+    MIXERAT_REQUEST_SMART_SWITCH,
     MIXERAT_REQUEST_ABORT,
 } mixerProfileATRequest_e;
 
@@ -52,6 +53,7 @@ typedef struct mixerProfileAT_s {
     timeMs_t transitionStabEndTime;
     timeMs_t transitionTransEndTime;
 } mixerProfileAT_t;
+
 extern mixerProfileAT_t mixerProfileAT;
 bool checkMixerATRequired(mixerProfileATRequest_e required_action);
 bool mixerATUpdateState(mixerProfileATRequest_e required_action);
@@ -82,3 +84,5 @@ bool checkMixerProfileHotSwitchAvalibility(void);
 void activateMixerConfig(void);
 void mixerConfigInit(void);
 void outputProfileUpdateTask(timeUs_t currentTimeUs);
+
+void updateTransitionFractionFromServo(const int fraction);

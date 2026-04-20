@@ -39,6 +39,8 @@ int nextMixerProfileIndex;
 
 PG_REGISTER_ARRAY_WITH_RESET_FN(mixerProfile_t, MAX_MIXER_PROFILE_COUNT, mixerProfiles, PG_MIXER_PROFILE, 1);
 
+static int transitionFractionFromServo = 0;
+
 void pgResetFn_mixerProfiles(mixerProfile_t *instance)
 {
     for (int i = 0; i < MAX_MIXER_PROFILE_COUNT; i++)
@@ -133,12 +135,11 @@ bool checkMixerATRequired(mixerProfileATRequest_e required_action)
     }
 
     if(currentMixerConfig.automated_switch){
-        if ((required_action == MIXERAT_REQUEST_RTH) && STATE(MULTIROTOR))
-        {
+        if ((required_action == MIXERAT_REQUEST_RTH) && STATE(MULTIROTOR)) {
             return true;
-        }
-        if ((required_action == MIXERAT_REQUEST_LAND) && STATE(AIRPLANE))
-        {
+        } else if ((required_action == MIXERAT_REQUEST_LAND) && STATE(AIRPLANE)) {
+            return true;
+        } else if ((required_action == MIXERAT_REQUEST_SMART_SWITCH)) {
             return true;
         }
     }
@@ -157,23 +158,24 @@ bool mixerATUpdateState(mixerProfileATRequest_e required_action)
             mixerProfileAT.phase = MIXERAT_PHASE_IDLE;
             return true;
         }
+
         switch (mixerProfileAT.phase){
         case MIXERAT_PHASE_IDLE:
             //check if mixerAT is required
             if (checkMixerATRequired(required_action)){
                 mixerProfileAT.phase=MIXERAT_PHASE_TRANSITION_INITIALIZE;
-                reprocessState = true;
             }
             break;
         case MIXERAT_PHASE_TRANSITION_INITIALIZE:
-            // LOG_INFO(PWM, "MIXERAT_PHASE_IDLE");
-            setMixerProfileAT();
-            mixerProfileAT.phase = MIXERAT_PHASE_TRANSITIONING;
-            reprocessState = true;
+            LOG_INFO(PWM, "MIXINIT, val: %d", transitionFractionFromServo);
+            isMixerTransitionMixing_requested = true;
+            if(transitionFractionFromServo > 0 && transitionFractionFromServo < 1000) { 
+                mixerProfileAT.phase = MIXERAT_PHASE_TRANSITIONING;
+            }
             break;
         case MIXERAT_PHASE_TRANSITIONING:
-            isMixerTransitionMixing_requested = true;
-            if (millis() > mixerProfileAT.transitionTransEndTime){
+            LOG_INFO(PWM, "MIXTRANS, val: %d", transitionFractionFromServo);
+            if (transitionFractionFromServo == 0 || transitionFractionFromServo == 1000) {
                 isMixerTransitionMixing_requested = false;
                 outputProfileHotSwitch(nextMixerProfileIndex);
                 mixerProfileAT.phase = MIXERAT_PHASE_IDLE;
@@ -203,14 +205,37 @@ void outputProfileUpdateTask(timeUs_t currentTimeUs)
 {   
     UNUSED(currentTimeUs);
     if(cliMode) return;
+
     bool mixerAT_inuse = mixerProfileAT.phase != MIXERAT_PHASE_IDLE;
+
     // transition mode input for servo mix and motor mix
-    if (!FLIGHT_MODE(FAILSAFE_MODE) && (!mixerAT_inuse))
+    if (!FLIGHT_MODE(FAILSAFE_MODE))
     {
-        if (isModeActivationConditionPresent(BOXMIXERPROFILE)){
-            outputProfileHotSwitch(IS_RC_MODE_ACTIVE(BOXMIXERPROFILE) == 0 ? 0 : 1);
+        // If auto smart switch is allowed
+        if (currentMixerConfig.automated_switch) {
+
+            int requested_profile_index = IS_RC_MODE_ACTIVE(BOXMIXERPROFILE) == 0 ? 0 : 1;
+            if (currentMixerProfileIndex != requested_profile_index) {
+                mixerATUpdateState(MIXERAT_REQUEST_SMART_SWITCH);
+            } else {
+                mixerATUpdateState(MIXERAT_REQUEST_NONE);
+            }
+
+        
+        // Otherwise, use traditional switching
+        } else {
+
+            if (!mixerAT_inuse) {
+
+                if (isModeActivationConditionPresent(BOXMIXERPROFILE)){
+                    outputProfileHotSwitch(IS_RC_MODE_ACTIVE(BOXMIXERPROFILE) == 0 ? 0 : 1);
+                }
+                isMixerTransitionMixing_requested = IS_RC_MODE_ACTIVE(BOXMIXERTRANSITION);
+
+            }
+
         }
-        isMixerTransitionMixing_requested = IS_RC_MODE_ACTIVE(BOXMIXERTRANSITION);
+
     }
     isMixerTransitionMixing = isMixerTransitionMixing_requested && ((posControl.navState == NAV_STATE_IDLE) || mixerAT_inuse ||(posControl.navState == NAV_STATE_ALTHOLD_IN_PROGRESS));
 }
@@ -254,4 +279,10 @@ bool outputProfileHotSwitch(int profile_index)
     }
     mixerConfigInit();
     return true;
+}
+
+
+void updateTransitionFractionFromServo(const int fraction)
+{
+    transitionFractionFromServo = fraction;
 }
