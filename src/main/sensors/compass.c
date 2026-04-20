@@ -360,9 +360,6 @@ bool compassIsReady(void)
 
 bool compassIsCalibrationComplete(void)
 {
-#ifdef USE_FAKE_MAG
-    return true;  // Skip calibration for fake magnetometer in SITL
-#endif
     if (STATE(COMPASS_CALIBRATED)) {
         return true;
     }

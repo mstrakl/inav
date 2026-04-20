@@ -1002,8 +1002,5 @@ void updatePositionEstimator(void)
 
 bool navIsCalibrationComplete(void)
 {
-#ifdef SITL_BUILD
-    return true;  // Skip gravity calibration in SITL
-#endif
     return gravityCalibrationComplete();
 }
