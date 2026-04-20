@@ -61,7 +61,7 @@
 
 
 
-#define SIMULATE_SENSOR_NOISE 1
+#define SIMULATE_SENSOR_NOISE 0
 
 #if SIMULATE_SENSOR_NOISE
     #include "target/SITL/sim/jsbsim_sensor_noise.h"
@@ -279,13 +279,28 @@ static void* listenWorker(void* arg)
             // Send motor data to simulation
             char msg[512];  
             int len = snprintf(msg, sizeof(msg),
-                            "%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;\n",
+                            "%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n",
                             (double)motorValue[0], (double)motorValue[1], (double)motorValue[2], (double)motorValue[3],
                             (double)servoValue[0], (double)servoValue[1], (double)servoValue[2],
                             (double)servoValue[3], (double)servoValue[4], (double)servoValue[5]);
 
-            if (len > 0) {
-                (void)send(sockfd, msg, len, 0);
+            if (len > 0 && len < (int)sizeof(msg)) {
+                ssize_t sent = 0;
+                ssize_t remaining = len;
+                while (remaining > 0) {
+                    ssize_t n = send(sockfd, msg + sent, remaining, 0);
+                    if (n < 0) {
+                        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                            // Socket buffer full, retry
+                            usleep(100);
+                            continue;
+                        }
+                        // Connection error
+                        break;
+                    }
+                    sent += n;
+                    remaining -= n;
+                }
             }
 
             // Read all data from socket
