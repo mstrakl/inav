@@ -48,7 +48,7 @@
 // *************** IMU: ICM42670 on I2C2 **********************
 #define USE_IMU_ICM42670
 #define ICM42670_I2C_BUS        BUS_I2C2
-#define IMU_ICM42670_ALIGN      CW0_DEG
+#define IMU_ICM42670_ALIGN      CW90_DEG_FLIP
 
 // *************** UART *****************************
 #define USE_VCP
@@ -98,6 +98,7 @@
 
 #define USE_BARO
 #define USE_BARO_BMP388
+#define BMP388_I2C_ADDR         (0x77)
 #define BARO_I2C_BUS            BUS_I2C2
 
 #define USE_MAG
