@@ -129,6 +129,8 @@ static bool accDetect(accDev_t *dev, accelerationSensor_e accHardwareToUse)
 
     requestedSensors[SENSOR_INDEX_ACC] = accHardwareToUse;
 
+    volatile int accsave = (int)accHardwareToUse; 
+
     switch (accHardwareToUse) {
     case ACC_AUTODETECT:
         FALLTHROUGH;
@@ -283,6 +285,8 @@ static bool accDetect(accDev_t *dev, accelerationSensor_e accHardwareToUse)
     if (accHardware == ACC_NONE) {
         return false;
     }
+
+    accsave += 1;
 
     detectedSensors[SENSOR_INDEX_ACC] = accHardware;
     sensorsSet(SENSOR_ACC);
