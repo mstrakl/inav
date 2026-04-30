@@ -41,27 +41,6 @@
 
 #if defined(USE_IMU_ICM42670)
 
-
-bool icm42670AccDetect(accDev_t *acc)
-{
-    acc->busDev = busDeviceOpen(BUSTYPE_ANY, DEVHW_ICM42670, acc->imuSensorToUse);
-    
-    if (acc->busDev == NULL) {
-        return false;
-    }
-
-    mpuContextData_t * ctx = busDeviceGetScratchpadMemory(acc->busDev);
-    if (ctx->chipMagicNumber != 0x4267) {
-        return false;
-    }
-
-    acc->initFn = icm42670AccInit;
-    acc->readFn = icm42670AccRead;
-    acc->accAlign = acc->busDev->param;
-
-    return true;
-}
-
 static void icm42670AccInit(accDev_t *acc)
 {
     acc->acc_1G = 512 * 4;
@@ -79,6 +58,26 @@ static bool icm42670AccRead(accDev_t *acc)
     acc->ADCRaw[X] = (float) int16_val_big_endian(data, 0);
     acc->ADCRaw[Y] = (float) int16_val_big_endian(data, 1);
     acc->ADCRaw[Z] = (float) int16_val_big_endian(data, 2);
+
+    return true;
+}
+
+bool icm42670AccDetect(accDev_t *acc)
+{
+    acc->busDev = busDeviceOpen(BUSTYPE_ANY, DEVHW_ICM42670, acc->imuSensorToUse);
+    
+    if (acc->busDev == NULL) {
+        return false;
+    }
+
+    mpuContextData_t * ctx = busDeviceGetScratchpadMemory(acc->busDev);
+    if (ctx->chipMagicNumber != 0x4267) {
+        return false;
+    }
+
+    acc->initFn = icm42670AccInit;
+    acc->readFn = icm42670AccRead;
+    acc->accAlign = acc->busDev->param;
 
     return true;
 }
@@ -106,8 +105,9 @@ static void icm42670AccAndGyroInit(gyroDev_t *gyro)
 
 static bool icm42670DeviceDetect(busDevice_t * dev)
 {
-    uint8_t tmp;
+    uint8_t tmp = 0xFF;
     uint8_t attemptsRemaining = 5;
+    volatile bool status = false;
 
     busSetSpeed(dev, BUS_SPEED_INITIALIZATION);
 
@@ -117,13 +117,17 @@ static bool icm42670DeviceDetect(busDevice_t * dev)
     do {
         delay(150);
 
-        busRead(dev, (WHO_AM_I & 0xFF), &tmp);
+        status = busRead(dev, (WHO_AM_I & 0xFF), &tmp);
 
         if (tmp == INV_IMU_WHOAMI) {
             return true;
         }
         /* Retry detection */
     } while (attemptsRemaining--);
+
+    if (!status && tmp == 0xFF) {
+        tmp = 0xFE;
+    }
 
     return false;
 }

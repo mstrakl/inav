@@ -1,41 +1,38 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Build AOCODARCH7DUAL",
-            "type": "shell",
-            "command": "make AOCODARCH7DUAL",
-            "group": "build",
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}/build"
-            }
-        },
-        {
-            "label": "Build AOCODARCH7DUAL",
-            "type": "shell",
-            "command": "make AOCODARCH7DUAL",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}/build"
-            }
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build JETFURYH743",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/build.sh",
+        "JETFURYH743"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build JETFURYH743 (Debug)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/build.sh",
+        "JETFURYH743"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CMAKE_BUILD_TYPE": "Debug"
         }
-        ,
-        {
-            "label": "CMAKE Update",
-            "type": "shell",
-            "command": "cmake ..",
-            "group": "build",
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}/build"
-            }
-        }
-    ]
+      },
+      "problemMatcher": []
+    }
+  ]
 }
