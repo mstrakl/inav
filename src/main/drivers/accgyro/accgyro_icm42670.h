@@ -15,20 +15,7 @@
  * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
-#include "platform.h"
-#include "config/config_master.h"
-#include "config/feature.h"
-#include "io/serial.h"
-#include "fc/config.h"
-#include "sensors/gyro.h"
+#pragma once
 
-
-void targetConfiguration(void)
-{
-    serialConfigMutable()->portConfigs[1].functionMask = FUNCTION_MSP;
-    serialConfigMutable()->portConfigs[1].msp_baudrateIndex = BAUD_57600;    
-    //serialConfigMutable()->portConfigs[2].functionMask = FUNCTION_MSP_OSD;
-    //serialConfigMutable()->portConfigs[3].functionMask = FUNCTION_GPS;
-    //serialConfigMutable()->portConfigs[6].functionMask = FUNCTION_ESCSERIAL;
-}
+bool icm42670AccDetect(accDev_t *acc);
+bool icm42670GyroDetect(gyroDev_t *gyro);

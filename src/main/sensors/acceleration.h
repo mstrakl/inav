@@ -42,6 +42,7 @@ typedef enum {
     ACC_ICM20689,
     ACC_BMI088,
     ACC_ICM42605,
+    ACC_ICM42670,
     ACC_BMI270,
     ACC_LSM6DXX,
     ACC_FAKE,

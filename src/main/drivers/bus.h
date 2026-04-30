@@ -83,6 +83,7 @@ typedef enum {
     DEVHW_BMI088_ACC,
     DEVHW_ICM20689,
     DEVHW_ICM42605,
+    DEVHW_ICM42670,
     DEVHW_BMI270,
     DEVHW_LSM6D,
     /* Combined ACC/GYRO/MAG chips */

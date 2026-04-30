@@ -26,12 +26,8 @@
 #include "drivers/pinio.h"
 #include "drivers/sensor.h"
 
-// Enable ICM42605 support and register as I2C device
-#define USE_IMU_ICM42605
-// ICM42605 I2C address: 0x68 if SDO/AD0 is LOW, 0x69 if HIGH
-// Try both addresses - INAV will detect which one responds
-BUSDEV_REGISTER_I2C(busdev_icm42605_1, DEVHW_ICM42605, ICM42605_I2C_BUS, 0x68, NONE, DEVFLAGS_NONE, IMU_ICM42605_ALIGN);
-BUSDEV_REGISTER_I2C(busdev_icm42605_2, DEVHW_ICM42605, ICM42605_I2C_BUS, 0x69, NONE, DEVFLAGS_NONE, IMU_ICM42605_ALIGN);
+#define ICM42670_I2C_ADDR (0x67)
+BUSDEV_REGISTER_I2C(busdev_icm42670, DEVHW_ICM42670, ICM42670_I2C_BUS, ICM42670_I2C_ADDR, NONE, DEVFLAGS_NONE, IMU_ICM42670_ALIGN);
 
 timerHardware_t timerHardware[] = {
     DEF_TIM(TIM1,  CH4, PE14,  TIM_USE_OUTPUT_AUTO, 0, 0), // S1

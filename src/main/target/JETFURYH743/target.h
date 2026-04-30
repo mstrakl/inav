@@ -42,15 +42,10 @@
 #define SPI2_MISO_PIN   	PC2
 #define SPI2_MOSI_PIN   	PC3
 
-// *************** IMU: ICM42605 on I2C1 **********************
-// Registered manually in target.c as I2C device
-// #define USE_IMU_ICM42605  // Don't enable here - causes common_hardware.c to register as SPI
-#define IMU_ICM42605_ALIGN      CW0_DEG
-#define ICM42605_I2C_BUS        BUS_I2C2
-
-//#define USE_MAX7456
-//#define MAX7456_SPI_BUS         BUS_SPI1
-//#define MAX7456_CS_PIN          PB12
+// *************** IMU: ICM42670 on I2C2 **********************
+#define USE_IMU_ICM42670
+#define ICM42670_I2C_BUS        BUS_I2C2
+#define IMU_ICM42670_ALIGN      CW0_DEG
 
 // *************** UART *****************************
 #define USE_VCP
