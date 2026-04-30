@@ -24,6 +24,9 @@
 
 #define USE_TARGET_CONFIG
 
+#define USE_LOG
+#define USE_BOOTLOG 2048
+
 // *************** LED **********************
 #define LED0                    PA1
 #define LED1                    PE6

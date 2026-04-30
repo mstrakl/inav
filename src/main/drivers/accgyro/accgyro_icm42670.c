@@ -35,11 +35,102 @@
 #include "drivers/accgyro/accgyro.h"
 #include "drivers/accgyro/accgyro_mpu.h"
 #include "drivers/accgyro/accgyro_icm42670.h"
-#include "drivers/accgyro/icm42670/inv_imu_defs.h"
-
-
 
 #if defined(USE_IMU_ICM42670)
+
+// Data registers
+#define TEMP_DATA1        0x10009
+#define ACCEL_DATA_X1     0x1000b
+#define GYRO_DATA_X1      0x10011
+
+#define PWR_MGMT0         0x1001f
+#define PWR_MGMT0_GYRO_MODE_POS      0x02
+#define PWR_MGMT0_GYRO_MODE_LN      (0x03 << PWR_MGMT0_GYRO_MODE_POS)
+#define PWR_MGMT0_GYRO_MODE_LP      (0x02 << PWR_MGMT0_GYRO_MODE_POS)
+#define PWR_MGMT0_GYRO_MODE_STANDBY (0x01 << PWR_MGMT0_GYRO_MODE_POS)
+#define PWR_MGMT0_GYRO_MODE_OFF     (0x00 << PWR_MGMT0_GYRO_MODE_POS)
+#define PWR_MGMT0_ACCEL_MODE_LN  0x03
+#define PWR_MGMT0_ACCEL_MODE_LP  0x02
+#define PWR_MGMT0_ACCEL_MODE_OFF 0x00
+#define GYRO_CONFIG0      0x10020
+#define ACCEL_CONFIG0     0x10021
+#define GYRO_CONFIG1      0x10023
+#define ACCEL_CONFIG1     0x10024
+#define INTF_CONFIG0      0x10035
+
+#define WHO_AM_I          0x10075
+#define INTF_CONFIG0_SENSOR_DATA_ENDIAN_MASK (0x01 << 4)
+
+
+// Configuration 
+
+#define ICM42670_GYRO_UI_FS_2000DPS               (0x00 << 5)
+#define ICM42670_ACCEL_UI_FS_16G                  (0x00 << 5)
+
+#define ICM42670_ODR_1600HZ                       0x05
+#define ICM42670_ODR_800HZ                        0x06
+#define ICM42670_ODR_400HZ                        0x07
+#define ICM42670_ODR_200HZ                        0x08
+#define ICM42670_ODR_100HZ                        0x09
+#define ICM42670_ODR_50HZ                         0x0A
+#define ICM42670_ODR_25HZ                         0x0B
+#define ICM42670_ODR_12HZ5                        0x0C
+
+#define ICM42670_GYRO_UI_FILT_BW_BYPASS           0x00
+#define ICM42670_GYRO_UI_FILT_BW_180HZ            0x01
+#define ICM42670_GYRO_UI_FILT_BW_121HZ            0x02
+#define ICM42670_GYRO_UI_FILT_BW_73HZ             0x03
+#define ICM42670_GYRO_UI_FILT_BW_53HZ             0x04
+#define ICM42670_GYRO_UI_FILT_BW_34HZ             0x05
+#define ICM42670_GYRO_UI_FILT_BW_25HZ             0x06
+#define ICM42670_GYRO_UI_FILT_BW_16HZ             0x07
+
+#define ICM42670_ACCEL_UI_AVG_4X                  (0x01 << 4)
+
+static const gyroFilterAndRateConfig_t icm42670GyroConfigs[] = {
+    { GYRO_LPF_256HZ, 1600, { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_1600HZ, ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_1600HZ } },
+    { GYRO_LPF_256HZ, 800,  { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_800HZ,  ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_800HZ } },
+    { GYRO_LPF_256HZ, 400,  { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_400HZ,  ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_400HZ } },
+    { GYRO_LPF_256HZ, 200,  { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_200HZ,  ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_200HZ } },
+    { GYRO_LPF_256HZ, 100,  { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_100HZ,  ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_100HZ } },
+    { GYRO_LPF_256HZ, 50,   { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_50HZ,   ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_50HZ } },
+    { GYRO_LPF_256HZ, 25,   { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_25HZ,   ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_25HZ } },
+    { GYRO_LPF_256HZ, 12,   { ICM42670_GYRO_UI_FS_2000DPS | ICM42670_ODR_12HZ5,  ICM42670_ACCEL_UI_FS_16G | ICM42670_ODR_12HZ5 } },
+};
+
+static uint8_t icm42670FilterBwFromLpf(uint8_t lpf)
+{
+    switch (lpf) {
+    case GYRO_LPF_NONE:
+        return ICM42670_GYRO_UI_FILT_BW_BYPASS;
+    case GYRO_LPF_256HZ:
+    case GYRO_LPF_188HZ:
+        return ICM42670_GYRO_UI_FILT_BW_180HZ;
+    case GYRO_LPF_98HZ:
+        return ICM42670_GYRO_UI_FILT_BW_121HZ;
+    case GYRO_LPF_42HZ:
+        return ICM42670_GYRO_UI_FILT_BW_34HZ;
+    case GYRO_LPF_20HZ:
+        return ICM42670_GYRO_UI_FILT_BW_16HZ;
+    case GYRO_LPF_10HZ:
+    case GYRO_LPF_5HZ:
+        return ICM42670_GYRO_UI_FILT_BW_16HZ;
+    }
+
+    return ICM42670_GYRO_UI_FILT_BW_BYPASS;
+}
+
+static void formatByteBinary(char *buf, uint8_t value)
+{
+    buf[0] = '0';
+    buf[1] = 'b';
+
+    for (int bit = 0; bit < 8; bit++) {
+        buf[2 + bit] = (value & (1 << (7 - bit))) ? '1' : '0';
+    }
+
+    buf[10] = '\0';
+}
 
 static void icm42670AccInit(accDev_t *acc)
 {
@@ -85,6 +176,10 @@ bool icm42670AccDetect(accDev_t *acc)
 static void icm42670AccAndGyroInit(gyroDev_t *gyro)
 {
     busDevice_t * dev = gyro->busDev;
+    const gyroFilterAndRateConfig_t * config = chooseGyroConfig(gyro->lpf, 1000000 / gyro->requestedSampleIntervalUs,
+                                                                &icm42670GyroConfigs[0], ARRAYLEN(icm42670GyroConfigs));
+
+    gyro->sampleRateIntervalUs = 1000000 / config->gyroRateHz;
 
     busSetSpeed(dev, BUS_SPEED_INITIALIZATION);
 
@@ -92,15 +187,65 @@ static void icm42670AccAndGyroInit(gyroDev_t *gyro)
     busWrite(dev, (PWR_MGMT0 & 0xFF), PWR_MGMT0_ACCEL_MODE_LN | PWR_MGMT0_GYRO_MODE_LN);
     delay(15);
 
-    /* Default: leave range/odr at device default (can be configured later) */
-    /* Configure DRDY interrupt: pulsed, push-pull, active high */
-    busWrite(dev, (INT_CONFIG & 0xFF), INT_CONFIG_INT1_MODE_PULSED | INT_CONFIG_INT1_DRIVE_CIRCUIT_PP | INT_CONFIG_INT1_POLARITY_HIGH);
+    /* ODR and dynamic range */
+    busWrite(dev, (GYRO_CONFIG0 & 0xFF), config->gyroConfigValues[0]);
     delay(15);
 
-    /* Enable data ready interrupt source */
-    busWrite(dev, (INT_SOURCE0 & 0xFF), 0x08);
+    busWrite(dev, (ACCEL_CONFIG0 & 0xFF), config->gyroConfigValues[1]);
+    delay(15);
+
+    /* Low latency filter bandwidth */
+    busWrite(dev, (GYRO_CONFIG1 & 0xFF), icm42670FilterBwFromLpf(gyro->lpf));
+    delay(15);
+    
+    // Also add averagning 4x for accel
+    busWrite(dev, (ACCEL_CONFIG1 & 0xFF), icm42670FilterBwFromLpf(gyro->lpf) | ICM42670_ACCEL_UI_AVG_4X);
+    delay(15);
+
+    /* Sensor data and FIFO readout use the same byte order as the driver */
+    busWrite(dev, (INTF_CONFIG0 & 0xFF), INTF_CONFIG0_SENSOR_DATA_ENDIAN_MASK);
+    delay(15);
 
     busSetSpeed(dev, BUS_SPEED_FAST);
+
+    uint8_t c1;
+    busRead(dev, (GYRO_CONFIG0 & 0xFF), &c1);
+    delay(15);
+
+    uint8_t c2;
+    busRead(dev, (ACCEL_CONFIG0 & 0xFF), &c2);
+    delay(15);
+
+    uint8_t c3;
+    busRead(dev, (GYRO_CONFIG1 & 0xFF), &c3);
+    delay(15);
+
+    uint8_t c4;
+    busRead(dev, (ACCEL_CONFIG1 & 0xFF), &c4);
+    delay(15);
+
+    LOG_INFO(GYRO, "Gyro ICM42670 configured with:");
+    LOG_INFO(GYRO, "  ODR: %d Hz, sample interval: %ld us", config->gyroRateHz, gyro->sampleRateIntervalUs);
+
+    {
+        char gyroCfg0Binary[11];
+        char accelCfg0Binary[11];
+        char gyroCfg1Binary[11];
+        char accelCfg1Binary[11];
+
+        formatByteBinary(gyroCfg0Binary, c1);
+        formatByteBinary(accelCfg0Binary, c2);
+        formatByteBinary(gyroCfg1Binary, c3);
+        formatByteBinary(accelCfg1Binary, c4);
+
+        LOG_INFO(GYRO, "  GyroCfg0_Byte: 0x%02X (%s)", c1, gyroCfg0Binary);
+        LOG_INFO(GYRO, "  AccelCfg0_Byte: 0x%02X (%s)", c2, accelCfg0Binary);
+        LOG_INFO(GYRO, "  GyroCfg1_Byte: 0x%02X (%s)", c3, gyroCfg1Binary);
+        LOG_INFO(GYRO, "  AccelCfg1_Byte: 0x%02X (%s)", c4, accelCfg1Binary);
+    }
+
+    gyro->scale = 1.0f / 16.4f;
+
 }
 
 static bool icm42670DeviceDetect(busDevice_t * dev)
@@ -118,8 +263,9 @@ static bool icm42670DeviceDetect(busDevice_t * dev)
         delay(150);
 
         status = busRead(dev, (WHO_AM_I & 0xFF), &tmp);
-
-        if (tmp == INV_IMU_WHOAMI) {
+        
+        // Return of icm42670 who_am_i is 0x67
+        if (tmp == 0x67) {
             return true;
         }
         /* Retry detection */
