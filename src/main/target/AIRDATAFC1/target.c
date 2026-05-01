@@ -25,7 +25,7 @@
 #include "drivers/pinio.h"
 #include "drivers/sensor.h"
 
-#define ICM42670_I2C_ADDR (0x68)
+#define ICM42670_I2C_ADDR (0x69)
 BUSDEV_REGISTER_I2C(busdev_icm42670, DEVHW_ICM42670, ICM42670_I2C_BUS, ICM42670_I2C_ADDR, NONE, DEVFLAGS_NONE, IMU_ICM42670_ALIGN);
 
 timerHardware_t timerHardware[] = {

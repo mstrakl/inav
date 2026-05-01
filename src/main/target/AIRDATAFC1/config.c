@@ -27,12 +27,15 @@ void targetConfiguration(void)
     }
 }
 
+
+/*
 void validateAndFixTargetConfig(void)
 {
     const int portIndex = findSerialPortIndexByIdentifier(SERIAL_PORT_USART1);
 
     if (portIndex >= 0) {
-        serialConfigMutable()->portConfigs[portIndex].functionMask = FUNCTION_MSP;
+        serialConfigMutable()->portConfigs[portIndex].functionMask = FUNCTION_MSP | FUNCTION_LOG;
         serialConfigMutable()->portConfigs[portIndex].msp_baudrateIndex = BAUD_115200;
     }
 }
+*/

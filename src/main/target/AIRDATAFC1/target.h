@@ -22,7 +22,6 @@
 
 #define USE_HARDWARE_PREBOOT_SETUP
 #define USE_TARGET_CONFIG
-
 #define USE_LOG
 #define USE_BOOTLOG 2048
 
@@ -58,17 +57,20 @@
 
 #define USE_IMU_ICM42670
 #define ICM42670_I2C_BUS        BUS_I2C1
-#define IMU_ICM42670_ALIGN      CW90_DEG
+#define IMU_ICM42670_ALIGN      CW0_DEG
 
 #define USE_BARO
 #define BARO_I2C_BUS            BUS_I2C1
 #define USE_BARO_BMP388
 
+
 // *************** ADC *****************************
 
 
 // ***************  OTHERS *************************
-#define DEFAULT_FEATURES        (FEATURE_TX_PROF_SEL | FEATURE_TELEMETRY)
+
+#define USE_GPS
+#define DEFAULT_FEATURES        (FEATURE_TELEMETRY)
 
 //#define USE_DSHOT
 //#define USE_ESC_SENSOR

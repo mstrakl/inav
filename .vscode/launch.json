@@ -13,6 +13,7 @@
       "configFiles": [
         "${workspaceFolder}/board/h7fc.cfg"
       ],
+      "preLaunchTask": "Build JETFURYH743 (Debug)",
       "preLaunchCommands": [
         "set substitute-path /src ${workspaceFolder}"
       ],
@@ -33,6 +34,7 @@
       "configFiles": [
         "${workspaceFolder}/board/f4fc.cfg"
       ],
+      "preLaunchTask": "Build AIRDATAFC1 (Debug)",
       "preLaunchCommands": [
         "set substitute-path /src ${workspaceFolder}"
       ],
