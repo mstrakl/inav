@@ -33,6 +33,22 @@
         }
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Build AIRDATAFC1 (Debug)",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${workspaceFolder}/build.sh",
+        "AIRDATAFC1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CMAKE_BUILD_TYPE": "Debug"
+        }
+      },
+      "problemMatcher": []
     }
   ]
 }

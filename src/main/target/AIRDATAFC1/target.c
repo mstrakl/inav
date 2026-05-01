@@ -18,9 +18,12 @@
 #include <stdbool.h>
 #include <platform.h>
 
+#include "drivers/bus.h"
 #include "drivers/io.h"
 #include "drivers/pwm_mapping.h"
 #include "drivers/timer.h"
+#include "drivers/pinio.h"
+#include "drivers/sensor.h"
 
 #define ICM42670_I2C_ADDR (0x68)
 BUSDEV_REGISTER_I2C(busdev_icm42670, DEVHW_ICM42670, ICM42670_I2C_BUS, ICM42670_I2C_ADDR, NONE, DEVFLAGS_NONE, IMU_ICM42670_ALIGN);
