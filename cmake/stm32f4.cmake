@@ -119,6 +119,25 @@ function(target_stm32f405xg name)
     )
 endfunction()
 
+set(STM32F407_COMPILE_DEFINITIONS
+    STM32F40_41xxx
+    STM32F407xx
+    MCU_FLASH_SIZE=512
+    OPTIMIZATION -Os
+)
+
+function(target_stm32f407xe name)
+    target_stm32f4xx(
+        NAME ${name}
+        STARTUP startup_stm32f40xx.s
+        SOURCES ${STM32F4_STDPERIPH_SRC}
+        COMPILE_DEFINITIONS ${STM32F407_COMPILE_DEFINITIONS}
+        LINKER_SCRIPT stm32_flash_f407xe
+        SVD STM32F405
+        ${ARGN}
+    )
+endfunction()
+
 set(STM32F411_OR_F427_STDPERIPH_SRC ${STM32F4_STDPERIPH_SRC})
 set(STM32F411_OR_F427_STDPERIPH_SRC_EXCLUDES "stm32f4xx_fsmc.c")
 exclude_basenames(STM32F411_OR_F427_STDPERIPH_SRC ${STM32F411_OR_F427_STDPERIPH_SRC_EXCLUDES})
