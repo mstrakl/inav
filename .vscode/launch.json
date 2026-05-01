@@ -13,7 +13,6 @@
       "configFiles": [
         "${workspaceFolder}/board/h7fc.cfg"
       ],
-      "preLaunchTask": "Build JETFURYH743 (Debug)",
       "preLaunchCommands": [
         "set substitute-path /src ${workspaceFolder}"
       ],
@@ -21,6 +20,29 @@
       "cwd": "${workspaceFolder}",
       "showDevDebugOutput": "raw"
     },
+
+    {
+      "name": "Debug AIRDATAFC1",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "gdbPath": "/usr/bin/gdb-multiarch",
+      "serverpath": "/usr/bin/openocd",
+      "objdumpPath": "/usr/bin/arm-none-eabi-objdump",
+      "executable": "${workspaceFolder}/build/bin/AIRDATAFC1.elf",
+      "configFiles": [
+        "${workspaceFolder}/board/f4fc.cfg"
+      ],
+      "preLaunchCommands": [
+        "set substitute-path /src ${workspaceFolder}"
+      ],
+      "runToEntryPoint": "main",
+      "cwd": "${workspaceFolder}",
+      "showDevDebugOutput": "raw"
+    },
+
+
+
     {
       "name": "Attach JETFURYH743",
       "type": "cortex-debug",
@@ -33,7 +55,6 @@
       "configFiles": [
         "${workspaceFolder}/board/h7fc.cfg"
       ],
-      "preLaunchTask": "Build JETFURYH743 (Debug)",
       "preLaunchCommands": [
         "set substitute-path /src ${workspaceFolder}"
       ],

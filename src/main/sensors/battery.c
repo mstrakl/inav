@@ -325,36 +325,9 @@ static void updateBatteryVoltage(timeUs_t timeDelta, bool justConnected)
     }
 }
 
-batteryState_e checkBatteryVoltageState(void)
-{
-    uint16_t stateVoltage = getBatteryVoltage();
-    static batteryState_e currentBatteryVoltageState = BATTERY_OK;
+#endif
 
-    switch (currentBatteryVoltageState)
-    {
-        case BATTERY_OK:
-            if (stateVoltage <= (batteryWarningVoltage - VBATT_HYSTERESIS)) {
-                currentBatteryVoltageState = BATTERY_WARNING;
-            }
-            break;
-        case BATTERY_WARNING:
-            if (stateVoltage <= (batteryCriticalVoltage - VBATT_HYSTERESIS)) {
-                currentBatteryVoltageState = BATTERY_CRITICAL;
-            } else if (stateVoltage > (batteryWarningVoltage + VBATT_HYSTERESIS)){
-                currentBatteryVoltageState = BATTERY_OK;
-            }
-            break;
-        case BATTERY_CRITICAL:
-            if (stateVoltage > (batteryCriticalVoltage + VBATT_HYSTERESIS)) {
-                currentBatteryVoltageState = BATTERY_WARNING;
-            }
-            break;
-        default:
-            break;
-    }
-
-    return currentBatteryVoltageState;
-}
+#ifdef USE_ADC
 
 static void checkBatteryCapacityState(void)
 {
@@ -455,6 +428,41 @@ void batteryUpdate(timeUs_t timeDelta)
     }
 }
 #endif
+
+batteryState_e checkBatteryVoltageState(void)
+{
+#ifdef USE_ADC
+    uint16_t stateVoltage = getBatteryVoltage();
+    static batteryState_e currentBatteryVoltageState = BATTERY_OK;
+
+    switch (currentBatteryVoltageState)
+    {
+        case BATTERY_OK:
+            if (stateVoltage <= (batteryWarningVoltage - VBATT_HYSTERESIS)) {
+                currentBatteryVoltageState = BATTERY_WARNING;
+            }
+            break;
+        case BATTERY_WARNING:
+            if (stateVoltage <= (batteryCriticalVoltage - VBATT_HYSTERESIS)) {
+                currentBatteryVoltageState = BATTERY_CRITICAL;
+            } else if (stateVoltage > (batteryWarningVoltage + VBATT_HYSTERESIS)){
+                currentBatteryVoltageState = BATTERY_OK;
+            }
+            break;
+        case BATTERY_CRITICAL:
+            if (stateVoltage > (batteryCriticalVoltage + VBATT_HYSTERESIS)) {
+                currentBatteryVoltageState = BATTERY_WARNING;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return currentBatteryVoltageState;
+#else
+    return BATTERY_NOT_PRESENT;
+#endif
+}
 
 batteryState_e getBatteryState(void)
 {
