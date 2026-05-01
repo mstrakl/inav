@@ -38,14 +38,22 @@
 #define UART2_RX_PIN            PA3
 
 #define USE_UART3
-#define UART3_RX_PIN            PC7
-#define UART3_TX_PIN            PC6
+#define UART3_TX_PIN            NONE
+#define UART3_RX_PIN            NONE
 
 #define USE_UART4
 #define UART4_TX_PIN            NONE
 #define UART4_RX_PIN            PA1
 
-#define SERIAL_PORT_COUNT       4
+#define USE_UART5
+#define UART5_RX_PIN            PD2
+#define UART5_TX_PIN            PC12
+
+#define USE_UART6
+#define UART6_RX_PIN            PC7
+#define UART6_TX_PIN            PC6
+
+#define SERIAL_PORT_COUNT       6
 
 // *************** I2C /Baro/Mag/Pitot ********************
 #define USE_I2C
@@ -78,7 +86,7 @@
 #define TARGET_IO_PORTA         0xffff
 #define TARGET_IO_PORTB         0xffff
 #define TARGET_IO_PORTC         0xffff
-#define TARGET_IO_PORTD         (BIT(12) | BIT(13) | BIT(14) | BIT(15))
+#define TARGET_IO_PORTD         (BIT(2) | BIT(12) | BIT(13) | BIT(14) | BIT(15))
 #define TARGET_IO_PORTE         (BIT(5) | BIT(6) | BIT(9) | BIT(11) | BIT(13) | BIT(14))
 
 #define MAX_PWM_OUTPUT_PORTS      12
