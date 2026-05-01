@@ -299,7 +299,7 @@ void createDefaultConfig(void)
 
 #ifdef MSP_UART
     int port = findSerialPortIndexByIdentifier(MSP_UART);
-    if (port) {
+    if (port >= 0) {
         serialConfigMutable()->portConfigs[port].functionMask = FUNCTION_MSP;
         serialConfigMutable()->portConfigs[port].msp_baudrateIndex = BAUD_115200;
     }
