@@ -129,6 +129,26 @@ set(STM32F411_COMPILE_DEFINITIONS
     OPTIMIZATION -Os
 )
 
+set(STM32F407_COMPILE_DEFINITIONS
+    STM32F40_41xxx
+    STM32F407xx
+    MCU_FLASH_SIZE=512
+    OPTIMIZATION -Os
+)
+
+function(target_stm32f407xe name)
+    target_stm32f4xx(
+        NAME ${name}
+        STARTUP startup_stm32f40xx.s
+        SOURCES ${STM32F4_STDPERIPH_SRC}
+        COMPILE_DEFINITIONS ${STM32F407_COMPILE_DEFINITIONS}
+        LINKER_SCRIPT stm32_flash_f407xe
+        SVD STM32F405
+        ${ARGN}
+    )
+endfunction()
+
+
 function(target_stm32f411xe name)
     target_stm32f4xx(
         NAME ${name}
