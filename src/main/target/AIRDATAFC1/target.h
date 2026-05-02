@@ -31,7 +31,6 @@
 #define USE_UART1
 #define UART1_TX_PIN            PA9
 #define UART1_RX_PIN            PA10
-#define MSP_UART                SERIAL_PORT_USART1  
 
 #define USE_UART2
 #define UART2_TX_PIN            PA2
@@ -53,7 +52,25 @@
 #define UART6_RX_PIN            PC7
 #define UART6_TX_PIN            PC6
 
-#define SERIAL_PORT_COUNT       6
+#define SERIAL_PORT_COUNT       6  
+
+
+// *************** SPI: SDCARD **********************
+
+#define USE_SPI
+#define USE_SPI_DEVICE_1
+
+#define SPI1_SCK_PIN        PA5
+#define SPI1_MISO_PIN   	PA6
+#define SPI1_MOSI_PIN   	PA7
+
+// Enable SD card support over SPI
+#define USE_SDCARD
+#define USE_SDCARD_SPI
+#define SDCARD_SPI_BUS          BUS_SPI1
+#define SDCARD_CS_PIN           PA4
+#define USE_BLACKBOX
+
 
 // *************** I2C /Baro/Mag/Pitot ********************
 #define USE_I2C
@@ -83,7 +100,7 @@
 //#define USE_DSHOT
 //#define USE_ESC_SENSOR
 
-#define TARGET_IO_PORTA         0xffff
+#define TARGET_IO_PORTA         (0xFFFF & ~(BIT(13) | BIT(14)))  // Remove PA13.14 to free them for SWD
 #define TARGET_IO_PORTB         0xffff
 #define TARGET_IO_PORTC         0xffff
 #define TARGET_IO_PORTD         (BIT(2) | BIT(12) | BIT(13) | BIT(14) | BIT(15))
