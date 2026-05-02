@@ -1,0 +1,227 @@
+diff all
+
+# version
+# INAV/AIRDATAFC1 9.0.1 May  2 2026 / 14:15:25 (a2ee91ff) 
+# GCC-13.2.1 20231009
+
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults noreboot
+
+# resources
+
+# Timer overrides
+
+# Outputs [servo]
+servo 1 900 2000 1350 -100
+servo 2 1000 2100 1600 -100
+servo 3 1000 2000 1550 100
+servo 4 1000 2000 1550 100
+servo 5 1200 1750 1500 100
+servo 6 1250 1800 1550 100
+
+# safehome
+
+# Fixed Wing Approach
+
+# features
+feature GPS
+feature BLACKBOX
+feature PWM_OUTPUT_ENABLE
+feature FW_AUTOTRIM
+
+# blackbox
+blackbox -NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 1 64 115200 115200 0 115200
+serial 5 2 115200 115200 0 115200
+
+# Modes [aux]
+aux 0 0 0 1700 2100
+aux 1 1 1 1300 1500
+aux 2 12 1 900 1100
+aux 3 53 1 1500 1700
+aux 4 11 1 1700 1900
+aux 5 10 1 1900 2100
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 0 invalid
+
+# OSD [osd_layout]
+
+# Programming: logic
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set looptime = 1000
+set gyro_main_lpf_hz = 25
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 30
+set gyro_zero_x = -4
+set gyro_zero_z = -3
+set ins_gravity_cmss =  1010.633
+set gyro_adaptive_filter_min_hz = 20
+set acc_hardware = ICM42670
+set acczero_z = -20
+set accgain_x = 4095
+set accgain_y = 4095
+set accgain_z = 4095
+set baro_hardware = BMP388
+set receiver_type = SERIAL
+set serialrx_provider = CRSF
+set motor_pwm_protocol = STANDARD
+set small_angle = 180
+set applied_defaults = 3
+set airmode_type = STICK_CENTER_ONCE
+set nav_wp_radius = 800
+set nav_wp_max_safe_distance = 500
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 5000
+set nav_fw_control_smoothness = 2
+set nav_fw_launch_motor_delay = 100
+set nav_fw_launch_max_altitude = 5000
+set nav_fw_launch_climb_angle = 25
+set i2c_speed = 800KHZ
+
+# control_profile
+control_profile 1
+
+set fw_p_pitch = 20
+set fw_i_pitch = 45
+set fw_d_pitch = 8
+set fw_ff_pitch = 70
+set fw_p_roll = 20
+set fw_i_roll = 50
+set fw_d_roll = 8
+set fw_ff_roll = 60
+set fw_p_yaw = 30
+set fw_i_yaw = 55
+set fw_ff_yaw = 70
+set fw_turn_assist_pitch_gain =  0.400
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set nav_fw_alt_control_response = 45
+set nav_fw_pos_xy_p = 55
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set fw_level_pitch_trim =  3.000
+set tpa_rate = 80
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 4
+
+# control_profile
+control_profile 2
+
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set dterm_lpf_hz = 10
+set fw_turn_assist_pitch_gain =  0.400
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set nav_fw_pos_xy_p = 55
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set tpa_rate = 80
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+
+# control_profile
+control_profile 3
+
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set tpa_rate = 80
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+
+# mixer_profile
+mixer_profile 1
+
+set platform_type = AIRPLANE
+set has_flaps = ON
+set model_preview_type = 14
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000  0.000  0.000  0.000
+
+# Mixer: servo mixer
+smix reset
+
+smix 0 1 0 100 0 -1
+smix 1 2 0 100 0 -1
+smix 2 3 1 100 0 -1
+smix 3 4 2 100 0 -1
+smix 4 5 11 100 50 -1
+smix 5 6 11 100 50 -1
+
+# battery_profile
+battery_profile 1
+
+set throttle_idle =  5.000
+
+# battery_profile
+battery_profile 2
+
+
+# battery_profile
+battery_profile 3
+
+
+# restore original profile selection
+control_profile 1
+mixer_profile 1
+battery_profile 3
+
+# save configuration
+save
+
+# 

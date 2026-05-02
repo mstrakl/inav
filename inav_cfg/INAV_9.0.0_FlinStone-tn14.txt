@@ -1,0 +1,200 @@
+diff all
+
+# version
+# INAV/ATOMRCF405NAVI 9.0.1 Feb 21 2026 / 12:35:11 (07aaded8) 
+# GCC-13.2.1 20231009
+
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults noreboot
+
+# resources
+
+# Timer overrides
+
+# Outputs [servo]
+
+# safehome
+
+# Fixed Wing Approach
+fwapproach 8 1000 500 0 250 0 0
+
+# geozone
+
+# geozone vertices
+
+# features
+feature GPS
+feature PWM_OUTPUT_ENABLE
+
+# beeper
+
+# blackbox
+blackbox -NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox -MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox -SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 20 32769 115200 115200 0 115200
+serial 1 0 115200 115200 0 115200
+serial 3 2 115200 115200 0 115200
+serial 4 64 115200 115200 0 115200
+serial 5 256 115200 115200 57600 115200
+
+# LEDs
+
+# LED color
+
+# LED mode_color
+
+# Modes [aux]
+aux 0 0 0 1700 2100
+aux 1 1 1 1650 2100
+aux 2 11 2 1350 1700
+aux 3 28 2 1725 2100
+aux 4 3 2 1350 2100
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 0 invalid
+
+# OSD [osd_layout]
+
+# Programming: logic
+logic 50 1 -1 2 1 12 0 1800 0
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set gyro_zero_y = 1
+set gyro_zero_z = -5
+set ins_gravity_cmss =  981.221
+set acc_hardware = BMI270
+set acczero_x = 3
+set acczero_y = -5
+set acczero_z = -15
+set accgain_x = 4058
+set accgain_y = 4073
+set accgain_z = 4056
+set align_mag = CW270
+set mag_hardware = IST8310
+set magzero_x = -92
+set magzero_y = 122
+set magzero_z = 85
+set maggain_x = 490
+set maggain_y = 490
+set maggain_z = 482
+set baro_hardware = SPL06
+set pitot_lpf_milli_hz = 350
+set serialrx_provider = CRSF
+set blackbox_rate_denom = 2
+set motor_pwm_protocol = STANDARD
+set failsafe_min_distance_procedure = LAND
+set align_board_pitch = 10
+set servo_pwm_rate = 100
+set ahrs_inertia_comp_method = VELNED
+set applied_defaults = 1
+set gps_ublox_use_galileo = ON
+set fw_autotune_max_rate_deflection = 80
+set nav_wp_load_on_boot = ON
+set nav_fw_wp_tracking_accuracy = 3
+set nav_auto_speed = 150
+set nav_max_auto_speed = 250
+set nav_manual_speed = 250
+set nav_land_slowdown_maxalt = 1000
+set nav_emerg_landing_speed = 250
+set nav_max_altitude = 2000
+set nav_mc_bank_angle = 25
+set nav_mc_auto_climb_rate = 150
+set nav_mc_manual_climb_rate = 150
+set nav_mc_braking_boost_factor = 50
+set log_level = DEBUG
+set log_topics = 4294967295
+
+# control_profile
+control_profile 1
+
+
+# control_profile
+control_profile 2
+
+set max_angle_inclination_rll = 300
+set max_angle_inclination_pit = 300
+set nav_mc_pos_xy_p = 50
+set rc_expo = 51
+
+# control_profile
+control_profile 3
+
+
+# mixer_profile
+mixer_profile 1
+
+set model_preview_type = 3
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000 -1.000  1.000 -1.000
+mmix 1  1.000 -1.000 -1.000  1.000
+mmix 2  1.000  1.000 -1.000 -1.000
+mmix 3  1.000  1.000  1.000  1.000
+
+# Mixer: servo mixer
+
+# mixer_profile
+mixer_profile 2
+
+
+# Mixer: motor mixer
+
+# Mixer: servo mixer
+
+# battery_profile
+battery_profile 1
+
+
+# battery_profile
+battery_profile 2
+
+set failsafe_throttle = 1100
+set nav_mc_hover_thr = 1500
+
+# battery_profile
+battery_profile 3
+
+
+# restore original profile selection
+control_profile 2
+mixer_profile 1
+battery_profile 2
+
+# save configuration
+save
+
+# 
