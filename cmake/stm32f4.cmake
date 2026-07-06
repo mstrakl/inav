@@ -148,6 +148,17 @@ function(target_stm32f407xe name)
     )
 endfunction()
 
+function(target_stm32f407xg name)
+    target_stm32f4xx(
+        NAME ${name}
+        STARTUP startup_stm32f40xx.s
+        SOURCES ${STM32F4_STDPERIPH_SRC}
+        COMPILE_DEFINITIONS ${STM32F405_COMPILE_DEFINITIONS}
+        LINKER_SCRIPT stm32_flash_f405xg
+        SVD STM32F405
+        ${ARGN}
+    )
+endfunction()
 
 function(target_stm32f411xe name)
     target_stm32f4xx(

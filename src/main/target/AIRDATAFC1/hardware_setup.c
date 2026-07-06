@@ -31,12 +31,12 @@
 
 void initialisePreBootHardware(void)
 {
-
+/*
     IOInit(DEFIO_IO(PA11), OWNER_SYSTEM, RESOURCE_OUTPUT, 0);
     IOConfigGPIO(DEFIO_IO(PA11), IOCFG_OUT_PP);
     IOHi(DEFIO_IO(PA11));
 
     delay(100);
     IOLo(DEFIO_IO(PA11));
-
+*/
 }
