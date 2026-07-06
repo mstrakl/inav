@@ -11,9 +11,9 @@
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_DIST 1000.0f 
 #define MAX_ALT 10000.0f // max 100 m
-#define GAIN 2.0f
+#define GAIN 5.0f
 
-#define HOLD_ALT_CM 300.0f
+#define HOLD_ALT_CM 200.0f
 #define HOLD_TIME_MS 3000
 
 
@@ -83,9 +83,9 @@ void navigationDlzInit(void) {
     navPosIntegratorInit(&navDlzPosIntegrator, millis());
 
     // Rate limited 
-    navRateLimiterInit(&navDlzBiasPosXRateLimiter, 50.0f, 0.0f, millis());
-    navRateLimiterInit(&navDlzBiasPosYRateLimiter, 50.0f, 0.0f, millis());
-    navRateLimiterInit(&navDlzVspdRateLimiter, 50.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzBiasPosXRateLimiter, 75.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzBiasPosYRateLimiter, 75.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzVspdRateLimiter, 75.0f, 0.0f, millis());
 
     isNewDataReady = false;
     setSkyvisFlag(5);
@@ -225,7 +225,7 @@ float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targe
             const float posErrMag = sqrtf(conditionedBiasPosX * conditionedBiasPosX + conditionedBiasPosY * conditionedBiasPosY);
 
             // Always required hold for now
-            if (posErrMag > 200.0f) {
+            if (posErrMag > 100.0f) {
                 localRequireHold = true;
             }
         //} 
