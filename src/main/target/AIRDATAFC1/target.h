@@ -92,9 +92,8 @@
 // *************** ADC *****************************
 #define USE_ADC
 #define ADC_CHANNEL_1_PIN               PC1
-#define ADC_CHANNEL_2_PIN               PC2
 #define VBAT_ADC_CHANNEL                ADC_CHN_1
-#define CURRENT_METER_ADC_CHANNEL       ADC_CHN_2
+
 
 // ***************  OTHERS *************************
 
