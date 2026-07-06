@@ -89,16 +89,19 @@
 #define BARO_I2C_BUS            BUS_I2C1
 #define USE_BARO_BMP388
 
-
 // *************** ADC *****************************
-
+#define USE_ADC
+#define ADC_CHANNEL_1_PIN               PC1
+#define ADC_CHANNEL_2_PIN               PC2
+#define VBAT_ADC_CHANNEL                ADC_CHN_1
+#define CURRENT_METER_ADC_CHANNEL       ADC_CHN_2
 
 // ***************  OTHERS *************************
 
 #define USE_GPS
 #define DEFAULT_FEATURES        (FEATURE_TELEMETRY)
 
-//#define USE_DSHOT
+#define USE_DSHOT
 //#define USE_ESC_SENSOR
 
 #define TARGET_IO_PORTA         (0xFFFF & ~(BIT(13) | BIT(14)))  // Remove PA13.14 to free them for SWD
