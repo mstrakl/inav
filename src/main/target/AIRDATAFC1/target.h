@@ -90,15 +90,17 @@
 
 
 // *************** ADC *****************************
-
+#define USE_ADC
+#define ADC_CHANNEL_1_PIN               PC5
+#define VBAT_ADC_CHANNEL                ADC_CHN_1
 
 // ***************  OTHERS *************************
 
 #define USE_GPS
-#define DEFAULT_FEATURES        (FEATURE_TELEMETRY)
+#define DEFAULT_FEATURES        (FEATURE_TELEMETRY | FEATURE_VBAT)
 
-//#define USE_DSHOT
-//#define USE_ESC_SENSOR
+#define USE_DSHOT
+#define USE_ESC_SENSOR
 
 #define TARGET_IO_PORTA         (0xFFFF & ~(BIT(13) | BIT(14)))  // Remove PA13.14 to free them for SWD
 #define TARGET_IO_PORTB         0xffff
