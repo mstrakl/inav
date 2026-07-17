@@ -54,38 +54,22 @@
 #define USE_VCP
 
 #define USE_UART1
-#define UART1_RX_PIN            PA10
 #define UART1_TX_PIN            PA9
-
-#define USE_UART2
-#define UART2_RX_PIN            PA3
-#define UART2_TX_PIN            PA2
+#define UART1_RX_PIN            PA10
 
 #define USE_UART3
-#define UART3_RX_PIN            PD9
 #define UART3_TX_PIN            PD8
-
-#define USE_UART4
-#define UART4_RX_PIN            PA1
-#define UART4_TX_PIN            PA0
+#define UART3_RX_PIN            PD9
 
 #define USE_UART6
+#define UART6_TX_PIN            PC6
 #define UART6_RX_PIN            PC7
-#define UART6_TX_PIN            PC6 
-#define INVERTER_PIN_UART6_RX   PD0
 
-#define USE_UART7
-#define UART7_RX_PIN            PE7
-
-#define USE_UART8
-#define UART8_RX_PIN            PE0
-#define UART8_TX_PIN            PE1
-
-#define SERIAL_PORT_COUNT       8      //VCP, UART1, UART2, UART3, UART4, UART6, UART7, UART8
+#define SERIAL_PORT_COUNT       6
 
 #define DEFAULT_RX_TYPE         RX_TYPE_SERIAL
-#define SERIALRX_PROVIDER       SERIALRX_SBUS
-#define SERIALRX_UART           SERIAL_PORT_USART6
+#define SERIALRX_PROVIDER       SERIALRX_CRSF
+#define SERIALRX_UART           SERIAL_PORT_USART3
 
 // *************** I2C: BARO & MAG ****************************
 #define USE_I2C
@@ -104,12 +88,6 @@
 #define USE_MAG
 #define MAG_I2C_BUS             BUS_I2C1
 #define USE_MAG_ALL
-
-// *************** ENABLE OPTICAL FLOW & RANGEFINDER *****************************
-#define USE_RANGEFINDER
-#define USE_RANGEFINDER_MSP
-#define USE_OPFLOW
-#define USE_OPFLOW_MSP
 
 // *************** SDIO SD BLACKBOX*******************
 #define USE_SDCARD
@@ -140,4 +118,4 @@
 #define TARGET_IO_PORTD 0xffff
 #define TARGET_IO_PORTE 0xffff
 
-#define MAX_PWM_OUTPUT_PORTS       10
+#define MAX_PWM_OUTPUT_PORTS       5

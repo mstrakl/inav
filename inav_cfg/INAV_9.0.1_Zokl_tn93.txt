@@ -1,0 +1,172 @@
+
+
+# diff
+
+# version
+# INAV/JETFURYH743 9.0.1 Jul 14 2026 / 17:32:25 (eee6161a) 
+# GCC-13.2.1 20231009
+
+# start the command batch
+batch start
+
+# resources
+
+# Timer overrides
+timer_output_mode 2 SERVOS
+timer_output_mode 3 SERVOS
+
+# Outputs [servo]
+servo 1 1000 2000 1200 100
+servo 2 1000 2000 1400 100
+servo 3 1000 2000 1600 100
+servo 4 1000 2000 1200 100
+servo 5 1000 2000 2000 100
+
+# safehome
+
+# Fixed Wing Approach
+
+# geozone
+
+# geozone vertices
+
+# features
+feature GPS
+feature PWM_OUTPUT_ENABLE
+
+# beeper
+
+# blackbox
+blackbox -NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 0 1 115200 115200 0 115200
+serial 5 2 115200 115200 0 115200
+
+# Modes [aux]
+aux 0 0 0 1725 2100
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 0 invalid
+
+# OSD [osd_layout]
+
+# Programming: logic
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set looptime = 1000
+set gyro_main_lpf_hz = 25
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 30
+set gyro_zero_y = 6
+set gyro_zero_z = 7
+set ins_gravity_cmss =  974.183
+set gyro_adaptive_filter_min_hz = 20
+set acc_hardware = ICM42670
+set acczero_x = 1
+set align_mag = CW270FLIP
+set mag_hardware = NONE
+set baro_hardware = BMP388
+set blackbox_rate_denom = 2
+set motor_pwm_protocol = STANDARD
+set small_angle = 180
+set applied_defaults = 4
+set airmode_type = STICK_CENTER_ONCE
+set nav_wp_radius = 1000
+set nav_wp_max_safe_distance = 500
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 5000
+set nav_fw_bank_angle = 45
+set nav_fw_control_smoothness = 2
+set nav_fw_launch_max_angle = 75
+set nav_fw_launch_motor_delay = 100
+set nav_fw_launch_max_altitude = 5000
+set nav_fw_launch_climb_angle = 25
+
+# control_profile
+control_profile 1
+
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 70
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_p_yaw = 20
+set fw_i_yaw = 0
+set fw_ff_yaw = 100
+set max_angle_inclination_rll = 550
+set dterm_lpf_hz = 10
+set fw_turn_assist_pitch_gain =  0.300
+set nav_fw_pos_z_p = 25
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 5
+set nav_fw_alt_control_response = 45
+set d_boost_min =  1.000
+set d_boost_max =  1.000
+set tpa_rate = 80
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+
+# mixer_profile
+mixer_profile 1
+
+set platform_type = AIRPLANE
+set model_preview_type = 8
+
+# Mixer: motor mixer
+
+# Mixer: servo mixer
+smix reset
+
+smix 0 1 0 50 0 -1
+smix 1 1 1 50 0 -1
+smix 2 2 0 -50 0 -1
+smix 3 2 1 50 0 -1
+smix 4 3 15 100 0 -1
+smix 5 4 16 100 0 -1
+smix 6 5 17 100 0 -1
+
+# battery_profile
+battery_profile 1
+
+set throttle_idle =  5.000
+
+# save configuration
+save
+
+# end the command batch
+batch end
+
+# 
