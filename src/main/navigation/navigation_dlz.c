@@ -3,15 +3,17 @@
 
 #include "common/maths.h"
 #include "common/vector.h"
+#include "common/log.h"
 
 #include "flight/imu.h"
 
 #include "navigation/navigation_dlz.h"
 
+
 #define UPDATE_TIMEOUT_MS 1000  // if no update in this time, DLZ is considered lost
 #define MAX_DIST 1000.0f 
 #define MAX_ALT 10000.0f // max 100 m
-#define GAIN 5.0f
+#define GAIN 1.0f
 
 #define HOLD_ALT_CM 200.0f
 #define HOLD_TIME_MS 3000
@@ -85,7 +87,7 @@ void navigationDlzInit(void) {
     // Rate limited 
     navRateLimiterInit(&navDlzBiasPosXRateLimiter, 75.0f, 0.0f, millis());
     navRateLimiterInit(&navDlzBiasPosYRateLimiter, 75.0f, 0.0f, millis());
-    navRateLimiterInit(&navDlzVspdRateLimiter, 75.0f, 0.0f, millis());
+    navRateLimiterInit(&navDlzVspdRateLimiter, 50.0f, 0.0f, millis());
 
     isNewDataReady = false;
     setSkyvisFlag(5);
@@ -162,8 +164,11 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
             iy = 0.0f;
         }
 
-        const float rawPosX = constrainf(pos.x + ix, -MAX_DIST, MAX_DIST);
-        const float rawPosY = constrainf(pos.y + iy, -MAX_DIST, MAX_DIST);  
+        // Removed integrator
+
+        const float rawPosX = constrainf(pos.x, -MAX_DIST, MAX_DIST);
+        const float rawPosY = constrainf(pos.y, -MAX_DIST, MAX_DIST);  
+        
 
         // Calculate bias, rate limited
         conditionedBiasPosX = navRateLimiterUpdate(&navDlzBiasPosXRateLimiter,
@@ -181,6 +186,8 @@ void navigationDlzUpdate(const float posErrorX, const float posErrorY) {
         if (conditionedNavDlzConfidence > 0.95f) {
 
             if (conditionedNavDlzPosZ > HOLD_ALT_CM) dlzDetectedFromHigh = true;
+
+            //LOG_INFO(SYSTEM, "DLZ: posX=%.2f posY=%.2f posZ=%.2f conf=%.2f", conditionedBiasPosX, conditionedBiasPosY, conditionedNavDlzPosZ, conditionedNavDlzConfidence);
 
             setSkyvisFlag(30); // Tag detected
         } else {
@@ -225,7 +232,7 @@ float navigationDlzUpdateAltCtrl(const bool landingInProgress, const float targe
             const float posErrMag = sqrtf(conditionedBiasPosX * conditionedBiasPosX + conditionedBiasPosY * conditionedBiasPosY);
 
             // Always required hold for now
-            if (posErrMag > 100.0f) {
+            if (posErrMag > 30.0f) {
                 localRequireHold = true;
             }
         //} 

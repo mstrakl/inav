@@ -1,0 +1,195 @@
+diff
+
+# version
+# INAV/ATOMRCF405NAVI 9.0.1 Jul  8 2026 / 18:04:43 (2eb4c1b1) 
+# GCC-13.2.1 20231009
+
+# start the command batch
+batch start
+
+# resources
+
+# Timer overrides
+timer_output_mode 1 MOTORS
+timer_output_mode 7 MOTORS
+
+# Outputs [servo]
+
+# safehome
+
+# Fixed Wing Approach
+
+# geozone
+
+# geozone vertices
+
+# features
+feature GPS
+feature PWM_OUTPUT_ENABLE
+
+# beeper
+
+# blackbox
+blackbox -NAV_ACC
+blackbox NAV_POS
+blackbox NAV_PID
+blackbox MAG
+blackbox ACC
+blackbox ATTI
+blackbox RC_DATA
+blackbox RC_COMMAND
+blackbox MOTORS
+blackbox -GYRO_RAW
+blackbox -PEAKS_R
+blackbox -PEAKS_P
+blackbox -PEAKS_Y
+blackbox SERVOS
+
+# Receiver: Channel map
+
+# Ports
+serial 20 32769 115200 115200 0 115200
+serial 0 256 115200 115200 0 115200
+serial 3 2 115200 115200 0 115200
+
+# LEDs
+
+# LED color
+
+# LED mode_color
+
+# Modes [aux]
+aux 0 0 0 1650 2100
+aux 1 1 1 1675 2100
+aux 2 11 2 1300 1700
+aux 3 28 2 1750 2100
+aux 4 3 2 1300 1700
+aux 5 5 2 1300 1700
+
+# Adjustments [adjrange]
+
+# Receiver rxrange
+
+# temp_sensor
+
+# Mission Control Waypoints [wp]
+#wp 1 valid
+wp 0 1 466314919 161773027 5000 0 0 0 165
+wp 1 1 465624358 156253160 1000 0 0 0 0
+wp 2 8 465625286 156256899 1000 0 0 0 165
+
+# OSD [osd_layout]
+
+# Programming: logic
+logic 0 0 -1 6 1 7 0 0 0
+logic 1 0 0 0 0 0 0 0 0
+logic 50 1 -1 6 1 10 0 0 0
+
+# Programming: global variables
+
+# Programming: PID controllers
+
+# OSD: custom elements
+
+# master
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 60
+set dynamic_gyro_notch_mode = 3D
+set setpoint_kalman_q = 200
+set gyro_zero_z = -5
+set ins_gravity_cmss =  980.082
+set acc_hardware = BMI270
+set accgain_x = 4095
+set align_mag = CW0FLIP
+set mag_hardware = QMC5883
+set magzero_x = 622
+set magzero_y = -55
+set magzero_z = 86
+set maggain_x = 1609
+set maggain_y = 1655
+set maggain_z = 1635
+set align_mag_pitch = 1850
+set baro_hardware = NONE
+set serialrx_provider = CRSF
+set blackbox_rate_denom = 2
+set motor_pwm_protocol = DSHOT600
+set failsafe_procedure = RTH
+set align_board_pitch = -20
+set align_board_yaw = -10
+set applied_defaults = 5
+set airmode_type = THROTTLE_THRESHOLD
+set nav_wp_load_on_boot = ON
+set nav_wp_radius = 150
+set nav_auto_speed = 200
+set nav_max_auto_speed = 200
+set nav_manual_speed = 200
+set nav_land_maxalt_vspd = 150
+set nav_land_slowdown_minalt = 300
+set nav_land_slowdown_maxalt = 500
+set nav_emerg_landing_speed = 300
+set nav_max_altitude = 1000
+set nav_mc_bank_angle = 15
+set nav_mc_auto_climb_rate = 100
+set nav_mc_manual_climb_rate = 100
+set nav_mc_braking_boost_factor = 50
+set nav_mc_braking_bank_angle = 30
+set log_level = DEBUG
+set log_topics = 4294967295
+
+# control_profile
+control_profile 1
+
+set mc_p_pitch = 20
+set mc_i_pitch = 25
+set mc_d_pitch = 12
+set mc_p_roll = 20
+set mc_i_roll = 25
+set mc_d_roll = 12
+set mc_p_yaw = 40
+set mc_i_yaw = 60
+set mc_d_yaw = 5
+set mc_p_level = 16
+set mc_i_level = 10
+set max_angle_inclination_rll = 300
+set max_angle_inclination_pit = 300
+set nav_mc_pos_xy_p = 50
+set nav_mc_vel_xy_d = 60
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 24
+set yaw_rate = 12
+set ez_filter_hz = 90
+set ez_axis_ratio = 120
+set ez_response = 90
+set ez_damping = 130
+
+# mixer_profile
+mixer_profile 1
+
+set model_preview_type = 3
+set motorstop_on_low = OFF
+
+# Mixer: motor mixer
+
+mmix reset
+
+mmix 0  1.000 -1.000  1.000 -1.000
+mmix 1  1.000 -1.000 -1.000  1.000
+mmix 2  1.000  1.000  1.000  1.000
+mmix 3  1.000  1.000 -1.000 -1.000
+
+# Mixer: servo mixer
+
+# battery_profile
+battery_profile 1
+
+set failsafe_throttle = 1200
+set nav_mc_hover_thr = 1400
+
+# save configuration
+save
+
+# end the command batch
+batch end
+
+# 
