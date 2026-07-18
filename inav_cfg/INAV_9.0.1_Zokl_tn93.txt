@@ -14,13 +14,10 @@ batch start
 # Timer overrides
 timer_output_mode 2 SERVOS
 timer_output_mode 3 SERVOS
+timer_output_mode 7 SERVOS
 
 # Outputs [servo]
-servo 1 1000 2000 1200 100
-servo 2 1000 2000 1400 100
-servo 3 1000 2000 1600 100
-servo 4 1000 2000 1200 100
-servo 5 1000 2000 2000 100
+servo 5 1000 2000 1600 100
 
 # safehome
 
@@ -31,7 +28,6 @@ servo 5 1000 2000 2000 100
 # geozone vertices
 
 # features
-feature GPS
 feature PWM_OUTPUT_ENABLE
 
 # beeper
@@ -55,11 +51,14 @@ blackbox SERVOS
 # Receiver: Channel map
 
 # Ports
-serial 0 1 115200 115200 0 115200
+serial 0 0 115200 115200 0 115200
 serial 5 2 115200 115200 0 115200
 
 # Modes [aux]
 aux 0 0 0 1725 2100
+aux 1 1 1 1725 2100
+aux 2 12 1 900 1300
+aux 3 37 2 1775 2100
 
 # Adjustments [adjrange]
 
@@ -85,9 +84,10 @@ set looptime = 1000
 set gyro_main_lpf_hz = 25
 set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 30
-set gyro_zero_y = 6
-set gyro_zero_z = 7
-set ins_gravity_cmss =  974.183
+set gyro_zero_x = -1
+set gyro_zero_y = 8
+set gyro_zero_z = 5
+set ins_gravity_cmss =  972.516
 set gyro_adaptive_filter_min_hz = 20
 set acc_hardware = ICM42670
 set acczero_x = 1
@@ -96,6 +96,7 @@ set mag_hardware = NONE
 set baro_hardware = BMP388
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = STANDARD
+set align_board_roll = 20
 set small_angle = 180
 set applied_defaults = 4
 set airmode_type = STICK_CENTER_ONCE
@@ -113,13 +114,13 @@ set nav_fw_launch_climb_angle = 25
 # control_profile
 control_profile 1
 
-set fw_p_pitch = 15
-set fw_i_pitch = 5
-set fw_d_pitch = 5
+set fw_p_pitch = 30
+set fw_i_pitch = 10
+set fw_d_pitch = 10
 set fw_ff_pitch = 70
-set fw_p_roll = 15
-set fw_i_roll = 3
-set fw_d_roll = 7
+set fw_p_roll = 30
+set fw_i_roll = 10
+set fw_d_roll = 15
 set fw_p_yaw = 20
 set fw_i_yaw = 0
 set fw_ff_yaw = 100
@@ -137,7 +138,7 @@ set rc_expo = 30
 set rc_yaw_expo = 30
 set roll_rate = 18
 set pitch_rate = 9
-set yaw_rate = 3
+set yaw_rate = 4
 
 # mixer_profile
 mixer_profile 1
@@ -150,13 +151,15 @@ set model_preview_type = 8
 # Mixer: servo mixer
 smix reset
 
-smix 0 1 0 50 0 -1
-smix 1 1 1 50 0 -1
-smix 2 2 0 -50 0 -1
-smix 3 2 1 50 0 -1
-smix 4 3 15 100 0 -1
-smix 5 4 16 100 0 -1
-smix 6 5 17 100 0 -1
+smix 0 2 24 -40 0 -1
+smix 1 2 23 -25 0 -1
+smix 2 3 24 -25 0 -1
+smix 3 3 23 -40 0 -1
+smix 4 2 26 -65 0 -1
+smix 5 3 26 55 0 -1
+smix 6 2 25 -40 0 -1
+smix 7 3 25 40 0 -1
+smix 8 4 7 100 0 -1
 
 # battery_profile
 battery_profile 1
@@ -168,5 +171,3 @@ save
 
 # end the command batch
 batch end
-
-# 
