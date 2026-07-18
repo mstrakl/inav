@@ -1,9 +1,10 @@
 
+Entering CLI Mode, type 'exit' to return, or 'help'
 
 # diff
 
 # version
-# INAV/JETFURYH743 9.0.1 Jul 14 2026 / 17:32:25 (eee6161a) 
+# INAV/JETFURYH743 9.0.1 Jul 18 2026 / 10:03:46 (0a2adc10) 
 # GCC-13.2.1 20231009
 
 # start the command batch
@@ -14,7 +15,7 @@ batch start
 # Timer overrides
 timer_output_mode 2 SERVOS
 timer_output_mode 3 SERVOS
-timer_output_mode 7 SERVOS
+timer_output_mode 7 MOTORS
 
 # Outputs [servo]
 servo 5 1000 2000 1600 100
@@ -85,10 +86,11 @@ set gyro_main_lpf_hz = 25
 set dynamic_gyro_notch_q = 250
 set dynamic_gyro_notch_min_hz = 30
 set gyro_zero_x = -1
-set gyro_zero_y = 8
+set gyro_zero_y = 6
 set gyro_zero_z = 5
-set ins_gravity_cmss =  972.516
+set ins_gravity_cmss =  969.658
 set gyro_adaptive_filter_min_hz = 20
+set current_adc_channel = 2
 set acc_hardware = ICM42670
 set acczero_x = 1
 set align_mag = CW270FLIP
@@ -97,6 +99,8 @@ set baro_hardware = BMP388
 set blackbox_rate_denom = 2
 set motor_pwm_protocol = STANDARD
 set align_board_roll = 20
+set vbat_scale = 605
+set current_meter_scale = 402
 set small_angle = 180
 set applied_defaults = 4
 set airmode_type = STICK_CENTER_ONCE
@@ -148,18 +152,22 @@ set model_preview_type = 8
 
 # Mixer: motor mixer
 
+mmix reset
+
+mmix 0  1.000  0.000  0.000  0.000
+
 # Mixer: servo mixer
 smix reset
 
-smix 0 2 24 -40 0 -1
-smix 1 2 23 -25 0 -1
-smix 2 3 24 -25 0 -1
-smix 3 3 23 -40 0 -1
-smix 4 2 26 -65 0 -1
-smix 5 3 26 55 0 -1
-smix 6 2 25 -40 0 -1
-smix 7 3 25 40 0 -1
-smix 8 4 7 100 0 -1
+smix 0 1 24 -40 0 -1
+smix 1 1 23 -25 0 -1
+smix 2 2 24 -25 0 -1
+smix 3 2 23 -40 0 -1
+smix 4 1 26 -65 0 -1
+smix 5 2 26 55 0 -1
+smix 6 1 25 -40 0 -1
+smix 7 2 25 40 0 -1
+smix 8 3 16 100 0 -1
 
 # battery_profile
 battery_profile 1
@@ -171,3 +179,5 @@ save
 
 # end the command batch
 batch end
+
+# 

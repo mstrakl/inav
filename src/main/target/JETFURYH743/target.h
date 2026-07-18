@@ -99,14 +99,11 @@
 // *************** ADC *****************************
 #define USE_ADC
 #define ADC_INSTANCE                ADC1
-#define ADC_CHANNEL_1_PIN           PC0
-#define ADC_CHANNEL_2_PIN           PC1
+#define ADC_CHANNEL_1_PIN           PB0
 #define VBAT_ADC_CHANNEL            ADC_CHN_1
-#define CURRENT_METER_ADC_CHANNEL   ADC_CHN_2
-#define VBAT_SCALE_DEFAULT          2121
-#define CURRENT_METER_SCALE         402
+#define VBAT_SCALE_DEFAULT          605
 
-#define DEFAULT_FEATURES        (FEATURE_TELEMETRY)
+#define DEFAULT_FEATURES        (FEATURE_TELEMETRY | FEATURE_VBAT)
 
 #define USE_DSHOT
 #define USE_DSHOT_DMAR

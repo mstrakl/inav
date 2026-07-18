@@ -1,1 +1,1 @@
-target_stm32h743xi(JETFURYH743 HSE_MHZ 25)
+target_stm32h743xi(JETFURYH743)
