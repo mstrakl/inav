@@ -24,14 +24,14 @@
 #include "drivers/pinio.h"
 
 timerHardware_t timerHardware[] = {
-    // DEF_TIM(TIM9, CH2, PA3,  TIM_USE_PPM,      0, 0),
+    DEF_TIM(TIM9, CH2, PA3,  TIM_USE_PPM,            0, 0), // PPM / RX2
 
-    DEF_TIM(TIM5, CH1, PA0,  TIM_USE_MOTOR, 0, 0),
-    DEF_TIM(TIM2, CH3, PB10, TIM_USE_MOTOR, 0, 0),
-    DEF_TIM(TIM4, CH1, PB6,  TIM_USE_MOTOR, 0, 0),
-    DEF_TIM(TIM4, CH2, PB7,  TIM_USE_MOTOR, 0, 0),
+    DEF_TIM(TIM3, CH3, PB0,  TIM_USE_MOTOR,           0, 0), // M1  D(1,7,5)
+    DEF_TIM(TIM3, CH4, PB1,  TIM_USE_MOTOR,           0, 0), // M2  D(1,2,5)
+    DEF_TIM(TIM8, CH4, PC9,  TIM_USE_MOTOR,           0, 0), // M3  D(2,7,7)
+    DEF_TIM(TIM8, CH3, PC8,  TIM_USE_MOTOR,           0, 0), // M4  D(2,2,7)
 
-    DEF_TIM(TIM1, CH1, PA8,  TIM_USE_LED,      0, 0), 
+    DEF_TIM(TIM4, CH1, PB6,  TIM_USE_LED,             0, 0), // LED_STRIP
 };
 
 const int timerHardwareCount = sizeof(timerHardware) / sizeof(timerHardware[0]);

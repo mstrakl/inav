@@ -20,10 +20,9 @@
 #define TARGET_BOARD_IDENTIFIER "IFSD"
 #define USBD_PRODUCT_STRING     "IFLIGHT_SucceX_D"
 
-#define LED0                    PC13
-#define LED1                    PC14
+#define LED0                    PB5
 
-#define BEEPER                  PB2
+#define BEEPER                  PB4
 #define BEEPER_INVERTED
 
 // *************** SPI1 Gyro & ACC **********************
@@ -39,11 +38,6 @@
 #define MPU6000_CS_PIN          PA4
 #define MPU6000_SPI_BUS         BUS_SPI1
 
-#define USE_IMU_ICM42605
-#define IMU_ICM42605_ALIGN      CW180_DEG
-#define ICM42605_SPI_BUS        BUS_SPI1
-#define ICM42605_CS_PIN         PA4
-
 // *************** SPI2 OSD *****************************
 #define USE_SPI_DEVICE_2
 #define SPI2_SCK_PIN            PB13
@@ -56,9 +50,9 @@
 
 // *************** SPI3 FLASH **************************
 #define USE_SPI_DEVICE_3
-#define SPI3_SCK_PIN            PB3
-#define SPI3_MISO_PIN           PB4
-#define SPI3_MOSI_PIN           PB5
+#define SPI3_SCK_PIN            PC10
+#define SPI3_MISO_PIN           PC11
+#define SPI3_MOSI_PIN           PC12
 
 #define M25P16_CS_PIN           PA15
 #define M25P16_SPI_BUS          BUS_SPI3
@@ -69,7 +63,7 @@
 
 // *************** UART *****************************
 #define USE_VCP
-#define VBUS_SENSING_PIN        PC15
+#define VBUS_SENSING_PIN        PC5
 #define VBUS_SENSING_ENABLED
 
 #define USE_UART1
@@ -80,7 +74,19 @@
 #define UART2_TX_PIN            PA2
 #define UART2_RX_PIN            PA3
 
-#define SERIAL_PORT_COUNT       3
+// PC13 is UART2 RX inverter (SBUS signal)
+#define USE_UART_INVERTER
+#define INVERTER_PIN_UART2_RX   PC13
+
+#define USE_UART4
+#define UART4_TX_PIN            PA0
+#define UART4_RX_PIN            PA1
+
+#define USE_UART6
+#define UART6_TX_PIN            PC6
+#define UART6_RX_PIN            PC7
+
+#define SERIAL_PORT_COUNT       5
 
 #define DEFAULT_RX_TYPE         RX_TYPE_SERIAL
 #define SERIALRX_PROVIDER       SERIALRX_SBUS
@@ -88,46 +94,45 @@
 
 // *************** I2C /Baro/Mag/Pitot ********************
 #define USE_I2C
-#define USE_I2C_DEVICE_1
-#define I2C1_SCL                PB8
-#define I2C1_SDA                PB9
+#define USE_I2C_DEVICE_2
+#define I2C2_SCL                PB10
+#define I2C2_SDA                PB11
 
-#define DEFAULT_I2C_BUS         BUS_I2C1
+#define DEFAULT_I2C_BUS         BUS_I2C2
 
 #define USE_BARO
-#define BARO_I2C_BUS            BUS_I2C1
-#define USE_BARO_ALL
+#define BARO_I2C_BUS            BUS_I2C2
+#define USE_BARO_BMP280
+#define BMP280_I2C_ADDR         0x76
 
 #define USE_MAG
-#define MAG_I2C_BUS             BUS_I2C1
+#define MAG_I2C_BUS             BUS_I2C2
 #define USE_MAG_ALL
-
-#define PITOT_I2C_BUS           BUS_I2C1
-#define TEMPERATURE_I2C_BUS     BUS_I2C1
 
 #define USE_RANGEFINDER
 #define USE_RANGEFINDER_MSP
-#define RANGEFINDER_I2C_BUS     BUS_I2C1
+#define RANGEFINDER_I2C_BUS     BUS_I2C2
 
 // *************** ADC *****************************
 #define USE_ADC
 #define ADC_INSTANCE                ADC1
 #define ADC1_DMA_STREAM             DMA2_Stream0
 
-#define ADC_CHANNEL_1_PIN           PB0
-#define ADC_CHANNEL_2_PIN           PB1
+#define ADC_CHANNEL_1_PIN           PC2
+#define ADC_CHANNEL_2_PIN           PC1
 
 #define VBAT_ADC_CHANNEL            ADC_CHN_1
 #define CURRENT_METER_ADC_CHANNEL   ADC_CHN_2
 
 // *************** LED2812 ************************
 #define USE_LED_STRIP
-#define WS2811_PIN                  PA8
+#define WS2811_PIN                  PB6
 
 // ***************  OTHERS *************************
 #define DEFAULT_FEATURES            (FEATURE_TX_PROF_SEL | FEATURE_OSD | FEATURE_CURRENT_METER | FEATURE_VBAT | FEATURE_TELEMETRY | FEATURE_BLACKBOX)
 
 #define USE_DSHOT
+#define USE_DSHOT_DMAR
 #define USE_ESC_SENSOR
 #define USE_SERIAL_4WAY_BLHELI_INTERFACE
 
